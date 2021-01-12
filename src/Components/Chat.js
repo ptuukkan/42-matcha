@@ -1,13 +1,17 @@
 import React from 'react'
-import { Button, Comment, Form, Header } from 'semantic-ui-react'
+import { Comment, Header, Segment, Divider } from 'semantic-ui-react'
 
 const Chat = () => {
 	return (
+		<>
+		<Segment>
+			<Header size='large'>Get more matchas to chat with!</Header>
+		</Segment>
 		<Comment.Group minimal>
 		<Header as='h3' dividing>
-		  Comments
+		  Messages
 		</Header>
-	
+
 		<Comment>
 		  <Comment.Avatar as='a' src='https://react.semantic-ui.com/images/avatar/small/matt.jpg' />
 		  <Comment.Content>
@@ -16,12 +20,11 @@ const Chat = () => {
 			  <span>Today at 5:42PM</span>
 			</Comment.Metadata>
 			<Comment.Text>How artistic!</Comment.Text>
-			<Comment.Actions>
-			  <a>Reply</a>
-			</Comment.Actions>
 		  </Comment.Content>
 		</Comment>
 	
+		<Divider/>
+
 		<Comment>
 		  <Comment.Avatar as='a' src='https://react.semantic-ui.com/images/avatar/small/elliot.jpg' />
 		  <Comment.Content>
@@ -32,12 +35,10 @@ const Chat = () => {
 			<Comment.Text>
 			  <p>This has been very useful for my research. Thanks as well!</p>
 			</Comment.Text>
-			<Comment.Actions>
-			  <a>Reply</a>
-			</Comment.Actions>
 		  </Comment.Content>
 	
-		  <Comment.Group>
+		  <Divider/>
+
 			<Comment>
 			  <Comment.Avatar as='a' src='https://react.semantic-ui.com/images/avatar/small/jenny.jpg' />
 			  <Comment.Content>
@@ -46,14 +47,12 @@ const Chat = () => {
 				  <span>Just now</span>
 				</Comment.Metadata>
 				<Comment.Text>Elliot you are always so right :)</Comment.Text>
-				<Comment.Actions>
-				  <a>Reply</a>
-				</Comment.Actions>
 			  </Comment.Content>
 			</Comment>
-		  </Comment.Group>
 		</Comment>
 	
+		<Divider/>
+
 		<Comment>
 		  <Comment.Avatar as='a' src='https://react.semantic-ui.com/images/avatar/small/joe.jpg' />
 		  <Comment.Content>
@@ -62,17 +61,10 @@ const Chat = () => {
 			  <span>5 days ago</span>
 			</Comment.Metadata>
 			<Comment.Text>Dude, this is awesome. Thanks so much</Comment.Text>
-			<Comment.Actions>
-			  <a>Reply</a>
-			</Comment.Actions>
 		  </Comment.Content>
 		</Comment>
-	
-		<Form reply>
-		  <Form.TextArea />
-		  <Button content='Add Reply' labelPosition='left' icon='edit' primary />
-		</Form>
 	  </Comment.Group>
+		</>
 	)
 }
 

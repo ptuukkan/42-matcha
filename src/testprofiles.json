@@ -1,0 +1,70 @@
+{
+	"profiles":[
+		{
+			"firstName":"John",
+			"lastName":"Doe",
+			"gender":"Male",
+			"sexualPreference":"Hetero",
+			"biography":"Well there I was, in a middele of road called Ring III. The first thing I noticed was how little I had clothes",
+			"interests": ["#vegan", "#geek", "#piercing"],
+			"pictures": ["https://randomuser.me/api/portraits/thumb/men/76.jpg","https://randomuser.me/api/portraits/thumb/men/78.jpg", "https://randomuser.me/api/portraits/thumb/men/66.jpg"]
+		},
+		{
+			"firstName":"Mikko",
+			"lastName":"Mäkinen",
+			"gender":"Male",
+			"sexualPreference":"Gay",
+			"biography":"Well there I was, someone called me a Ring III. The first thing I noticed wat that I was a road",
+			"interests": ["#vegan", "#geek", "#piercing"],
+			"pictures": ["https://randomuser.me/api/portraits/thumb/men/26.jpg","https://randomuser.me/api/portraits/thumb/men/38.jpg", "https://randomuser.me/api/portraits/thumb/men/33.jpg"]
+		},
+		{
+			"firstName":"Tuire",
+			"lastName":"Titta",
+			"gender":"Female",
+			"sexualPreference":"All",
+			"biography":"A small river named Duden flows by their place and supplies it with the necessary regelialia. It is a paradisematic country, in which roasted parts of sentences fly into your mouth.",
+			"interests": ["#vegan", "#geek", "#piercing"],
+			"pictures": ["https://randomuser.me/api/portraits/thumb/men/76.jpg","https://randomuser.me/api/portraits/thumb/men/78.jpg", "https://randomuser.me/api/portraits/thumb/men/66.jpg"]
+		},
+		{
+			"firstName":"Croud",
+			"lastName":"Aero",
+			"gender":"Nonbinary",
+			"sexualPreference":"VHS",
+			"biography":"When she reached the first hills of the Italic Mountains, she had a last view back on the skyline of her hometown Bookmarksgrove, the headline of Alphabet Village and the subline of her own road, the Line Lane.",
+			"interests": ["#vegan", "#geek", "#piercing"],
+			"pictures": ["https://randomuser.me/api/portraits/thumb/men/76.jpg","https://randomuser.me/api/portraits/thumb/men/78.jpg", "https://randomuser.me/api/portraits/thumb/men/66.jpg"]
+		},
+		{
+			"firstName":"Heath",
+			"lastName":"Dumbeldore",
+			"gender":"Male",
+			"sexualPreference":"All",
+			"biography":"Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts. ",
+			"interests": ["#vegan", "#geek", "#piercing"],
+			"pictures": ["https://randomuser.me/api/portraits/thumb/men/72.jpg","https://randomuser.me/api/portraits/thumb/men/18.jpg", "https://randomuser.me/api/portraits/thumb/men/16.jpg"]
+		},
+		{
+			"firstName":"Frank",
+			"lastName":"Desibel",
+			"gender":"trans",
+			"sexualPreference":"Hetero",
+			"biography":" Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean",
+			"interests": ["#vegan", "#geek", "#piercing"],
+			"pictures": ["https://randomuser.me/api/portraits/thumb/men/74.jpg","https://randomuser.me/api/portraits/thumb/men/28.jpg", "https://randomuser.me/api/portraits/thumb/men/62.jpg"]
+		},
+		{
+			"firstName":"James",
+			"lastName":"Heffi",
+			"gender":"Male",
+			"sexualPreference":"Hetero",
+			"biography":"Taste me you will see More is all you need You're dedicated to How I'm killing you",
+			"interests": ["#vegan", "#geek", "#piercing"],
+			"pictures": ["https://randomuser.me/api/portraits/thumb/men/12.jpg","https://randomuser.me/api/portraits/thumb/men/38.jpg", "https://randomuser.me/api/portraits/thumb/men/55.jpg"]
+		}
+	]
+}
+
+
+

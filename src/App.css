@@ -1,3 +1,9 @@
 .main_container{
   padding-top: 75px;
 }
+
+.notificationBall {
+  position: absolute;
+  left: 30px;
+  top: 1px;
+}
