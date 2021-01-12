@@ -1,25 +1,22 @@
-import logo from './logo.svg';
-import './App.css';
+import React, {useState} from 'react'
+import '../src/App.css'
+import { Container } from 'semantic-ui-react'
+import Navigation from './Components/Navigaton';
+import Profile from './Components/Profile'
+import Footer from './Components/Footer'
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+
+const App = () => {
+  const [profile, setProfile] = useState('Profiles')
+
+    return(
+        <Container className='main_container'>
+          <Navigation/>
+          <Profile setProfile={setProfile}/>
+          <Footer/>
+        </Container>
+    )
 }
+
 
 export default App;

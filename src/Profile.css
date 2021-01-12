@@ -1,0 +1,12 @@
+.profileinfo {
+	position: -webkit-sticky;
+	position: sticky;
+	padding-left: 4vw;
+	padding-right: 4vw;
+	padding-bottom: 2vh;
+	padding-top: 2vh;
+	bottom: 0vh;
+	z-index: 1;
+	background-color: rgba(255, 255, 255, 0.521);
+	background-blend-mode: lighten;
+  }
