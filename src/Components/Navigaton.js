@@ -6,7 +6,7 @@ import '../App.css'
 const Navigation = () => {
 
 	return(
-		<Menu fixed='top' icon='labeled' size='mini' borderless>
+		<Menu fixed='top' icon='labeled' size='mini' borderless className='navi'>
 			<Link to='/profile'>
 				<Menu.Item name='heart'>
 					<Icon name='heart' color='red'/>

@@ -3,7 +3,10 @@ import '../Profile.css'
 import { Header, Image, Card, Icon, Button } from 'semantic-ui-react'
 
 const Profile = ({getProfile, user}) => {
-	console.log(user)
+	const birth = new Date(user.birthday).getFullYear()
+	const nyt = new Date().getFullYear()
+
+
 	return(
 		<div>
 			<Card fluid>
@@ -12,10 +15,11 @@ const Profile = ({getProfile, user}) => {
 				<Image src={user.pictures[2]} wrapped ui={false} />
 				<div className="profileinfo">
 
-					<Header as='h1'>{user.firstName} {user.lastName}</Header>
+					<Header as='h1'>{user.firstname} {user.lastname}</Header>
 					<Icon name='mars'/>
 					<Card.Meta>Joined in 2016</Card.Meta>
-
+					Age: {nyt - birth}
+					
 					<Card.Description>
 						{user.biography}
 					</Card.Description>

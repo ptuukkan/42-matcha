@@ -7,7 +7,7 @@ import Settings from './Components/Settings'
 import Browse from './Components/Browse'
 import Chat from './Components/Chat'
 import Footer from './Components/Footer'
-import Profiles from './testprofiles.json'
+import Profiles from './testProfiles1.json'
 import {
   BrowserRouter as Router,
   Switch,
@@ -39,7 +39,8 @@ const App = () => {
               <Profile getProfile={getRandomUser} user={profile}/>
             </Route>
             <Route exact path='/browse'>
-              <Browse user={Profiles.profiles}/>
+              {/**Profiles.profiles.map(user => <Browse key={user.address.latitude - Date.now()} users={user}/>)**/}
+              <Browse users={Profiles.profiles}/>
             </Route>
           </Switch>
           </Router>
