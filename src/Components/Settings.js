@@ -1,5 +1,5 @@
-import React, {useEffect, useState} from 'react'
-import { Button, Header, Segment, Item, Divider, Form, Input, Dropdown, Label, Image } from 'semantic-ui-react'
+import React, {useState} from 'react'
+import { Button, Header, Segment, Item, Divider, Form, Label, Image } from 'semantic-ui-react'
 
 
 const Settings = () => {

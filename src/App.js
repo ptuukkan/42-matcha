@@ -3,6 +3,7 @@ import '../src/App.css'
 import { Container } from 'semantic-ui-react'
 import Navigation from './Components/Navigaton';
 import Profile from './Components/Profile'
+import Register from './Components/Register'
 import Settings from './Components/Settings'
 import Browse from './Components/Browse'
 import Chat from './Components/Chat'
@@ -41,6 +42,9 @@ const App = () => {
             <Route exact path='/browse'>
               {/**Profiles.profiles.map(user => <Browse key={user.address.latitude - Date.now()} users={user}/>)**/}
               <Browse users={Profiles.profiles}/>
+            </Route>
+            <Route exact path='/register'>
+              <Register/>
             </Route>
           </Switch>
           </Router>
