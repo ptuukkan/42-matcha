@@ -4,6 +4,7 @@ import { Container } from 'semantic-ui-react'
 import Navigation from './Components/Navigaton';
 import Profile from './Components/Profile'
 import Register from './Components/Register'
+import Login from './Components/Login'
 import Settings from './Components/Settings'
 import Browse from './Components/Browse'
 import Chat from './Components/Chat'
@@ -45,6 +46,9 @@ const App = () => {
             </Route>
             <Route exact path='/register'>
               <Register/>
+            </Route>
+            <Route exact path='/login'>
+              <Login/>
             </Route>
           </Switch>
           </Router>
