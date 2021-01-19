@@ -14,30 +14,36 @@ const Login = () => {
 
 	return (
 		<div>
-			<Header as='h1'>Login to Matcha</Header>
+			<Header as="h1">Login to Matcha</Header>
 			<Form onSubmit={handleSubmit(onSubmit)}>
-				{errors.email && <Message negative>{errors.email.message}</Message>}
-				{errors.password && <Message negative>{errors.password.message}</Message>}
+				{errors.email && (
+					<Message negative>{errors.email.message}</Message>
+				)}
+				{errors.password && (
+					<Message negative>{errors.password.message}</Message>
+				)}
 				<Form.Group widths={2}>
 					<Form.Field>
 						<label>email</label>
-						<input 
-							type='text'
-							name='email'
-							placeholder='email'
+						<input
+							type="text"
+							name="email"
+							placeholder="email"
 							ref={register({
-								required: 'Email is required'
-							})}/>
+								required: 'Email is required',
+							})}
+						/>
 					</Form.Field>
 					<Form.Field>
 						<label>password</label>
 						<input
-						type="password"
-						name="password"
-						placeholder='password'
-						ref={register({
-							required: 'Password is required'
-							})} />
+							type="password"
+							name="password"
+							placeholder="password"
+							ref={register({
+								required: 'Password is required',
+							})}
+						/>
 					</Form.Field>
 				</Form.Group>
 				<Button type="submit">Login</Button>
