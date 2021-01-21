@@ -1,5 +1,5 @@
 import React, {useState} from 'react'
-import '../src/App.css'
+import './App.css'
 import { Container } from 'semantic-ui-react'
 import Navigation from './Components/Navigaton';
 import Profile from './Components/Profile'
