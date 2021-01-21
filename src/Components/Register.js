@@ -30,7 +30,7 @@ const Register = () => {
 				<Image
 					circular
 					centered
-					src="https://randomuser.me/api/portraits/men/41.jpg"
+					src="addphoto.png"
 				></Image>
 
 				{errors.firstname && (

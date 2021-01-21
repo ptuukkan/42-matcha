@@ -7,6 +7,7 @@ import Register from './Components/Register'
 import Login from './Components/Login'
 import Settings from './Components/Settings'
 import Browse from './Components/Browse'
+import Matches from './Components/Matches'
 import Chat from './Components/Chat'
 import Footer from './Components/Footer'
 import Profiles from './testProfiles1.json'
@@ -40,8 +41,10 @@ const App = () => {
             <Route exact path='/profile'>
               <Profile getProfile={getRandomUser} user={profile}/>
             </Route>
+            <Route exact path='/matches'>
+              <Matches users={Profiles.profiles}/>
+            </Route>
             <Route exact path='/browse'>
-              {/**Profiles.profiles.map(user => <Browse key={user.address.latitude - Date.now()} users={user}/>)**/}
               <Browse users={Profiles.profiles}/>
             </Route>
             <Route exact path='/register'>

@@ -1,22 +1,21 @@
 import React from 'react'
-import { Container, Card, Image, Header } from 'semantic-ui-react'
+import { Container, Card, Image, Header, Label } from 'semantic-ui-react'
 
-const Browse = ({ users }) => {
+const Matches = ({ users }) => {
 	return (
 		<Container>
-			<Card.Group itemsPerRow={3}>
+			<Card.Group itemsPerRow={1}>
 				{users.map((user) => (
 					<Card key={user.address.latitude - Date.now()}>
+						<Label color={user.address.buildingNumber < "40" ? 'red' : 'green' } floating>
+							{user.address.buildingNumber < "40" ? 'Offline' : 'Online' }
+						</Label>
 						<Image src={user.pictures[0]} wrapped ui={false} />
 						<Header as="h5">
 							{user.firstname} {user.lastname}
 						</Header>
 						<Card.Content>
 							Distance: {Math.floor(Math.random() * 80)} km
-							<Card.Meta>
-								Likes:{' '}
-								{Math.abs(Math.floor(user.address.latitude))}
-							</Card.Meta>
 						</Card.Content>
 					</Card>
 				))}
@@ -25,4 +24,4 @@ const Browse = ({ users }) => {
 	)
 }
 
-export default Browse
+export default Matches

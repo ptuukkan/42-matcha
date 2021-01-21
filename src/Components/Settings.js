@@ -124,8 +124,10 @@ const Settings = () => {
 						<option value="Asexual"></option>
 					</datalist>
 				</Form.Group>
-				Location
+				<Header as='h4'>Location</Header>
+				<label>Search radius</label>
 				<Form.Group>
+					<br></br>
 					<input
 						type="range"
 						min={1}
