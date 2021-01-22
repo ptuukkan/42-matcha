@@ -58,7 +58,7 @@ const Profile: React.FC<IProps> = ({ getProfile, user }) => {
 					<Header as="h1">
 						{user.firstName} {user.lastName}
 					</Header>
-					<Icon name={user.gender === Gender.Male ? 'mars' : 'venus'} />
+					<Icon name={user.gender === 'male' ? 'mars' : 'venus'} />
 					<Card.Meta>
 						Distance:{' '}
 						{getDistance(

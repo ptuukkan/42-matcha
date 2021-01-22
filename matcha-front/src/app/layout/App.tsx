@@ -37,10 +37,10 @@ const App = () => {
 						<Profile getProfile={getRandomUser} user={profile} />
 					</Route>
 					<Route exact path="/matches">
-{/* 						<Matches users={Profiles.profiles} /> */}
+						<Matches users={Profiles.profiles} />
 					</Route>
 					<Route exact path="/browse">
-{/* 						<Browse users={Profiles.profiles} /> */}
+						<Browse users={Profiles.profiles} />
 					</Route>
 					<Route exact path="/register">
 						<Register />

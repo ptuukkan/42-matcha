@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 import { Container, Card, Image, Header } from 'semantic-ui-react'
 import { IUser } from '../../app/models/user'
 
@@ -11,7 +12,7 @@ const Browse: React.FC<IProps> = ({ users }) => {
 		<Container>
 			<Card.Group itemsPerRow={3}>
 				{users.map((user) => (
-					<Card key={user.location.latitude - Date.now()}>
+					<Card key={user.location.latitude - Date.now()} as={Link} to={'/profile'}>
 						<Image src={`https://robohash.org/${user.firstName}`} wrapped ui={false} />
 						<Header as="h5">
 							{user.firstName} {user.lastName}

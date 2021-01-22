@@ -12,10 +12,10 @@ const Matches: React.FC<IProps> = ({ users }) => {
 			<Card.Group itemsPerRow={1}>
 				{users.map((user) => (
 					<Card key={user.location.latitude - Date.now()}>
-						<Label color={Math.random() * 100 < 40 ? 'red' : 'green' } floating>
-							{Math.random() * 100 < 40 ? 'Offline' : 'Online' }
+						<Label color={Math.abs(Math.floor(user.location.latitude)) < 40 ? 'red' : 'green' } floating>
+							{Math.abs(Math.floor(user.location.latitude)) < 40 ? 'Offline' : 'Online' }
 						</Label>
-						<Image src={user.pictures[0]} wrapped ui={false} />
+						<Image src={`https://robohash.org/${user.firstName}`} wrapped ui={false} />
 						<Header as="h5">
 							{user.firstName} {user.lastName}
 						</Header>

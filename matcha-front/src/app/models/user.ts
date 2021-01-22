@@ -2,13 +2,17 @@ export interface IUser {
 	firstName: string;
 	lastName: string;
 	emailAddress: string;
-	birthday: Date;
-	sexualPreference: SexualPreference;
-	gender: Gender;
-	biography: string;
+	birthday: string;
+	/* birthday: Date; */
+	sexualPreference: string;
+	gender: string;
+	/* gender: Gender; */
+	/* sexualPreference: SexualPreference; */
 	fameRating: number;
+	biography: string;
 	location: ILocation;
 	interests: string[];
+/* 	pictures: string[]; */
 	pictures: IPicture[];
 }
 
