@@ -7,7 +7,7 @@ const Browse = ({ users }) => {
 			<Card.Group itemsPerRow={3}>
 				{users.map((user) => (
 					<Card key={user.address.latitude - Date.now()}>
-						<Image src={user.pictures[0]} wrapped ui={false} />
+						<Image src={`https://robohash.org/${user.firstname}`} wrapped ui={false} />
 						<Header as="h5">
 							{user.firstname} {user.lastname}
 						</Header>

@@ -11,16 +11,6 @@ struct Jwt {
 	token: String
 }
 
-#[derive(Serialize)]
-struct CursorRequest {
-	query: String
-}
-
-#[derive(Deserialize)]
-struct CursorResponse {
-
-}
-
 pub async fn get_arango_jwt() -> Result<String, Error> {
 	let jwt: String;
 

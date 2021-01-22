@@ -43,9 +43,9 @@ const Profile = ({ getProfile, user }) => {
 	return (
 		<div>
 			<Card fluid>
-				<Image src={user.pictures[0]} wrapped ui={false} />
-				<Image src={user.pictures[1]} wrapped ui={false} />
-				<Image src={user.pictures[2]} wrapped ui={false} />
+				<Image src={`https://robohash.org/${user.firstname}1`} wrapped ui={false} />
+				<Image src={`https://robohash.org/${user.firstname}2`} wrapped ui={false} />
+				<Image src={`https://robohash.org/${user.firstname}3`} wrapped ui={false} />
 				<div className="profileinfo">
 					<Header as="h1">
 						{user.firstname} {user.lastname}

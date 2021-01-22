@@ -1,0 +1,14 @@
+.main_container{
+	padding-top: 90px;
+  }
+  
+  .notificationBall {
+	position: absolute;
+	left: 30px;
+	top: 1px;
+  }
+  
+  .navi{
+	padding-top: 1.2vh;
+	padding-bottom: 1.2vh;
+  }

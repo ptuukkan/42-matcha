@@ -32,7 +32,7 @@ const Settings = () => {
 
 	useEffect(() => {
 		reset({
-			firstname: 'firstnameFromDatabase',
+			firstame: 'firstnameFromDatabase',
 			lastname: 'lastnameFromDatabase',
 			gender: 'Male',
 			sexpreference: 'Heterosexual',
@@ -47,13 +47,13 @@ const Settings = () => {
 		})
 	} */
 
-	const handleMultiChange = (e, selectedOption) => {
+	const handleMultiChange = (selectedOption: any) => {
 		let selectedIterest = selectedOption.value
 		setValue('selectInterest', selectedOption.value)
 		setInterestSelect({ selectedIterest })
 	}
 
-	const handleAddition = (e, newOption) => {
+	const handleAddition = (newOption: any) => {
 		interests.push({
 			key: newOption.value,
 			text: newOption.value,
@@ -62,16 +62,16 @@ const Settings = () => {
 		setInterest(interests)
 	}
 
-	const handleRadius = (e) => {
+	const handleRadius = (e: React.ChangeEvent<HTMLInputElement>) => {
 		e.preventDefault()
-		setRadius(e.target.value)
+		setRadius(Number(e.target.value))
 	}
 
 	useEffect(() => {
 		register({ name: 'selectInterest' })
 	}, [register])
 
-	const onSubmit = (data) => console.log(data)
+	const onSubmit = (data: any) => console.log(data)
 
 	return (
 		<div>
