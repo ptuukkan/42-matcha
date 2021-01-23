@@ -12,6 +12,7 @@ import Matches from '../../features/matches/Matches'
 import Footer from '../../features/nav/Footer'
 import Login from '../../features/user/Login'
 import Register from '../../features/user/Register'
+import Landing from '../../features/home/Landing'
 
 const App = () => {
 	const [profile, setProfile] = useState(Profiles.profiles[0])
@@ -27,12 +28,8 @@ const App = () => {
 			<Router>
 				<Navigation />
 				<Switch>
-					<Route exact path="/chat">
-						<Chat />
-					</Route>
-					<Route exact path="/settings">
- 						<Settings/>
-					</Route>
+					<Route exact path="/chat" component={Chat} />
+					<Route exact path="/settings" component={Settings} />
 					<Route exact path="/profile">
 						<Profile getProfile={getRandomUser} user={profile} />
 					</Route>
@@ -42,12 +39,9 @@ const App = () => {
 					<Route exact path="/browse">
 						<Browse users={Profiles.profiles} />
 					</Route>
-					<Route exact path="/register">
-						<Register />
-					</Route>
-					<Route exact path="/login">
-						<Login />
-					</Route>
+					<Route exact path="/register" component={Register} />
+					<Route exact path="/login" component={Login} />
+					<Route exact path="/" component={Landing} />
 				</Switch>
 			</Router>
 			<Footer />

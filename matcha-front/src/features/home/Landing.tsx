@@ -1,10 +1,10 @@
 import React from 'react'
 import { Header } from 'semantic-ui-react'
 
-const Main = () => {
+const Landing = () => {
 	return (
-		<div>
-			<Header>Welcome to matcha</Header>
-		</div>
+		<Header>Welcome to matcha</Header>
 	)
 }
+
+export default Landing
