@@ -1,10 +1,22 @@
-import React from 'react'
-import { Header } from 'semantic-ui-react'
+import React, { Fragment } from 'react';
+import { Button, Header, Menu } from 'semantic-ui-react';
 
 const Landing = () => {
 	return (
-		<Header>Welcome to matcha</Header>
-	)
-}
+		<Fragment>
+			<Menu fixed="top" icon="labeled" size="mini" borderless className="navi">
+					<Menu.Item header style={{fontSize: 32, padding: 0}}>Matcha</Menu.Item>
+					<Menu.Item position="right">
+						<Button size="tiny" secondary content="Login" />
+					</Menu.Item>
+					<Menu.Item>
+						<Button size='huge' secondary content="Register" />
+					</Menu.Item>
 
-export default Landing
+			</Menu>
+			<Header>Welcome to matcha</Header>
+		</Fragment>
+	);
+};
+
+export default Landing;
