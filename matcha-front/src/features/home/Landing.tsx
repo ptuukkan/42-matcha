@@ -1,17 +1,12 @@
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useContext, useState } from 'react';
 import { Button, Header, Menu } from 'semantic-ui-react';
+import { RootStoreContext } from '../../app/stores/rootStore';
+import Login from '../user/Login';
 import Register from '../user/Register';
 
 const Landing = () => {
-	const [registerOpen, setRegisterOpen] = useState(false);
-
-	const closeRegisterModal = () => {
-		setRegisterOpen(false);
-	};
-
-	const openRegisterModal = () => {
-		setRegisterOpen(true);
-	};
+	const rootStore = useContext(RootStoreContext);
+	const { openRegisterModal, openLoginModal } = rootStore.modalStore;
 
 	return (
 		<Fragment>
@@ -20,7 +15,12 @@ const Landing = () => {
 					Matcha
 				</Menu.Item>
 				<Menu.Item position="right">
-					<Button size="tiny" secondary content="Login" />
+					<Button
+						size="huge"
+						secondary
+						content="Login"
+						onClick={openLoginModal}
+					/>
 				</Menu.Item>
 				<Menu.Item>
 					<Button
@@ -32,7 +32,8 @@ const Landing = () => {
 				</Menu.Item>
 			</Menu>
 			<Header>Welcome to matcha</Header>
-			<Register open={registerOpen} closeRegisterModal={closeRegisterModal} />
+			<Register />
+			<Login />
 		</Fragment>
 	);
 };

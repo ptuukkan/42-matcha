@@ -37,3 +37,12 @@ export enum Gender {
 	Male,
 	Female,
 }
+
+export interface IRegisterFormValues {
+	emailAddress: string,
+	userName: string,
+	firstName: string,
+	lastName: string,
+	password: string,
+	confirmPassword: string
+}

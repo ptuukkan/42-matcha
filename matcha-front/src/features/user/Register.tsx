@@ -1,16 +1,16 @@
-import React from 'react';
-import { Form, Message, Button, Image, Header, Modal } from 'semantic-ui-react';
+import React, { useContext } from 'react';
+import { Form, Message, Button, Image, Modal } from 'semantic-ui-react';
 import { useForm } from 'react-hook-form';
+import { RootStoreContext } from '../../app/stores/rootStore';
+import { observer } from 'mobx-react-lite';
+import { IRegisterFormValues } from '../../app/models/user';
 
-interface IProps {
-	open: boolean;
-	closeRegisterModal: () => void;
-}
-
-const Register: React.FC<IProps> = ({ open, closeRegisterModal }) => {
+const Register = () => {
+	const rootStore = useContext(RootStoreContext);
+	const { registerOpen, closeRegisterModal } = rootStore.modalStore;
 	const { register, handleSubmit, errors, formState } = useForm();
 
-	const onSubmit = (data: any) => {
+	const onSubmit = (data: IRegisterFormValues) => {
 		console.log(data);
 		if (formState.isSubmitted) {
 			console.log('Redirect to success page');
@@ -29,7 +29,7 @@ const Register: React.FC<IProps> = ({ open, closeRegisterModal }) => {
 	};
 
 	return (
-		<Modal open={open} onClose={closeRegisterModal}>
+		<Modal open={registerOpen} onClose={closeRegisterModal}>
 			<Modal.Header>Register</Modal.Header>
 			<Modal.Content>
 				<Form onSubmit={handleSubmit(onSubmit)}>
@@ -126,4 +126,4 @@ const Register: React.FC<IProps> = ({ open, closeRegisterModal }) => {
 	);
 };
 
-export default Register;
+export default observer(Register);
