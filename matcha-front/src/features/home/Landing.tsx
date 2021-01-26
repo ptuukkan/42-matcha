@@ -1,4 +1,4 @@
-import React, { Fragment, useContext, useState } from 'react';
+import React, { Fragment, useContext } from 'react';
 import { Button, Header, Menu } from 'semantic-ui-react';
 import { RootStoreContext } from '../../app/stores/rootStore';
 import Login from '../user/Login';

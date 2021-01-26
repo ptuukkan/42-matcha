@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { Form, Message, Button, Header, Modal } from 'semantic-ui-react';
+import { Form, Message, Button, Modal } from 'semantic-ui-react';
 import { useForm } from 'react-hook-form';
 import { RootStoreContext } from '../../app/stores/rootStore';
 import { observer } from 'mobx-react-lite';

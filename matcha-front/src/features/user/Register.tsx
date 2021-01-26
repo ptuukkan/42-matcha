@@ -15,14 +15,12 @@ const Register = () => {
 		setSecondClose,
 		registerUser,
 	} = rootStore.userStore;
-	const { register, handleSubmit, errors, formState } = useForm();
+	const { register, handleSubmit, errors } = useForm();
 
 	const onSubmit = (data: IRegisterFormValues) => {
 		console.log(data);
-		if (formState.isSubmitted) {
-			registerUser(data);
-			setSecondOpen();
-		}
+		registerUser(data);
+		setSecondOpen();
 	};
 
 	const validatePassword = (value: string) => {
