@@ -1,9 +1,9 @@
-import { configure } from "mobx";
-import { createContext } from "react";
-import ModalStore from "./modalStore";
-import UserStore from "./userStore";
+import { configure } from 'mobx';
+import { createContext } from 'react';
+import ModalStore from './modalStore';
+import UserStore from './userStore';
 
-configure ({enforceActions: 'always'});
+configure({ enforceActions: 'always' });
 
 export class RootStore {
 	modalStore: ModalStore;
@@ -16,4 +16,3 @@ export class RootStore {
 }
 
 export const RootStoreContext = createContext(new RootStore());
-
