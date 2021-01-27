@@ -1,5 +1,5 @@
 import { action, makeObservable, observable } from "mobx";
-import { IRegisterFormValues } from "../models/user";
+import { ILoginFormValues, IRegisterFormValues } from "../models/user";
 import { RootStore } from "./rootStore";
 
 export default class UserStore {
@@ -11,6 +11,7 @@ export default class UserStore {
 		makeObservable(this, {
 			secondOpen: observable,
 			registerUser: action,
+			loginUser: action,
 			setSecondOpen: action,
 			setSecondClose: action
 		});
@@ -19,6 +20,11 @@ export default class UserStore {
 	registerUser = (data: IRegisterFormValues) => {
 		console.log(data);
 
+	}
+
+	loginUser = (data: ILoginFormValues) => {
+		console.log(data)
+		
 	}
 
 	setSecondOpen = () => {

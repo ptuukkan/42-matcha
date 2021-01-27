@@ -11,16 +11,13 @@ const Register = () => {
 	const { registerOpen, closeRegisterModal } = rootStore.modalStore;
 	const {
 		secondOpen,
-		setSecondOpen,
 		setSecondClose,
 		registerUser,
 	} = rootStore.userStore;
 	const { register, handleSubmit, errors } = useForm();
 
 	const onSubmit = (data: IRegisterFormValues) => {
-		console.log(data);
 		registerUser(data);
-		setSecondOpen();
 	};
 
 	const validatePassword = (value: string) => {

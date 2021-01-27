@@ -3,17 +3,16 @@ import { Form, Message, Button, Modal } from 'semantic-ui-react';
 import { useForm } from 'react-hook-form';
 import { RootStoreContext } from '../../app/stores/rootStore';
 import { observer } from 'mobx-react-lite';
+import { ILoginFormValues } from '../../app/models/user';
 
 const Login = () => {
 	const rootStore = useContext(RootStoreContext);
 	const { loginOpen, closeLoginModal } = rootStore.modalStore;
-	const { register, handleSubmit, errors, formState } = useForm();
+	const { loginUser } = rootStore.userStore;
+	const { register, handleSubmit, errors } = useForm();
 
-	const onSubmit = (data: any) => {
-		console.log(data);
-		if (formState.isSubmitted) {
-			console.log('Redirect to success page');
-		}
+	const onSubmit = (data: ILoginFormValues) => {
+		loginUser(data);
 	};
 
 	return (
@@ -27,13 +26,13 @@ const Login = () => {
 					)}
 					<Form.Group widths={2}>
 						<Form.Field>
-							<label>email</label>
+							<label>username</label>
 							<input
 								type="text"
-								name="email"
-								placeholder="email"
+								name="username"
+								placeholder="username"
 								ref={register({
-									required: 'Email is required',
+									required: 'Username is required',
 								})}
 							/>
 						</Form.Field>
