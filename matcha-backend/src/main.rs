@@ -22,7 +22,13 @@ async fn seed() -> impl Responder {
     HttpResponse::Ok().body("Success")
 }
 
-#[post("/register")]
+#[post("/user/login")]
+async fn login(values: Json<models::user::LoginFormValues>) -> Result<HttpResponse, Error> {
+    application::user::login::login(values.into_inner()).await?;
+    Ok(HttpResponse::Ok().finish())
+}
+
+#[post("/user/register")]
 async fn register(values: Json<models::user::RegisterFormValues>) -> Result<HttpResponse, Error> {
     application::user::register::register(values.into_inner()).await?;
     Ok(HttpResponse::Created().finish())
@@ -38,6 +44,7 @@ async fn main() -> std::io::Result<()> {
             .service(hello)
             .service(seed)
             .service(register)
+            .service(login)
     })
     .bind("127.0.0.1:8080")?
     .run()

@@ -1,9 +1,8 @@
 
-use std::convert::TryFrom;
 use crate::database::api;
 use serde::{Deserialize, Serialize};
 use std::env;
-use crate::errors::{AppError, AppErrorType};
+use crate::errors::{AppError};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct User {
@@ -32,6 +31,13 @@ pub struct RegisterFormValues {
 	email_address: String,
 	user_name: String,
 	password: String
+}
+
+#[derive(Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct LoginFormValues {
+	pub email_address: String,
+	pub password: String
 }
 
 impl User {
