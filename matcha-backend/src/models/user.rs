@@ -1,9 +1,8 @@
 
-use std::convert::TryFrom;
 use crate::database::api;
 use serde::{Deserialize, Serialize};
 use std::env;
-use crate::errors::{AppError, AppErrorType};
+use crate::errors::{AppError};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct User {
@@ -13,6 +12,7 @@ pub struct User {
 	first_name: String,
 	last_name: String,
 	pub email_address: String,
+	pub user_name: String,
 	password: String
 }
 
@@ -24,22 +24,32 @@ struct CreateUserResponse {
 }
 
 #[derive(Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
 pub struct RegisterFormValues {
 	first_name: String,
 	last_name: String,
 	email_address: String,
+	user_name: String,
 	password: String
+}
+
+#[derive(Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct LoginFormValues {
+	pub email_address: String,
+	pub password: String
 }
 
 impl User {
 	pub fn new(first_name: &str, last_name: &str,
-				email_address: &str, password: &str)
+				email_address: &str, password: &str, user_name: &str)
 				-> User {
 		User {
 			key: String::new(),
 			first_name: String::from(first_name),
 			last_name: String::from(last_name),
 			email_address: String::from(email_address),
+			user_name: String::from(user_name),
 			password: String::from(password)
 		}
 	}
@@ -66,11 +76,10 @@ impl User {
 	// 	true
 	// }
 
-	pub async fn create(&mut self) {
-		let res = api::post::<User, CreateUserResponse>(&User::url(), &self)
-			.await
-			.expect("Failed");
-		self.key = res._key;
+	pub async fn create(&self) -> Result<(), AppError> {
+		api::post::<User, CreateUserResponse>(&User::url(), &self)
+			.await?;
+		Ok(())
 	}
 
 	// pub async fn delete(&self) {
@@ -83,15 +92,28 @@ impl User {
 
 }
 
-impl TryFrom<RegisterFormValues> for User {
-	type Error = AppError;
+// impl TryFrom<RegisterFormValues> for User {
+// 	type Error = AppError;
 
-	fn try_from(values: RegisterFormValues) -> Result<Self, Self::Error> {
-		if values.first_name == "rikki" {
-			return Err(AppError {
-				error: AppErrorType::ValidationError("invalid field".to_owned())
-			})
+// 	fn try_from(values: RegisterFormValues) -> Result<Self, Self::Error> {
+// 		if values.first_name == "rikki" {
+// 			return Err(AppError {
+// 				error: AppErrorType::ValidationError("invalid field".to_owned())
+// 			})
+// 		}
+// 		Ok(User::new(&values.first_name, &values.last_name, &values.email_address, &values.password))
+// 	}
+// }
+
+impl From<RegisterFormValues> for User {
+	fn from(values: RegisterFormValues) -> Self {
+		Self {
+			key: "".to_owned(),
+			email_address: values.email_address,
+			user_name: values.user_name,
+			first_name: values.first_name,
+			last_name: values.last_name,
+			password: values.password
 		}
-		Ok(User::new(&values.first_name, &values.last_name, &values.email_address, &values.password))
 	}
 }

@@ -4,22 +4,34 @@ use actix_web::{
 	http::header, http::StatusCode,
 	HttpResponse, ResponseError,
 	client::SendRequestError,
-	error::PayloadError
+	error::PayloadError,
+	Error
 };
 use serde::Serialize;
 use std::fmt;
 use crate::database::cursor::CursorResponse;
 use derive_more::{Display};
+use std::str::FromStr;
 
 #[derive(Serialize, Debug, Display)]
 pub enum AppErrorType {
-	ValidationError(String),
+	#[display(fmt = "validation error")]
+	ValidationError(Vec<FieldError>),
 
 	#[display(fmt = "cursor error")]
 	CursorError(CursorError),
 
 	#[display(fmt = "internal error: {}", error)]
-	InternalError { error: String }
+	InternalError { error: String },
+
+	#[display(fmt = " bad request: {}", error)]
+	BadRequest { error: String }
+}
+
+#[derive(Serialize, Debug)]
+pub struct FieldError {
+	field: String,
+    reason: String
 }
 
 #[derive(Serialize, Debug)]
@@ -71,7 +83,8 @@ impl ResponseError for AppError {
 		match &self.error {
 			AppErrorType::ValidationError(_) => StatusCode::BAD_REQUEST,
 			AppErrorType::CursorError(_) => StatusCode::INTERNAL_SERVER_ERROR,
-			AppErrorType::InternalError { error: _ } => StatusCode::INTERNAL_SERVER_ERROR
+			AppErrorType::InternalError { error: _ } => StatusCode::INTERNAL_SERVER_ERROR,
+			AppErrorType::BadRequest { error: _ } => StatusCode::BAD_REQUEST
 		}
 	}
 
@@ -92,8 +105,30 @@ impl ResponseError for AppError {
 	}
 }
 
+impl FromStr for FieldError {
+	type Err = AppError;
+
+	fn from_str(s: &str) -> Result<Self, Self::Err> {
+		let parts: Vec<&str> = s.split(':').collect();
+		Ok(Self {
+			field: parts[0].to_owned(),
+			reason: parts[1].to_owned()
+		})
+	}
+}
+
 impl From<SendRequestError> for AppError {
 	fn from(from_error: SendRequestError) -> Self {
+		Self {
+			error: AppErrorType::InternalError {
+				error: from_error.to_string()
+			}
+		}
+	}
+}
+
+impl From<Error> for AppError {
+	fn from(from_error: Error) -> Self {
 		Self {
 			error: AppErrorType::InternalError {
 				error: from_error.to_string()
