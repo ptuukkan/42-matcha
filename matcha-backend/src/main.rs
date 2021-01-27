@@ -25,7 +25,7 @@ async fn seed() -> impl Responder {
 #[post("/register")]
 async fn register(values: Json<models::user::RegisterFormValues>) -> Result<HttpResponse, Error> {
     application::user::register::register(values.into_inner()).await?;
-    Ok(HttpResponse::Ok().body(""))
+    Ok(HttpResponse::Created().finish())
 }
 
 #[actix_web::main]
