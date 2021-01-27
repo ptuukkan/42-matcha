@@ -127,7 +127,7 @@ const Register = () => {
 							content="All Done"
 							onClick={() => setSecondClose()}
 							as={Link}
-							to="/login"
+							to="/"
 						/>
 					</Modal.Actions>
 				</Modal>
