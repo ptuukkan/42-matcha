@@ -22,7 +22,10 @@ pub enum AppErrorType {
 	CursorError(CursorError),
 
 	#[display(fmt = "internal error: {}", error)]
-	InternalError { error: String }
+	InternalError { error: String },
+
+	#[display(fmt = " bad request: {}", error)]
+	BadRequest { error: String }
 }
 
 #[derive(Serialize, Debug)]
@@ -80,7 +83,8 @@ impl ResponseError for AppError {
 		match &self.error {
 			AppErrorType::ValidationError(_) => StatusCode::BAD_REQUEST,
 			AppErrorType::CursorError(_) => StatusCode::INTERNAL_SERVER_ERROR,
-			AppErrorType::InternalError { error: _ } => StatusCode::INTERNAL_SERVER_ERROR
+			AppErrorType::InternalError { error: _ } => StatusCode::INTERNAL_SERVER_ERROR,
+			AppErrorType::BadRequest { error: _ } => StatusCode::BAD_REQUEST
 		}
 	}
 
