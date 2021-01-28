@@ -1,5 +1,6 @@
 import { action, makeObservable, observable } from "mobx";
-import { IRegisterFormValues } from "../models/user";
+import agent from "../api/agent";
+import { ILoginFormValues, IRegisterFormValues } from "../models/user";
 import { RootStore } from "./rootStore";
 
 export default class UserStore {
@@ -11,14 +12,21 @@ export default class UserStore {
 		makeObservable(this, {
 			secondOpen: observable,
 			registerUser: action,
+			loginUser: action,
 			setSecondOpen: action,
 			setSecondClose: action
 		});
 	}
 
-	registerUser = (data: IRegisterFormValues) => {
-		console.log(data);
+	registerUser = async (data: IRegisterFormValues) => {
+		agent.User.register(data).catch(error => {
+			console.log('Error: ',error)
+		})
+	}
 
+	loginUser = (data: ILoginFormValues) => {
+		console.log(data)
+		
 	}
 
 	setSecondOpen = () => {
@@ -27,5 +35,7 @@ export default class UserStore {
 
 	setSecondClose = () => {
 		this.secondOpen = false;
+		this.rootStore.modalStore.closeRegisterModal();
+
 	}
 }
