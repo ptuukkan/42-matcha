@@ -38,13 +38,13 @@ const Register = () => {
 			<Modal.Content>
 				<Form onSubmit={handleSubmit(onSubmit)}>
 					{errors.username && (
-						<Message negative>{errors.username.message}</Message>
+						<Message negative>{errors.userName.message}</Message>
 					)}
 					{errors.firstname && (
-						<Message negative>{errors.firstname.message}</Message>
+						<Message negative>{errors.firstName.message}</Message>
 					)}
 					{errors.lastname && (
-						<Message negative>{errors.lastname.message}</Message>
+						<Message negative>{errors.lastName.message}</Message>
 					)}
 					{errors.email && (
 						<Message negative>{errors.email.message}</Message>
@@ -56,7 +56,7 @@ const Register = () => {
 					<label>Username:</label>
 					<input
 						type="text"
-						name="username"
+						name="userName"
 						placeholder="Username"
 						ref={register({
 							required: 'Username is required',
@@ -66,7 +66,7 @@ const Register = () => {
 					<label>Firstname:</label>
 					<input
 						type="text"
-						name="firstname"
+						name="firstName"
 						placeholder="Firstname"
 						ref={register({
 							required: 'Firstname is required',
@@ -76,7 +76,7 @@ const Register = () => {
 					<label>Lastname:</label>
 					<input
 						type="text"
-						name="lastname"
+						name="lastName"
 						placeholder="Lastname"
 						ref={register({
 							required: 'Lastname is required',
