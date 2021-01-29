@@ -6,7 +6,7 @@ use super::api;
 use std::env;
 use actix_web::client::Client;
 use serde_json;
-use crate::errors::{AppError, AppErrorType, CursorError};
+use crate::errors::{AppError, CursorError};
 
 
 #[derive(Serialize, Debug)]
@@ -69,10 +69,7 @@ impl CursorRequest {
 			.await?;
 		let mut cursor_response: CursorResponse = serde_json::from_slice(&bytes)?;
 		if cursor_response.error == true {
-			let app_error = AppError {
-				error: AppErrorType::CursorError(CursorError::from(cursor_response))
-			};
-			return Err(app_error);
+			return Err(AppError::CursorError(CursorError::from(cursor_response)));
 		}
 		cursor_response.bytes = bytes;
 		Ok(cursor_response)
@@ -100,10 +97,7 @@ impl CursorResponse {
 				.await?;
 			let cursor_response: CursorResponse = serde_json::from_slice(&bytes)?;
 			if cursor_response.error == true {
-				let app_error = AppError {
-					error: AppErrorType::CursorError(CursorError::from(cursor_response))
-				};
-				return Err(app_error);
+				return Err(AppError::CursorError(CursorError::from(cursor_response)));
 			}
 			let mut cursor: Cursor<T> = serde_json::from_slice(&bytes)?;
 			return_data.append(&mut cursor.result);

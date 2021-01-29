@@ -8,34 +8,53 @@ use actix_web::{
 	Error
 };
 use serde::Serialize;
-use std::fmt;
 use crate::database::cursor::CursorResponse;
 use derive_more::{Display};
-use std::str::FromStr;
 
 #[derive(Serialize, Debug, Display)]
-pub enum AppErrorType {
+pub enum AppError {
 	#[display(fmt = "validation error")]
-	ValidationError(Vec<FieldError>),
+	ValidationError(ValidationError),
+
+	#[display(fmt = "internal error")]
+	InternalError(InternalError),
 
 	#[display(fmt = "cursor error")]
 	CursorError(CursorError),
 
-	#[display(fmt = "internal error: {}", error)]
-	InternalError { error: String },
+	#[display(fmt = "login error")]
+	LoginError(LoginError),
+}
 
-	#[display(fmt = " bad request: {}", error)]
-	BadRequest { error: String }
+#[derive(Serialize, Debug)]
+pub enum AppErrorType {
+	ValidationError,
+	InternalError,
+	CursorError,
+	LoginError,
+}
+
+#[derive(Serialize, Debug)]
+pub struct ValidationError {
+	error_type: AppErrorType,
+	pub errors: Vec<FieldError>
 }
 
 #[derive(Serialize, Debug)]
 pub struct FieldError {
 	field: String,
-    reason: String
+    error: String
+}
+
+#[derive(Serialize, Debug)]
+pub struct InternalError {
+	error_type: AppErrorType,
+	error: String
 }
 
 #[derive(Serialize, Debug)]
 pub struct CursorError {
+	error_type: AppErrorType,
 	error: bool,
     code: i32,
     error_num: i32,
@@ -43,27 +62,52 @@ pub struct CursorError {
 }
 
 #[derive(Serialize, Debug)]
-pub struct AppError {
-	#[serde(flatten)]
-	pub error: AppErrorType,
+pub struct LoginError {
+	error_type: AppErrorType,
+	error: String
 }
 
-#[derive(Serialize)]
-pub struct AppErrorResponse {
-	pub error: String
+impl ValidationError {
+	pub fn new(field: &str, error: &str) -> Self {
+		let field_error = FieldError {
+			field: field.to_owned(),
+			error: error.to_owned()
+		};
+		Self {
+			error_type: AppErrorType::ValidationError,
+			errors: vec![field_error]
+		}
+	}
+
+	pub fn empty() -> Self {
+		Self {
+			error_type: AppErrorType::ValidationError,
+			errors: Vec::new()
+		}
+	}
+
+	pub fn add(&mut self, field: &str, error: &str) {
+		let field_error = FieldError {
+			field: field.to_owned(),
+			error: error.to_owned()
+		};
+		self.errors.push(field_error);
+	}
 }
 
-// impl AppError {
-// 	fn message(&self) -> String {
-// 		match self.error {
-// 			AppErrorType::ValidationError(s) => s
-// 		}
-// 	}
-// }
+impl InternalError {
+	pub fn new(error: &str) -> Self {
+		Self {
+			error_type: AppErrorType::InternalError,
+			error: error.to_owned()
+		}
+	}
+}
 
 impl From<CursorResponse> for CursorError {
 	fn from(cursor_response: CursorResponse) -> Self {
 		Self {
+			error_type: AppErrorType::CursorError,
 			code: cursor_response.code,
 			error: cursor_response.error,
 			error_message: cursor_response.error_message.unwrap(),
@@ -72,87 +116,64 @@ impl From<CursorResponse> for CursorError {
 	}
 }
 
-impl fmt::Display for AppError {
-	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> {
-		write!(f, "{:?}", self)
+impl LoginError {
+	pub fn new(error: &str) -> Self {
+		Self {
+			error_type: AppErrorType::LoginError,
+			error: error.to_owned()
+		}
 	}
 }
 
 impl ResponseError for AppError {
 	fn status_code(&self) -> StatusCode {
-		match &self.error {
-			AppErrorType::ValidationError(_) => StatusCode::BAD_REQUEST,
-			AppErrorType::CursorError(_) => StatusCode::INTERNAL_SERVER_ERROR,
-			AppErrorType::InternalError { error: _ } => StatusCode::INTERNAL_SERVER_ERROR,
-			AppErrorType::BadRequest { error: _ } => StatusCode::BAD_REQUEST
+		match &self {
+			AppError::ValidationError(_) => StatusCode::BAD_REQUEST,
+			AppError::CursorError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+			AppError::InternalError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+			AppError::LoginError(_) => StatusCode::BAD_REQUEST
 		}
 	}
 
 	fn error_response(&self) -> HttpResponse {
-		HttpResponseBuilder::new(self.status_code())
-			.set_header(header::CONTENT_TYPE, "application/json")
-			.json(self)
+		match &self {
+			AppError::ValidationError(e) => HttpResponseBuilder::new(self.status_code())
+				.set_header(header::CONTENT_TYPE, "application/json")
+				.json(e),
+			AppError::InternalError(e) => HttpResponseBuilder::new(self.status_code())
+				.set_header(header::CONTENT_TYPE, "application/json")
+				.json(e),
+			AppError::CursorError(e) => HttpResponseBuilder::new(self.status_code())
+				.set_header(header::CONTENT_TYPE, "application/json")
+				.json(e),
+			AppError::LoginError(e) => HttpResponseBuilder::new(self.status_code())
+				.set_header(header::CONTENT_TYPE, "application/json")
+				.json(e)
+		}
 
-		// match self.error {
-		// 	AppErrorType::CursorError(c) => HttpResponseBuilder::new(self.status_code())
-		// 		.set_header(header::CONTENT_TYPE, "application/json")
-		// 		.json(c),
-		// 	_ => HttpResponseBuilder::new(self.status_code())
-		// 	.set_header(header::CONTENT_TYPE, "application/json")
-		// 	.json(self)
-		// }
-
-	}
-}
-
-impl FromStr for FieldError {
-	type Err = AppError;
-
-	fn from_str(s: &str) -> Result<Self, Self::Err> {
-		let parts: Vec<&str> = s.split(':').collect();
-		Ok(Self {
-			field: parts[0].to_owned(),
-			reason: parts[1].to_owned()
-		})
 	}
 }
 
 impl From<SendRequestError> for AppError {
 	fn from(from_error: SendRequestError) -> Self {
-		Self {
-			error: AppErrorType::InternalError {
-				error: from_error.to_string()
-			}
-		}
+		Self::InternalError(InternalError::new(&from_error.to_string()))
 	}
 }
 
 impl From<Error> for AppError {
 	fn from(from_error: Error) -> Self {
-		Self {
-			error: AppErrorType::InternalError {
-				error: from_error.to_string()
-			}
-		}
+		Self::InternalError(InternalError::new(&from_error.to_string()))
 	}
 }
 
 impl From<PayloadError> for AppError {
 	fn from(from_error: PayloadError) -> Self {
-		Self {
-			error: AppErrorType::InternalError {
-				error: from_error.to_string()
-			}
-		}
+		Self::InternalError(InternalError::new(&from_error.to_string()))
 	}
 }
 
 impl From<serde_json::Error> for AppError {
 	fn from(from_error: serde_json::Error) -> Self {
-		Self {
-			error: AppErrorType::InternalError {
-				error: from_error.to_string()
-			}
-		}
+		Self::InternalError(InternalError::new(&from_error.to_string()))
 	}
 }
