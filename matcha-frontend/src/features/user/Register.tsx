@@ -9,11 +9,7 @@ import { IRegisterFormValues } from '../../app/models/user';
 const Register = () => {
 	const rootStore = useContext(RootStoreContext);
 	const { registerOpen, closeRegisterModal } = rootStore.modalStore;
-	const {
-		secondOpen,
-		setSecondClose,
-		registerUser,
-	} = rootStore.userStore;
+	const { secondOpen, setSecondClose, registerUser } = rootStore.userStore;
 	const { register, handleSubmit, errors } = useForm();
 
 	const onSubmit = (data: IRegisterFormValues) => {
@@ -32,27 +28,11 @@ const Register = () => {
 	};
 
 	return (
-		<Modal open={registerOpen} onClose={closeRegisterModal}>
+		<Modal size="tiny" open={registerOpen} onClose={closeRegisterModal}>
 			<Modal.Header>Register</Modal.Header>
 			<Modal.Description />
 			<Modal.Content>
 				<Form onSubmit={handleSubmit(onSubmit)}>
-					{errors.username && (
-						<Message negative>{errors.userName.message}</Message>
-					)}
-					{errors.firstname && (
-						<Message negative>{errors.firstName.message}</Message>
-					)}
-					{errors.lastname && (
-						<Message negative>{errors.lastName.message}</Message>
-					)}
-					{errors.email && (
-						<Message negative>{errors.email.message}</Message>
-					)}
-					{errors.password && (
-						<Message negative>{errors.password.message}</Message>
-					)}
-
 					<label>Username:</label>
 					<input
 						type="text"
@@ -62,6 +42,9 @@ const Register = () => {
 							required: 'Username is required',
 						})}
 					/>
+					{errors.userName && (
+						<Message negative>{errors.userName.message}</Message>
+					)}
 
 					<label>Firstname:</label>
 					<input
@@ -69,9 +52,12 @@ const Register = () => {
 						name="firstName"
 						placeholder="Firstname"
 						ref={register({
-							required: 'Firstname is required',
+							required: { value: true, message: 'Firstname is required' },
 						})}
 					/>
+					{errors.firstName && (
+						<Message negative>{errors.firstName.message}</Message>
+					)}
 
 					<label>Lastname:</label>
 					<input
@@ -82,6 +68,9 @@ const Register = () => {
 							required: 'Lastname is required',
 						})}
 					/>
+					{errors.lastName && (
+						<Message negative>{errors.lastName.message}</Message>
+					)}
 					<label>Email:</label>
 					<input
 						type="text"
@@ -95,6 +84,7 @@ const Register = () => {
 							},
 						})}
 					/>
+					{errors.email && <Message negative>{errors.email.message}</Message>}
 					<label>Password:</label>
 					<input
 						type="password"
@@ -105,14 +95,14 @@ const Register = () => {
 							validate: validatePassword,
 						})}
 					/>
-					<br></br>
-					<Button type="submit">Register</Button>
+					{errors.password && (
+						<Message negative>{errors.password.message}</Message>
+					)}
+					<br />
+					<br />
+					<Button primary type="submit">Register</Button>
 				</Form>
-				<Modal
-					onClose={() => setSecondClose()}
-					open={secondOpen}
-					size="small"
-				>
+				<Modal onClose={() => setSecondClose()} open={secondOpen} size="small">
 					<Modal.Header>All done!</Modal.Header>
 					<Modal.Content>
 						<p>Confirmation email sent!</p>
