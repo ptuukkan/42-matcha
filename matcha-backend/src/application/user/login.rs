@@ -1,5 +1,5 @@
 
-use crate::errors::{AppError, AppErrorType};
+use crate::errors::{AppError, LoginError};
 use crate::models::user::{LoginFormValues, User};
 use crate::database::cursor::{CursorRequest};
 
@@ -10,9 +10,7 @@ pub async fn login(values: LoginFormValues) -> Result<(), AppError> {
 		.extract_all::<User>()
 		.await?;
 	if result.is_empty() {
-		return Err(AppError {
-			error: AppErrorType::BadRequest { error: "Login failed".to_owned() }
-		})
+		return Err(AppError::LoginError(LoginError::new("Login failed")))
 	}
 
 	Ok(())
