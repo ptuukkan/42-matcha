@@ -1,19 +1,20 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 import { Comment, Header, Segment, Divider } from 'semantic-ui-react'
 
 const Chat = () => {
 	return (
 		<>
 		<Segment>
-			<Header size='large'>Get more matchas to chat with!</Header>
+			<Header size='large'>Browse profiles to get more matchas to chat with!</Header>
 		</Segment>
 		<Comment.Group minimal>
 		<Header as='h3' dividing>
 		  Messages
 		</Header>
 
-		<Comment>
-		  <Comment.Avatar as='a' src='https://react.semantic-ui.com/images/avatar/small/matt.jpg' />
+		<Comment as={Link} to={'#'}>
+		  <Comment.Avatar src='https://react.semantic-ui.com/images/avatar/small/matt.jpg' />
 		  <Comment.Content>
 			<Comment.Author as='a'>Matt</Comment.Author>
 			<Comment.Metadata>

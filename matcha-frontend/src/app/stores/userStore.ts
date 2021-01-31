@@ -18,10 +18,12 @@ export default class UserStore {
 		});
 	}
 
-	registerUser = async (data: IRegisterFormValues) => {
-		agent.User.register(data).catch(error => {
-			console.log('Error: ',error)
-		})
+	registerUser = async (data: IRegisterFormValues): Promise<void> => {
+		try {
+			await agent.User.register(data);
+		} catch (error) {
+			throw error 
+		}
 	}
 
 	loginUser = (data: ILoginFormValues) => {

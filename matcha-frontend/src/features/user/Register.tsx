@@ -9,11 +9,22 @@ import { IRegisterFormValues } from '../../app/models/user';
 const Register = () => {
 	const rootStore = useContext(RootStoreContext);
 	const { registerOpen, closeRegisterModal } = rootStore.modalStore;
-	const { secondOpen, setSecondClose, registerUser } = rootStore.userStore;
-	const { register, handleSubmit, errors } = useForm();
+	const {
+		secondOpen,
+		setSecondClose,
+		setSecondOpen,
+		registerUser,
+	} = rootStore.userStore;
+	const { register, handleSubmit, errors, setError } = useForm();
 
 	const onSubmit = (data: IRegisterFormValues) => {
-		registerUser(data);
+		registerUser(data)
+			.then(() => setSecondOpen())
+			.catch((error) => {
+				error.response.data.errors.forEach((err: any) => {
+					setError(err.field, { type: 'manual', message: err.error });
+				});
+			});
 	};
 
 	const validatePassword = (value: string) => {
@@ -74,7 +85,7 @@ const Register = () => {
 					<label>Email:</label>
 					<input
 						type="text"
-						name="email"
+						name="emailAddress"
 						placeholder="email"
 						ref={register({
 							required: 'Email is required',
@@ -84,7 +95,9 @@ const Register = () => {
 							},
 						})}
 					/>
-					{errors.email && <Message negative>{errors.email.message}</Message>}
+					{errors.emailAddress && (
+						<Message negative>{errors.emailAddress.message}</Message>
+					)}
 					<label>Password:</label>
 					<input
 						type="password"
@@ -100,9 +113,11 @@ const Register = () => {
 					)}
 					<br />
 					<br />
-					<Button primary type="submit">Register</Button>
+					<Button primary type="submit">
+						Register
+					</Button>
 				</Form>
-				<Modal onClose={() => setSecondClose()} open={secondOpen} size="small">
+				<Modal open={secondOpen} size="small">
 					<Modal.Header>All done!</Modal.Header>
 					<Modal.Content>
 						<p>Confirmation email sent!</p>
