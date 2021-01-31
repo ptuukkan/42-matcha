@@ -7,6 +7,7 @@ import { observer } from 'mobx-react-lite';
 import { IRegisterFormValues } from '../../app/models/user';
 import { ErrorMessage } from '@hookform/error-message';
 import TextInput from './TextInput';
+import { IValidationError } from '../../app/models/errors';
 
 const Register = () => {
 	const rootStore = useContext(RootStoreContext);
@@ -28,7 +29,7 @@ const Register = () => {
 		registerUser(data)
 			.then(() => setSecondOpen())
 			.catch((error) => {
-				error.response.data.errors.forEach((err: any) => {
+				error.response.data.errors.forEach((err: IValidationError) => {
 					setError(err.field, { type: 'manual', message: err.error });
 				});
 			});
