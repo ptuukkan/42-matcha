@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import { RootStoreContext } from '../../app/stores/rootStore';
 import { observer } from 'mobx-react-lite';
 import { ILoginFormValues } from '../../app/models/user';
+import TextInput from './TextInput';
 
 const Login = () => {
 	const rootStore = useContext(RootStoreContext);
@@ -16,41 +17,30 @@ const Login = () => {
 	};
 
 	return (
-		<Modal open={loginOpen} onClose={closeLoginModal}>
+		<Modal size="tiny" open={loginOpen} onClose={closeLoginModal}>
 			<Modal.Header>Login to Matcha</Modal.Header>
 			<Modal.Content>
 				<Form onSubmit={handleSubmit(onSubmit)}>
-					{errors.email && <Message negative>{errors.email.message}</Message>}
-					{errors.password && (
-						<Message negative>{errors.password.message}</Message>
-					)}
-					<Form.Group widths={2}>
-						<Form.Field>
-							<label>username</label>
-							<input
-								type="text"
-								name="username"
-								placeholder="username"
-								ref={register({
-									required: 'Username is required',
-								})}
-							/>
-						</Form.Field>
-						<Form.Field>
-							<label>password</label>
-							<input
-								type="password"
-								name="password"
-								placeholder="password"
-								ref={register({
-									required: 'Password is required',
-								})}
-							/>
-						</Form.Field>
-					</Form.Group>
-					<Button type="submit">Login</Button>
+					<TextInput
+						type="text"
+						name="username"
+						label="Username"
+						errors={errors}
+						register={register({
+							required: 'Username is required',
+						})}
+					/>
+					<TextInput
+						type="password"
+						name="password"
+						label="Password"
+						errors={errors}
+						register={register({
+							required: 'Password is required',
+						})}
+					/>
+					<Button primary type="submit">Login</Button>
 				</Form>
-				<br></br>
 			</Modal.Content>
 		</Modal>
 	);

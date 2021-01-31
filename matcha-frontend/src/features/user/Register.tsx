@@ -22,11 +22,7 @@ const Register = () => {
 		handleSubmit,
 		errors,
 		setError,
-		formState,
-	} = useForm({
-		mode: 'onTouched',
-	});
-	const { isDirty, isValid } = formState;
+	} = useForm();
 
 	const onSubmit = (data: IRegisterFormValues) => {
 		registerUser(data)
@@ -105,9 +101,7 @@ const Register = () => {
 							validate: validatePassword,
 						})}
 					/>
-					<br />
-					<br />
-					<Button primary type="submit" disabled={!isValid}>
+					<Button primary type="submit">
 						Register
 					</Button>
 				</Form>
