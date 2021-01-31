@@ -57,7 +57,7 @@ const Register = () => {
 				<Form onSubmit={handleSubmit(onSubmit)}>
 					<TextInput
 						type="text"
-						name="userName"
+						name="username"
 						label="Username"
 						errors={errors}
 						register={register({
@@ -67,7 +67,7 @@ const Register = () => {
 					<TextInput
 						type="text"
 						name="firstName"
-						label="First Name"
+						label="First name"
 						errors={errors}
 						register={register({
 							required: 'Firstname is required' ,
@@ -76,7 +76,7 @@ const Register = () => {
 					<TextInput
 						type="text"
 						name="lastName"
-						label="Last Name"
+						label="Last name"
 						errors={errors}
 						register={register({
 							required: 'Lastname is required' ,

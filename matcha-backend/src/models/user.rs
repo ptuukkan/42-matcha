@@ -29,7 +29,7 @@ pub struct RegisterFormValues {
 	first_name: String,
 	last_name: String,
 	email_address: String,
-	user_name: String,
+	username: String,
 	password: String
 }
 
@@ -110,7 +110,7 @@ impl From<RegisterFormValues> for User {
 		Self {
 			key: "".to_owned(),
 			email_address: values.email_address,
-			user_name: values.user_name,
+			user_name: values.username,
 			first_name: values.first_name,
 			last_name: values.last_name,
 			password: values.password
