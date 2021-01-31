@@ -5,6 +5,8 @@ import { useForm } from 'react-hook-form';
 import { RootStoreContext } from '../../app/stores/rootStore';
 import { observer } from 'mobx-react-lite';
 import { IRegisterFormValues } from '../../app/models/user';
+import { ErrorMessage } from '@hookform/error-message';
+import TextInput from './TextInput';
 
 const Register = () => {
 	const rootStore = useContext(RootStoreContext);
@@ -15,7 +17,16 @@ const Register = () => {
 		setSecondOpen,
 		registerUser,
 	} = rootStore.userStore;
-	const { register, handleSubmit, errors, setError } = useForm();
+	const {
+		register,
+		handleSubmit,
+		errors,
+		setError,
+		formState,
+	} = useForm({
+		mode: 'onTouched',
+	});
+	const { isDirty, isValid } = formState;
 
 	const onSubmit = (data: IRegisterFormValues) => {
 		registerUser(data)
@@ -44,50 +55,39 @@ const Register = () => {
 			<Modal.Description />
 			<Modal.Content>
 				<Form onSubmit={handleSubmit(onSubmit)}>
-					<label>Username:</label>
-					<input
+					<TextInput
 						type="text"
 						name="userName"
-						placeholder="Username"
-						ref={register({
+						label="Username"
+						errors={errors}
+						register={register({
 							required: 'Username is required',
 						})}
 					/>
-					{errors.userName && (
-						<Message negative>{errors.userName.message}</Message>
-					)}
-
-					<label>Firstname:</label>
-					<input
+					<TextInput
 						type="text"
 						name="firstName"
-						placeholder="Firstname"
-						ref={register({
-							required: { value: true, message: 'Firstname is required' },
+						label="First Name"
+						errors={errors}
+						register={register({
+							required: 'Firstname is required' ,
 						})}
 					/>
-					{errors.firstName && (
-						<Message negative>{errors.firstName.message}</Message>
-					)}
-
-					<label>Lastname:</label>
-					<input
+					<TextInput
 						type="text"
 						name="lastName"
-						placeholder="Lastname"
-						ref={register({
-							required: 'Lastname is required',
+						label="Last Name"
+						errors={errors}
+						register={register({
+							required: 'Lastname is required' ,
 						})}
 					/>
-					{errors.lastName && (
-						<Message negative>{errors.lastName.message}</Message>
-					)}
-					<label>Email:</label>
-					<input
+					<TextInput
 						type="text"
 						name="emailAddress"
-						placeholder="email"
-						ref={register({
+						label="Email address"
+						errors={errors}
+						register={register({
 							required: 'Email is required',
 							pattern: {
 								value: /^[^@ ]+@[^@ ]+\.[^@ .]{2,}$/,
@@ -95,25 +95,19 @@ const Register = () => {
 							},
 						})}
 					/>
-					{errors.emailAddress && (
-						<Message negative>{errors.emailAddress.message}</Message>
-					)}
-					<label>Password:</label>
-					<input
+					<TextInput
 						type="password"
 						name="password"
-						placeholder="password"
-						ref={register({
+						label="Password"
+						errors={errors}
+						register={register({
 							required: 'Password is required',
 							validate: validatePassword,
 						})}
 					/>
-					{errors.password && (
-						<Message negative>{errors.password.message}</Message>
-					)}
 					<br />
 					<br />
-					<Button primary type="submit">
+					<Button primary type="submit" disabled={!isValid}>
 						Register
 					</Button>
 				</Form>
