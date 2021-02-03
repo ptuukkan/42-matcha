@@ -1,3 +1,4 @@
+use crate::errors::LoginError;
 use crate::database::cursor::CursorRequest;
 use crate::errors::{AppError, ValidationError};
 use crate::models::user::{RegisterFormValues, User};
@@ -63,3 +64,28 @@ pub async fn register(values: RegisterFormValues) -> Result<(), AppError> {
 
 	Ok(())
 }
+
+// fn send_verification_email
+
+
+pub async fn verify(link: &str) -> Result<(), AppError> {
+	let mut result = CursorRequest::from(format!(
+		"FOR u IN users filter u.link == '{}' return u",
+		link
+	))
+	.send()
+	.await?
+	.extract_all::<User>()
+	.await?;
+	if result.is_empty() {
+		return Err(AppError::LoginError(LoginError::new("Verification failed"))); // Create a new error Verification error instead
+	}
+	if !result.is_empty() {
+		if let Some(mut user) = result.pop() {
+			user.link = String::from("");
+			user.update().await?
+		}
+	}
+	Ok(())
+}
+

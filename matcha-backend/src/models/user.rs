@@ -64,6 +64,12 @@ impl User {
 		db_url + "_api/document/users/"
 	}
 
+	fn key_url(&self) -> String {
+		let db_url: String = env::var("DB_URL")
+			.expect("Missing env variable DB_URL");
+		format!("{}_api/document/users/{}", db_url, self.key)
+	}
+
 	pub async fn create(&self) -> Result<(), AppError> {
 		api::post::<User, CreateUserResponse>(&User::url(), &self)
 			.await?;
@@ -81,7 +87,7 @@ impl User {
  		texthash
 	}
 	pub async fn update(&self) -> Result<(), AppError> {
-		api::post::<User, CreateUserResponse>(&User::url(), &self).await?;
+		api::patch(&self.key_url(), &self).await?;
 		Ok(())
 	}
 
