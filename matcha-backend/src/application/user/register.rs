@@ -41,7 +41,7 @@ pub async fn register(values: RegisterFormValues) -> Result<(), AppError> {
 		<h2>One step closer to your matchas!</h2>
 		<br>
 		<p>
-		To finish your registeration please click <a href=\"http://127.0.0.1:8080/{link}\">here</a> to confirm/activate your account
+		To finish your registeration please click <a href=\"http://127.0.0.1:8080/verify/{link}\">here</a> to confirm/activate your account
 		</p>",
 		link=user.link);
 
