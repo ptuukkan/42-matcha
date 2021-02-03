@@ -1,7 +1,7 @@
 use crate::database::cursor::CursorRequest;
 use crate::errors::{AppError, ValidationError};
 use crate::models::user::{RegisterFormValues, User};
-use lettre::{SendableEmail, Transport, SendmailTransport};
+use lettre::{SendableEmail, SendmailTransport, Transport};
 use lettre_email::EmailBuilder;
 
 pub async fn register(values: RegisterFormValues) -> Result<(), AppError> {
@@ -37,18 +37,19 @@ pub async fn register(values: RegisterFormValues) -> Result<(), AppError> {
 	}
 
 	if validation_error.errors.is_empty() {
+		let html_text = format!("
+		<h2>One step closer to your matchas!</h2>
+		<br>
+		<p>
+		To finish your registeration please click <a href=\"http://127.0.0.1:8080/{link}\">here</a> to confirm/activate your account
+		</p>",
+		link=user.link);
+
 		let email = EmailBuilder::new()
 			.to(user.email_address.to_string())
 			.from("no-reply@matcha.com")
 			.subject("Matcha confirmation!")
-			.html(
-				"
-			<h2>One step closer to your matchas!</h2>
-			<br>
-			<p>
-			To finish your registeration please click <a href=\"#\">here</a> to confirm/activate your account
-			</p>",
-			)
+			.html(html_text)
 			.build()
 			.unwrap();
 		let email: SendableEmail = email.into();

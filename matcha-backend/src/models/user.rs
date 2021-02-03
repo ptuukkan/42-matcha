@@ -3,6 +3,8 @@ use crate::database::api;
 use serde::{Deserialize, Serialize};
 use std::env;
 use crate::errors::{AppError};
+extern crate nanoid;
+use nanoid::nanoid;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct User {
@@ -13,7 +15,8 @@ pub struct User {
 	pub last_name: String,
 	pub email_address: String,
 	pub user_name: String,
-	password: String
+	password: String,
+	pub link: String
 }
 
 #[derive(Deserialize, Debug)]
@@ -50,7 +53,8 @@ impl User {
 			last_name: String::from(last_name),
 			email_address: String::from(email_address),
 			user_name: String::from(user_name),
-			password: String::from(password)
+			password: String::from(password),
+			link: String::new()
 		}
 	}
 
@@ -79,6 +83,11 @@ impl User {
 	pub async fn create(&self) -> Result<(), AppError> {
 		api::post::<User, CreateUserResponse>(&User::url(), &self)
 			.await?;
+		Ok(())
+	}
+
+	pub async fn update(&self) -> Result<(), AppError> {
+		api::post::<User, CreateUserResponse>(&User::url(), &self).await?;
 		Ok(())
 	}
 
@@ -113,7 +122,8 @@ impl From<RegisterFormValues> for User {
 			user_name: values.username,
 			first_name: values.first_name,
 			last_name: values.last_name,
-			password: values.password
+			password: values.password,
+			link: nanoid!(10, &nanoid::alphabet::SAFE)
 		}
 	}
 }
