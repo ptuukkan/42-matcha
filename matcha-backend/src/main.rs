@@ -35,21 +35,12 @@ async fn register(values: Json<models::user::RegisterFormValues>) -> Result<Http
 }
 
 #[get("/verify/{link}")] // <- define path parameters
-async fn verify(web::Path(link): web::Path<(String)>) -> Result<String, Error> {
-    application::user::verify::verify(&link).await?;
-    Ok(format!(
-        "Link {} verified",
-        link
-    ))
+async fn verify(web::Path(link): web::Path<String>) -> Result<HttpResponse, Error> {
+    application::user::register::verify(&link).await?;
+    Ok(HttpResponse::Ok().finish())
 }
 
 
-/* #[post("/user/verificate/{link}")]
-async fn verify(req: HttpRequest) -> Result<HttpResponse, Error> {
-    let link = req.match_info().get("link").unwrap_or("töps");
-    application::user::verify::verify(link.to_string()).await?;
-    Ok(HttpResponse::Created().finish())
-} */
 
 
 #[actix_web::main]
@@ -64,7 +55,6 @@ async fn main() -> std::io::Result<()> {
             .service(register)
             .service(login)
             .service(verify)
-            /* .route("/user/verify/{link}", web::get().to_async(verify)) */
     })
     .bind("127.0.0.1:8080")?
     .run()

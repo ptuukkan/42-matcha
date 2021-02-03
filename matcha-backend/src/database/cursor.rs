@@ -29,16 +29,6 @@ pub struct CursorResponse {
 	bytes: Bytes
 }
 
-// #[derive(Deserialize, Debug)]
-// pub struct CursorErrorResponse {
-// 	code: i16,
-// 	error: bool,
-// 	#[serde(rename = "errorMessage")]
-// 	error_message: String,
-// 	#[serde(rename = "errorNum")]
-// 	error_num: i32
-// }
-
 #[derive(Deserialize, Debug)]
 pub struct Cursor<T> {
 	#[serde(rename = "hasMore")]
@@ -106,12 +96,6 @@ impl CursorResponse {
 		Ok(return_data)
 	}
 }
-
-// impl<T> Cursor<T> {
-// 	pub async fn all(&self) {
-
-// 	}
-// }
 
 impl From<&str> for CursorRequest {
 	fn from(cursor_query: &str) -> Self {

@@ -64,21 +64,11 @@ impl User {
 		db_url + "_api/document/users/"
 	}
 
-	// fn is_valid(&self) -> bool {
-	// 	if self.first_name.len() < 2 {
-	// 		return false;
-	// 	}
-	// 	if self.last_name.len() < 2 {
-	// 		return false;
-	// 	}
-	// 	if self.email_address.len() < 3 {
-	// 		return false
-	// 	}
-	// 	if self.password.len() < 8 {
-	// 		return false
-	// 	}
-	// 	true
-	// }
+	fn key_url(&self) -> String {
+		let db_url: String = env::var("DB_URL")
+			.expect("Missing env variable DB_URL");
+		format!("{}_api/document/users/{}", db_url, self.key)
+	}
 
 	pub async fn create(&self) -> Result<(), AppError> {
 		api::post::<User, CreateUserResponse>(&User::url(), &self)
@@ -87,32 +77,11 @@ impl User {
 	}
 
 	pub async fn update(&self) -> Result<(), AppError> {
-		api::post::<User, CreateUserResponse>(&User::url(), &self).await?;
+		api::patch(&self.key_url(), &self).await?;
 		Ok(())
 	}
 
-	// pub async fn delete(&self) {
-	// 	let url = User::url() + &self.key;
-	// 	let res = api::delete(&url)
-	// 		.await
-	// 		.expect("Failed");
-	// 	println!("{:?}", res);
-	// }
-
 }
-
-// impl TryFrom<RegisterFormValues> for User {
-// 	type Error = AppError;
-
-// 	fn try_from(values: RegisterFormValues) -> Result<Self, Self::Error> {
-// 		if values.first_name == "rikki" {
-// 			return Err(AppError {
-// 				error: AppErrorType::ValidationError("invalid field".to_owned())
-// 			})
-// 		}
-// 		Ok(User::new(&values.first_name, &values.last_name, &values.email_address, &values.password))
-// 	}
-// }
 
 impl From<RegisterFormValues> for User {
 	fn from(values: RegisterFormValues) -> Self {
