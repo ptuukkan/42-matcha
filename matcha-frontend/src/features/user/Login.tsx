@@ -8,7 +8,7 @@ import TextInput from './TextInput';
 
 const Login = () => {
 	const rootStore = useContext(RootStoreContext);
-	const { loginOpen, closeLoginModal } = rootStore.modalStore;
+	const { loginOpen, closeLogin } = rootStore.modalStore;
 	const { loginUser } = rootStore.userStore;
 	const { register, handleSubmit, errors } = useForm();
 
@@ -17,7 +17,7 @@ const Login = () => {
 	};
 
 	return (
-		<Modal size="tiny" open={loginOpen} onClose={closeLoginModal}>
+		<Modal size="tiny" open={loginOpen} onClose={closeLogin}>
 			<Modal.Header>Login to Matcha</Modal.Header>
 			<Modal.Content>
 				<Form onSubmit={handleSubmit(onSubmit)}>

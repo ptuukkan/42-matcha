@@ -4,33 +4,46 @@ import { RootStore } from "./rootStore";
 export default class ModalStore {
 	rootStore: RootStore;
 	registerOpen = false;
+	registerFinishOpen = false;
 	loginOpen = false;
 
 	constructor(rootStore: RootStore) {
 		this.rootStore = rootStore;
 		makeObservable(this, {
 			registerOpen: observable,
+			registerFinishOpen: observable,
 			loginOpen: observable,
-			openRegisterModal: action,
-			closeRegisterModal: action,
-			openLoginModal: action,
-			closeLoginModal: action,
+			openRegister: action,
+			closeRegister: action,
+			openRegisterFinish: action,
+			closeRegisterFinish: action,
+			openLogin: action,
+			closeLogin: action,
 		});
 	}
 
-	openRegisterModal = () => {
+	openRegister = () => {
 		this.registerOpen = true;
 	}
 
-	closeRegisterModal = () => {
+	closeRegister = () => {
 		this.registerOpen = false;
 	}
 
-	openLoginModal = () => {
+	openRegisterFinish = () => {
+		this.registerFinishOpen = true;
+	}
+
+	closeRegisterFinish = () => {
+		this.registerFinishOpen = false;
+		this.registerOpen = false;
+	}
+
+	openLogin = () => {
 		this.loginOpen = true;
 	}
 
-	closeLoginModal = () => {
+	closeLogin = () => {
 		this.loginOpen = false;
 	}
 }

@@ -5,29 +5,22 @@ import { useForm } from 'react-hook-form';
 import { RootStoreContext } from '../../app/stores/rootStore';
 import { observer } from 'mobx-react-lite';
 import { IRegisterFormValues } from '../../app/models/user';
-import { ErrorMessage } from '@hookform/error-message';
 import TextInput from './TextInput';
 import { IValidationError } from '../../app/models/errors';
 
 const Register = () => {
 	const rootStore = useContext(RootStoreContext);
-	const { registerOpen, closeRegisterModal } = rootStore.modalStore;
 	const {
-		secondOpen,
-		setSecondClose,
-		setSecondOpen,
-		registerUser,
-	} = rootStore.userStore;
-	const {
-		register,
-		handleSubmit,
-		errors,
-		setError,
-	} = useForm();
+		registerOpen,
+		closeRegister,
+		registerFinishOpen,
+		closeRegisterFinish,
+	} = rootStore.modalStore;
+	const { registerUser } = rootStore.userStore;
+	const { register, handleSubmit, errors, setError } = useForm();
 
 	const onSubmit = (data: IRegisterFormValues) => {
 		registerUser(data)
-			.then(() => setSecondOpen())
 			.catch((error) => {
 				error.response.data.errors.forEach((err: IValidationError) => {
 					setError(err.field, { type: 'manual', message: err.error });
@@ -47,7 +40,7 @@ const Register = () => {
 	};
 
 	return (
-		<Modal size="tiny" open={registerOpen} onClose={closeRegisterModal}>
+		<Modal size="tiny" open={registerOpen} onClose={closeRegister}>
 			<Modal.Header>Register</Modal.Header>
 			<Modal.Description />
 			<Modal.Content>
@@ -67,7 +60,7 @@ const Register = () => {
 						label="First name"
 						errors={errors}
 						register={register({
-							required: 'Firstname is required' ,
+							required: 'Firstname is required',
 						})}
 					/>
 					<TextInput
@@ -76,7 +69,7 @@ const Register = () => {
 						label="Last name"
 						errors={errors}
 						register={register({
-							required: 'Lastname is required' ,
+							required: 'Lastname is required',
 						})}
 					/>
 					<TextInput
@@ -106,7 +99,7 @@ const Register = () => {
 						Register
 					</Button>
 				</Form>
-				<Modal open={secondOpen} size="small">
+				<Modal open={registerFinishOpen} size="small">
 					<Modal.Header>All done!</Modal.Header>
 					<Modal.Content>
 						<p>Confirmation email sent!</p>
@@ -116,7 +109,7 @@ const Register = () => {
 						<Button
 							icon="check"
 							content="All Done"
-							onClick={() => setSecondClose()}
+							onClick={closeRegisterFinish}
 							as={Link}
 							to="/"
 						/>

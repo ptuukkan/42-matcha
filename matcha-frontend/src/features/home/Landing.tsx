@@ -6,7 +6,7 @@ import Register from '../user/Register';
 
 const Landing = () => {
 	const rootStore = useContext(RootStoreContext);
-	const { openRegisterModal, openLoginModal } = rootStore.modalStore;
+	const { openRegister, openLogin } = rootStore.modalStore;
 
 	return (
 		<Fragment>
@@ -19,7 +19,7 @@ const Landing = () => {
 						size="huge"
 						secondary
 						content="Login"
-						onClick={openLoginModal}
+						onClick={openLogin}
 					/>
 				</Menu.Item>
 				<Menu.Item>
@@ -27,7 +27,7 @@ const Landing = () => {
 						size="huge"
 						secondary
 						content="Register"
-						onClick={openRegisterModal}
+						onClick={openRegister}
 					/>
 				</Menu.Item>
 			</Menu>
