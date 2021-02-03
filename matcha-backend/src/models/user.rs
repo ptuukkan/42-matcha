@@ -4,6 +4,7 @@ use serde::{Deserialize, Serialize};
 use std::env;
 use crate::errors::{AppError};
 use sodiumoxide::crypto::pwhash::argon2id13;
+use nanoid::nanoid;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct User {
@@ -14,7 +15,8 @@ pub struct User {
 	pub last_name: String,
 	pub email_address: String,
 	pub user_name: String,
-	password: String
+	password: String,
+	pub link: String
 }
 
 #[derive(Deserialize, Debug)]
@@ -51,7 +53,8 @@ impl User {
 			last_name: String::from(last_name),
 			email_address: String::from(email_address),
 			user_name: String::from(user_name),
-			password: User::hash_pw(&String::from(password))
+			password: User::hash_pw(&String::from(password)),
+			link: String::new()
 		}
 	}
 
@@ -76,6 +79,10 @@ impl User {
     	).unwrap();
     	let texthash = std::str::from_utf8(&hash.0).unwrap().trim_end_matches('\u{0}').to_string();
  		texthash
+	}
+	pub async fn update(&self) -> Result<(), AppError> {
+		api::post::<User, CreateUserResponse>(&User::url(), &self).await?;
+		Ok(())
 	}
 
 	pub fn verify_pw(&self, password: &String) -> bool {
@@ -103,7 +110,8 @@ impl From<RegisterFormValues> for User {
 			user_name: values.username,
 			first_name: values.first_name,
 			last_name: values.last_name,
-			password: User::hash_pw(&values.password)
+			password: User::hash_pw(&values.password),
+			link: nanoid!(10, &nanoid::alphabet::SAFE)
 		}
 	}
 }
