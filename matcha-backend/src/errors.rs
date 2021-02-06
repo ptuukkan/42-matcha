@@ -22,8 +22,8 @@ pub enum AppError {
 	#[display(fmt = "cursor error")]
 	CursorError(CursorError),
 
-	#[display(fmt = "login error")]
-	LoginError(LoginError),
+	#[display(fmt = "unauthorized error")]
+	UnauthorizedError(UnauthorizedError),
 }
 
 #[derive(Serialize, Debug)]
@@ -31,7 +31,7 @@ pub enum AppErrorType {
 	ValidationError,
 	InternalError,
 	CursorError,
-	LoginError,
+	UnauthorizedError,
 }
 
 #[derive(Serialize, Debug)]
@@ -62,22 +62,22 @@ pub struct CursorError {
 }
 
 #[derive(Serialize, Debug)]
-pub struct LoginError {
+pub struct UnauthorizedError {
 	error_type: AppErrorType,
 	error: String
 }
 
 impl ValidationError {
-	pub fn new(field: &str, error: &str) -> Self {
-		let field_error = FieldError {
-			field: field.to_owned(),
-			error: error.to_owned()
-		};
-		Self {
-			error_type: AppErrorType::ValidationError,
-			errors: vec![field_error]
-		}
-	}
+	// pub fn new(field: &str, error: &str) -> Self {
+	// 	let field_error = FieldError {
+	// 		field: field.to_owned(),
+	// 		error: error.to_owned()
+	// 	};
+	// 	Self {
+	// 		error_type: AppErrorType::ValidationError,
+	// 		errors: vec![field_error]
+	// 	}
+	// }
 
 	pub fn empty() -> Self {
 		Self {
@@ -95,11 +95,40 @@ impl ValidationError {
 	}
 }
 
-impl InternalError {
-	pub fn new(error: &str) -> Self {
-		Self {
-			error_type: AppErrorType::InternalError,
-			error: error.to_owned()
+impl AppError {
+	pub fn unauthorized(text: &str) -> AppError {
+		AppError::UnauthorizedError(UnauthorizedError::from(text))
+	}
+
+	pub fn cursor(cursor_response: CursorResponse) -> AppError {
+		AppError::CursorError(CursorError::from(cursor_response))
+	}
+}
+
+impl ResponseError for AppError {
+	fn status_code(&self) -> StatusCode {
+		match &self {
+			AppError::ValidationError(_) => StatusCode::BAD_REQUEST,
+			AppError::CursorError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+			AppError::InternalError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+			AppError::UnauthorizedError(_) => StatusCode::UNAUTHORIZED
+		}
+	}
+
+	fn error_response(&self) -> HttpResponse {
+		match &self {
+			AppError::ValidationError(e) => HttpResponseBuilder::new(self.status_code())
+				.set_header(header::CONTENT_TYPE, "application/json")
+				.json(e),
+			AppError::InternalError(e) => HttpResponseBuilder::new(self.status_code())
+				.set_header(header::CONTENT_TYPE, "application/json")
+				.json(e),
+			AppError::CursorError(e) => HttpResponseBuilder::new(self.status_code())
+				.set_header(header::CONTENT_TYPE, "application/json")
+				.json(e),
+			AppError::UnauthorizedError(e) => HttpResponseBuilder::new(self.status_code())
+				.set_header(header::CONTENT_TYPE, "application/json")
+				.json(e)
 		}
 	}
 }
@@ -116,64 +145,53 @@ impl From<CursorResponse> for CursorError {
 	}
 }
 
-impl LoginError {
-	pub fn new(error: &str) -> Self {
+impl From<&str> for InternalError {
+	fn from(text: &str) -> Self {
 		Self {
-			error_type: AppErrorType::LoginError,
-			error: error.to_owned()
+			error_type: AppErrorType::InternalError,
+			error: text.to_owned()
 		}
 	}
 }
 
-impl ResponseError for AppError {
-	fn status_code(&self) -> StatusCode {
-		match &self {
-			AppError::ValidationError(_) => StatusCode::BAD_REQUEST,
-			AppError::CursorError(_) => StatusCode::INTERNAL_SERVER_ERROR,
-			AppError::InternalError(_) => StatusCode::INTERNAL_SERVER_ERROR,
-			AppError::LoginError(_) => StatusCode::BAD_REQUEST
+impl From<String> for InternalError {
+	fn from(text: String) -> Self {
+		Self {
+			error_type: AppErrorType::InternalError,
+			error: text
 		}
-	}
-
-	fn error_response(&self) -> HttpResponse {
-		match &self {
-			AppError::ValidationError(e) => HttpResponseBuilder::new(self.status_code())
-				.set_header(header::CONTENT_TYPE, "application/json")
-				.json(e),
-			AppError::InternalError(e) => HttpResponseBuilder::new(self.status_code())
-				.set_header(header::CONTENT_TYPE, "application/json")
-				.json(e),
-			AppError::CursorError(e) => HttpResponseBuilder::new(self.status_code())
-				.set_header(header::CONTENT_TYPE, "application/json")
-				.json(e),
-			AppError::LoginError(e) => HttpResponseBuilder::new(self.status_code())
-				.set_header(header::CONTENT_TYPE, "application/json")
-				.json(e)
-		}
-
 	}
 }
 
 impl From<SendRequestError> for AppError {
 	fn from(from_error: SendRequestError) -> Self {
-		Self::InternalError(InternalError::new(&from_error.to_string()))
+		Self::InternalError(InternalError::from(from_error.to_string()))
 	}
 }
 
 impl From<Error> for AppError {
 	fn from(from_error: Error) -> Self {
-		Self::InternalError(InternalError::new(&from_error.to_string()))
+		Self::InternalError(InternalError::from(from_error.to_string()))
 	}
 }
 
 impl From<PayloadError> for AppError {
 	fn from(from_error: PayloadError) -> Self {
-		Self::InternalError(InternalError::new(&from_error.to_string()))
+		Self::InternalError(InternalError::from(from_error.to_string()))
 	}
 }
 
 impl From<serde_json::Error> for AppError {
 	fn from(from_error: serde_json::Error) -> Self {
-		Self::InternalError(InternalError::new(&from_error.to_string()))
+		Self::InternalError(InternalError::from(from_error.to_string()))
+	}
+}
+
+impl From<&str> for UnauthorizedError {
+	fn from(text: &str) -> Self {
+		Self {
+			error_type: AppErrorType::UnauthorizedError,
+			error: text.to_owned()
+		}
 	}
 }

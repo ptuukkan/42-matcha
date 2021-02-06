@@ -6,7 +6,7 @@ use super::api;
 use std::env;
 use actix_web::client::Client;
 use serde_json;
-use crate::errors::{AppError, CursorError};
+use crate::errors::{AppError};
 
 
 #[derive(Serialize, Debug)]
@@ -28,16 +28,6 @@ pub struct CursorResponse {
 	#[serde(skip)]
 	bytes: Bytes
 }
-
-// #[derive(Deserialize, Debug)]
-// pub struct CursorErrorResponse {
-// 	code: i16,
-// 	error: bool,
-// 	#[serde(rename = "errorMessage")]
-// 	error_message: String,
-// 	#[serde(rename = "errorNum")]
-// 	error_num: i32
-// }
 
 #[derive(Deserialize, Debug)]
 pub struct Cursor<T> {
@@ -69,7 +59,7 @@ impl CursorRequest {
 			.await?;
 		let mut cursor_response: CursorResponse = serde_json::from_slice(&bytes)?;
 		if cursor_response.error == true {
-			return Err(AppError::CursorError(CursorError::from(cursor_response)));
+			return Err(AppError::cursor(cursor_response));
 		}
 		cursor_response.bytes = bytes;
 		Ok(cursor_response)
@@ -97,7 +87,7 @@ impl CursorResponse {
 				.await?;
 			let cursor_response: CursorResponse = serde_json::from_slice(&bytes)?;
 			if cursor_response.error == true {
-				return Err(AppError::CursorError(CursorError::from(cursor_response)));
+				return Err(AppError::cursor(cursor_response));
 			}
 			let mut cursor: Cursor<T> = serde_json::from_slice(&bytes)?;
 			return_data.append(&mut cursor.result);
@@ -106,12 +96,6 @@ impl CursorResponse {
 		Ok(return_data)
 	}
 }
-
-// impl<T> Cursor<T> {
-// 	pub async fn all(&self) {
-
-// 	}
-// }
 
 impl From<&str> for CursorRequest {
 	fn from(cursor_query: &str) -> Self {
