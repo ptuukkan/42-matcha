@@ -1,6 +1,5 @@
 import React, { useContext } from 'react';
-import { Form, Message, Button, Modal } from 'semantic-ui-react';
-import { Link } from 'react-router-dom';
+import { Form, Button, Modal } from 'semantic-ui-react';
 import { useForm } from 'react-hook-form';
 import { RootStoreContext } from '../../app/stores/rootStore';
 import { observer } from 'mobx-react-lite';
@@ -16,16 +15,19 @@ const Register = () => {
 		registerFinishOpen,
 		closeRegisterFinish,
 	} = rootStore.modalStore;
-	const { registerUser } = rootStore.userStore;
+	const { registerUser, loading } = rootStore.userStore;
 	const { register, handleSubmit, errors, setError } = useForm();
 
 	const onSubmit = (data: IRegisterFormValues) => {
-		registerUser(data)
-			.catch((error) => {
-				error.response.data.errors.forEach((err: IValidationError) => {
+		registerUser(data).catch((error) => {
+			if (error.error_type === 'ValidationError') {
+				error.errors.forEach((err: IValidationError) => {
 					setError(err.field, { type: 'manual', message: err.error });
 				});
-			});
+			} else {
+				setError('global', { type: 'manual', message: error.error });
+			}
+		});
 	};
 
 	const validatePassword = (value: string) => {
@@ -95,7 +97,7 @@ const Register = () => {
 							validate: validatePassword,
 						})}
 					/>
-					<Button primary type="submit">
+					<Button primary type="submit" loading={loading}>
 						Register
 					</Button>
 				</Form>
@@ -107,11 +109,10 @@ const Register = () => {
 					</Modal.Content>
 					<Modal.Actions>
 						<Button
+							primary
 							icon="check"
 							content="All Done"
 							onClick={closeRegisterFinish}
-							as={Link}
-							to="/"
 						/>
 					</Modal.Actions>
 				</Modal>

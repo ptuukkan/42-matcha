@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import './Profile.css'
 import { Header, Image, Card, Icon, Button } from 'semantic-ui-react'
-import { Gender, IUser } from '../../app/models/user'
+import { IUser } from '../../app/models/user'
 
 interface IProps {
 	user: IUser
-	getProfile(): void; 
+	getProfile(): void;
 }
 
 const Profile: React.FC<IProps> = ({ getProfile, user }) => {
