@@ -1,11 +1,12 @@
 import React, { useContext } from 'react';
-import { Form, Button, Modal } from 'semantic-ui-react';
+import { Form, Button, Modal, Message } from 'semantic-ui-react';
 import { useForm } from 'react-hook-form';
 import { RootStoreContext } from '../../app/stores/rootStore';
 import { observer } from 'mobx-react-lite';
 import { IRegisterFormValues } from '../../app/models/user';
 import TextInput from './TextInput';
 import { IValidationError } from '../../app/models/errors';
+import { ErrorMessage } from '@hookform/error-message';
 
 const Register = () => {
 	const rootStore = useContext(RootStoreContext);
@@ -22,10 +23,10 @@ const Register = () => {
 		registerUser(data).catch((error) => {
 			if (error.error_type === 'ValidationError') {
 				error.errors.forEach((err: IValidationError) => {
-					setError(err.field, { type: 'manual', message: err.error });
+					setError(err.field, { type: 'manual', message: err.message });
 				});
 			} else {
-				setError('global', { type: 'manual', message: error.error });
+				setError('global', { type: 'manual', message: error.message });
 			}
 		});
 	};
@@ -96,6 +97,11 @@ const Register = () => {
 							required: 'Password is required',
 							validate: validatePassword,
 						})}
+					/>
+					<ErrorMessage
+						errors={errors}
+						name="global"
+						render={({ message }) => <Message negative>{message}</Message>}
 					/>
 					<Button primary type="submit" loading={loading}>
 						Register

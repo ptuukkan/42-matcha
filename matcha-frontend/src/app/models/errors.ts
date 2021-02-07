@@ -1,8 +1,12 @@
 export interface IValidationError {
 	field: string,
-	error: string
+	message: string
 }
 
-export interface IBackendError {
-	error: string
+export class BackendError {
+	message: string
+
+	constructor(message: string) {
+		this.message = message
+	}
 }

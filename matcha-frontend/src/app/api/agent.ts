@@ -1,11 +1,12 @@
 import axios, { AxiosResponse } from 'axios';
+import { BackendError } from '../models/errors';
 import { ILoginFormValues, IRegisterFormValues } from '../models/user';
 
 axios.defaults.baseURL = process.env.REACT_APP_API_URL;
 
 axios.interceptors.response.use(undefined, (error) => {
 	if (error.message === 'Network Error' && !error.response) {
-		const e = { error: 'Network Error' };
+		const e = new BackendError('Network Error');
 		throw e;
 	}
 	if (error.response && error.response.data) {

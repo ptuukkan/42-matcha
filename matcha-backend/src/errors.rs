@@ -19,9 +19,6 @@ pub enum AppError {
 	#[display(fmt = "internal error")]
 	InternalError(InternalError),
 
-	#[display(fmt = "cursor error")]
-	CursorError(CursorError),
-
 	#[display(fmt = "unauthorized error")]
 	UnauthorizedError(UnauthorizedError),
 }
@@ -30,7 +27,6 @@ pub enum AppError {
 pub enum AppErrorType {
 	ValidationError,
 	InternalError,
-	CursorError,
 	UnauthorizedError,
 }
 
@@ -43,28 +39,20 @@ pub struct ValidationError {
 #[derive(Serialize, Debug)]
 pub struct FieldError {
 	field: String,
-    error: String
+    message: String
 }
 
 #[derive(Serialize, Debug)]
 pub struct InternalError {
 	error_type: AppErrorType,
-	error: String
+	message: String
 }
 
-#[derive(Serialize, Debug)]
-pub struct CursorError {
-	error_type: AppErrorType,
-	error: bool,
-    code: i32,
-    error_num: i32,
-    error_message: String
-}
 
 #[derive(Serialize, Debug)]
 pub struct UnauthorizedError {
 	error_type: AppErrorType,
-	error: String
+	message: String
 }
 
 impl ValidationError {
@@ -86,10 +74,10 @@ impl ValidationError {
 		}
 	}
 
-	pub fn add(&mut self, field: &str, error: &str) {
+	pub fn add(&mut self, field: &str, message: &str) {
 		let field_error = FieldError {
 			field: field.to_owned(),
-			error: error.to_owned()
+			message: message.to_owned()
 		};
 		self.errors.push(field_error);
 	}
@@ -100,8 +88,8 @@ impl AppError {
 		AppError::UnauthorizedError(UnauthorizedError::from(text))
 	}
 
-	pub fn cursor(cursor_response: CursorResponse) -> AppError {
-		AppError::CursorError(CursorError::from(cursor_response))
+	pub fn internal(cursor_response: CursorResponse) -> AppError {
+		AppError::InternalError(InternalError::from(cursor_response))
 	}
 }
 
@@ -109,7 +97,6 @@ impl ResponseError for AppError {
 	fn status_code(&self) -> StatusCode {
 		match &self {
 			AppError::ValidationError(_) => StatusCode::BAD_REQUEST,
-			AppError::CursorError(_) => StatusCode::INTERNAL_SERVER_ERROR,
 			AppError::InternalError(_) => StatusCode::INTERNAL_SERVER_ERROR,
 			AppError::UnauthorizedError(_) => StatusCode::UNAUTHORIZED
 		}
@@ -123,9 +110,6 @@ impl ResponseError for AppError {
 			AppError::InternalError(e) => HttpResponseBuilder::new(self.status_code())
 				.set_header(header::CONTENT_TYPE, "application/json")
 				.json(e),
-			AppError::CursorError(e) => HttpResponseBuilder::new(self.status_code())
-				.set_header(header::CONTENT_TYPE, "application/json")
-				.json(e),
 			AppError::UnauthorizedError(e) => HttpResponseBuilder::new(self.status_code())
 				.set_header(header::CONTENT_TYPE, "application/json")
 				.json(e)
@@ -133,14 +117,11 @@ impl ResponseError for AppError {
 	}
 }
 
-impl From<CursorResponse> for CursorError {
+impl From<CursorResponse> for InternalError {
 	fn from(cursor_response: CursorResponse) -> Self {
 		Self {
-			error_type: AppErrorType::CursorError,
-			code: cursor_response.code,
-			error: cursor_response.error,
-			error_message: cursor_response.error_message.unwrap(),
-			error_num: cursor_response.error_num.unwrap()
+			error_type: AppErrorType::InternalError,
+			message: cursor_response.error_message.unwrap(),
 		}
 	}
 }
@@ -149,7 +130,7 @@ impl From<&str> for InternalError {
 	fn from(text: &str) -> Self {
 		Self {
 			error_type: AppErrorType::InternalError,
-			error: text.to_owned()
+			message: text.to_owned()
 		}
 	}
 }
@@ -158,7 +139,7 @@ impl From<String> for InternalError {
 	fn from(text: String) -> Self {
 		Self {
 			error_type: AppErrorType::InternalError,
-			error: text
+			message: text
 		}
 	}
 }
@@ -191,7 +172,7 @@ impl From<&str> for UnauthorizedError {
 	fn from(text: &str) -> Self {
 		Self {
 			error_type: AppErrorType::UnauthorizedError,
-			error: text.to_owned()
+			message: text.to_owned()
 		}
 	}
 }

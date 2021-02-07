@@ -5,7 +5,7 @@ import { RootStoreContext } from '../../app/stores/rootStore';
 import { observer } from 'mobx-react-lite';
 import { ILoginFormValues } from '../../app/models/user';
 import TextInput from './TextInput';
-import { IBackendError } from '../../app/models/errors';
+import { BackendError } from '../../app/models/errors';
 import { ErrorMessage } from '@hookform/error-message';
 
 const Login = () => {
@@ -15,8 +15,8 @@ const Login = () => {
 	const { register, handleSubmit, errors, setError } = useForm();
 
 	const onSubmit = (data: ILoginFormValues) => {
-		loginUser(data).catch((error: IBackendError) => {
-			setError('global', { type: 'manual', message: error.error });
+		loginUser(data).catch((error: BackendError) => {
+			setError('global', { type: 'manual', message: error.message });
 		});
 	};
 
