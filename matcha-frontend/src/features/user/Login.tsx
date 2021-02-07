@@ -5,15 +5,19 @@ import { RootStoreContext } from '../../app/stores/rootStore';
 import { observer } from 'mobx-react-lite';
 import { ILoginFormValues } from '../../app/models/user';
 import TextInput from './TextInput';
+import { IBackendError } from '../../app/models/errors';
+import { ErrorMessage } from '@hookform/error-message';
 
 const Login = () => {
 	const rootStore = useContext(RootStoreContext);
 	const { loginOpen, closeLogin } = rootStore.modalStore;
-	const { loginUser } = rootStore.userStore;
-	const { register, handleSubmit, errors } = useForm();
+	const { loginUser, loading } = rootStore.userStore;
+	const { register, handleSubmit, errors, setError } = useForm();
 
 	const onSubmit = (data: ILoginFormValues) => {
-		loginUser(data);
+		loginUser(data).catch((error: IBackendError) => {
+			setError('global', { type: 'manual', message: error.error });
+		});
 	};
 
 	return (
@@ -23,11 +27,15 @@ const Login = () => {
 				<Form onSubmit={handleSubmit(onSubmit)}>
 					<TextInput
 						type="text"
-						name="username"
-						label="Username"
+						name="emailAddress"
+						label="Email address"
 						errors={errors}
 						register={register({
-							required: 'Username is required',
+							required: 'Email address is required',
+							pattern: {
+								value: /^[^@ ]+@[^@ ]+\.[^@ .]{2,}$/,
+								message: 'Email is not valid',
+							},
 						})}
 					/>
 					<TextInput
@@ -39,7 +47,14 @@ const Login = () => {
 							required: 'Password is required',
 						})}
 					/>
-					<Button primary type="submit">Login</Button>
+					<ErrorMessage
+						errors={errors}
+						name="global"
+						render={({ message }) => <Message negative>{message}</Message>}
+					/>
+					<Button primary type="submit" loading={loading}>
+						Login
+					</Button>
 				</Form>
 			</Modal.Content>
 		</Modal>
