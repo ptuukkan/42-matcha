@@ -67,22 +67,12 @@ pub async fn get<O: de::DeserializeOwned>(url: &String)
 	Ok(res)
 }
 
-// pub async fn delete(url: &String) -> Result<(), Error> {
-// 	let jwt = get_arango_jwt().await.expect("DB Login failed");
-// 	let client = Client::default();
-// 	let _res = client.delete(url)
-// 		.set_header("Authorization", "bearer ".to_owned() + &jwt)
-// 		.send()
-// 		.await?;
-// 	Ok(())
-// }
-
-// pub async fn cursor<T>(data: &CursorRequest) {
-// 	let jwt = get_arango_jwt().await.expect("DB Login failed");
-// 	let db_url: String = env::var("DB_URL")
-// 		.expect("Missing env variable DB_URL");
-// 	let url = db_url + "_api/cursor";
-
-// 	let res = post<CursorRequest, CursorResponse>(&url, data)
-
-// }
+pub async fn patch<I: Serialize>(url: &String, data: &I) -> Result<(), Error> {
+	let jwt = get_arango_jwt().await.expect("DB Login failed");
+	let client = Client::default();
+	client.patch(url)
+		.set_header("Authorization", "bearer ".to_owned() + &jwt)
+		.send_json(data)
+		.await?;
+	Ok(())
+}

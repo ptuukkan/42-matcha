@@ -6,7 +6,7 @@ mod errors;
 use actix_web::error::Error;
 use actix_web::web::Json;
 use dotenv::dotenv;
-use actix_web::{get, post, App, HttpResponse, HttpServer, Responder};
+use actix_web::{web, get, post, App, HttpResponse, HttpServer, Responder};
 use actix_cors::Cors;
 use database::seed_data;
 
@@ -34,6 +34,15 @@ async fn register(values: Json<models::user::RegisterFormValues>) -> Result<Http
     Ok(HttpResponse::Created().finish())
 }
 
+#[get("/verify/{link}")] // <- define path parameters
+async fn verify(web::Path(link): web::Path<String>) -> Result<HttpResponse, Error> {
+    application::user::register::verify(&link).await?;
+    Ok(HttpResponse::Ok().finish())
+}
+
+
+
+
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     dotenv().ok();
@@ -45,6 +54,7 @@ async fn main() -> std::io::Result<()> {
             .service(seed)
             .service(register)
             .service(login)
+            .service(verify)
     })
     .bind("127.0.0.1:8080")?
     .run()
