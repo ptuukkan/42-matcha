@@ -17,10 +17,9 @@ const Register = () => {
 		closeRegisterFinish,
 	} = rootStore.modalStore;
 	const { registerUser, loading } = rootStore.userStore;
-	const { register, handleSubmit, errors, setError } = useForm();
+	const { register, handleSubmit, errors, setError, clearErrors } = useForm();
 
 	const onSubmit = (data: IRegisterFormValues) => {
-		console.log('ksdhf')
 		registerUser(data).catch((error) => {
 			if (error.error_type === 'ValidationError') {
 				error.errors.forEach((err: IValidationError) => {
@@ -104,7 +103,7 @@ const Register = () => {
 						name="global"
 						render={({ message }) => <Message negative>{message}</Message>}
 					/>
-					<Button primary type="submit" loading={loading}>
+					<Button primary type="submit" loading={loading} onClick={() => clearErrors()}>
 						Register
 					</Button>
 				</Form>

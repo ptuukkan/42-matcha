@@ -12,7 +12,7 @@ const Login = () => {
 	const rootStore = useContext(RootStoreContext);
 	const { loginOpen, closeLogin } = rootStore.modalStore;
 	const { loginUser, loading } = rootStore.userStore;
-	const { register, handleSubmit, errors, setError, reset } = useForm();
+	const { register, handleSubmit, errors, setError, reset, clearErrors } = useForm();
 
 	const onSubmit = (data: ILoginFormValues) => {
 		loginUser(data).catch((error: BackendError) => {
@@ -55,7 +55,7 @@ const Login = () => {
 						name="global"
 						render={({ message }) => <Message negative>{message}</Message>}
 					/>
-					<Button primary type="submit" loading={loading}>
+					<Button primary type="submit" loading={loading} onClick={() => clearErrors()}>
 						Login
 					</Button>
 				</Form>
