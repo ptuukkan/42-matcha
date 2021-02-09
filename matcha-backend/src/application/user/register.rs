@@ -30,13 +30,12 @@ pub async fn register(values: RegisterFormValues) -> Result<(), AppError> {
 		.extract_all::<User>()
 		.await?;
 	if !check_existing_username.is_empty() {
-		validation_error.add("userName", "Username is already in use");
+		validation_error.add("username", "Username is already in use");
 	}
 
 	if !validation_error.errors.is_empty() {
 		return Err(AppError::ValidationError(validation_error));
 	}
-
 	send_verification_email(&user)?;
 
 	user.create().await?;
