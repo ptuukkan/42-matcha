@@ -10,12 +10,12 @@ pub async fn login(values: LoginFormValues) -> Result<(), AppError> {
 		.extract_all::<User>()
 		.await?;
 	if let Some(user) = result.pop() {
-		if user.link == "" {
+			if !user.link == "" {
+				return Err(AppError::unauthorized("Please verify your account!"));
+			}
 			if !user.verify_pw(&values.password) {
 				return Err(AppError::unauthorized("Login failed"));
 			}
-		} else {
-			return Err(AppError::unauthorized("Please verify your account!"));
 		}
 	} else {
 		return Err(AppError::unauthorized("Login failed"));
