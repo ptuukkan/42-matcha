@@ -20,6 +20,7 @@ const Register = () => {
 	const { register, handleSubmit, errors, setError } = useForm();
 
 	const onSubmit = (data: IRegisterFormValues) => {
+		console.log('ksdhf')
 		registerUser(data).catch((error) => {
 			if (error.error_type === 'ValidationError') {
 				error.errors.forEach((err: IValidationError) => {

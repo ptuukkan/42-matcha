@@ -12,7 +12,7 @@ const Login = () => {
 	const rootStore = useContext(RootStoreContext);
 	const { loginOpen, closeLogin } = rootStore.modalStore;
 	const { loginUser, loading } = rootStore.userStore;
-	const { register, handleSubmit, errors, setError } = useForm();
+	const { register, handleSubmit, errors, setError, reset } = useForm();
 
 	const onSubmit = (data: ILoginFormValues) => {
 		loginUser(data).catch((error: BackendError) => {
@@ -21,7 +21,10 @@ const Login = () => {
 	};
 
 	return (
-		<Modal size="tiny" open={loginOpen} onClose={closeLogin}>
+		<Modal size="tiny" open={loginOpen} onClose={()=> {
+			closeLogin()
+			reset()
+		}}>
 			<Modal.Header>Login to Matcha</Modal.Header>
 			<Modal.Content>
 				<Form onSubmit={handleSubmit(onSubmit)}>
