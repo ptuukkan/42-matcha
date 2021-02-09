@@ -8,6 +8,7 @@ use actix_web::{
 	Error
 };
 use serde::Serialize;
+use std::env;
 use crate::database::cursor::CursorResponse;
 use derive_more::{Display};
 
@@ -21,6 +22,9 @@ pub enum AppError {
 
 	#[display(fmt = "unauthorized error")]
 	UnauthorizedError(UnauthorizedError),
+
+	#[display(fmt = "bad request error")]
+	BadRequestError(BadRequestError),
 }
 
 #[derive(Serialize, Debug)]
@@ -28,6 +32,7 @@ pub enum AppErrorType {
 	ValidationError,
 	InternalError,
 	UnauthorizedError,
+	BadRequestError,
 }
 
 #[derive(Serialize, Debug)]
@@ -48,6 +53,11 @@ pub struct InternalError {
 	message: String
 }
 
+#[derive(Serialize, Debug)]
+pub struct BadRequestError {
+	error_type: AppErrorType,
+	message: String
+}
 
 #[derive(Serialize, Debug)]
 pub struct UnauthorizedError {
@@ -91,6 +101,10 @@ impl AppError {
 	pub fn internal(cursor_response: CursorResponse) -> AppError {
 		AppError::InternalError(InternalError::from(cursor_response))
 	}
+
+	pub fn bad_request(text: &str) -> AppError {
+		AppError::BadRequestError(BadRequestError::from(text))
+	}
 }
 
 impl ResponseError for AppError {
@@ -98,7 +112,8 @@ impl ResponseError for AppError {
 		match &self {
 			AppError::ValidationError(_) => StatusCode::BAD_REQUEST,
 			AppError::InternalError(_) => StatusCode::INTERNAL_SERVER_ERROR,
-			AppError::UnauthorizedError(_) => StatusCode::UNAUTHORIZED
+			AppError::UnauthorizedError(_) => StatusCode::UNAUTHORIZED,
+			AppError::BadRequestError(_) => StatusCode::BAD_REQUEST,
 		}
 	}
 
@@ -111,6 +126,9 @@ impl ResponseError for AppError {
 				.set_header(header::CONTENT_TYPE, "application/json")
 				.json(e),
 			AppError::UnauthorizedError(e) => HttpResponseBuilder::new(self.status_code())
+				.set_header(header::CONTENT_TYPE, "application/json")
+				.json(e),
+			AppError::BadRequestError(e) => HttpResponseBuilder::new(self.status_code())
 				.set_header(header::CONTENT_TYPE, "application/json")
 				.json(e)
 		}
@@ -130,6 +148,15 @@ impl From<&str> for InternalError {
 	fn from(text: &str) -> Self {
 		Self {
 			error_type: AppErrorType::InternalError,
+			message: text.to_owned()
+		}
+	}
+}
+
+impl From<&str> for BadRequestError {
+	fn from(text: &str) -> Self {
+		Self {
+			error_type: AppErrorType::BadRequestError,
 			message: text.to_owned()
 		}
 	}
@@ -167,6 +194,25 @@ impl From<serde_json::Error> for AppError {
 		Self::InternalError(InternalError::from(from_error.to_string()))
 	}
 }
+
+impl From<env::VarError> for AppError {
+	fn from(from_error: env::VarError) -> Self {
+		Self::InternalError(InternalError::from(from_error.to_string()))
+	}
+}
+
+impl From<lettre_email::error::Error> for AppError {
+	fn from(from_error: lettre_email::error::Error) -> Self {
+		Self::InternalError(InternalError::from(from_error.to_string()))
+	}
+}
+
+impl From<lettre::sendmail::error::Error> for AppError {
+	fn from(from_error: lettre::sendmail::error::Error) -> Self {
+		Self::InternalError(InternalError::from(from_error.to_string()))
+	}
+}
+
 
 impl From<&str> for UnauthorizedError {
 	fn from(text: &str) -> Self {

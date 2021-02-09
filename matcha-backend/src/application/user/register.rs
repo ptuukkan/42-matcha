@@ -1,10 +1,9 @@
-use crate::errors::LoginError;
 use crate::database::cursor::CursorRequest;
 use crate::errors::{AppError, ValidationError};
 use crate::models::user::{RegisterFormValues, User};
-use std::env;
 use lettre::{SendableEmail, SendmailTransport, Transport};
 use lettre_email::EmailBuilder;
+use std::env;
 
 pub async fn register(values: RegisterFormValues) -> Result<(), AppError> {
 	let user = User::from(values);
@@ -38,39 +37,37 @@ pub async fn register(values: RegisterFormValues) -> Result<(), AppError> {
 		return Err(AppError::ValidationError(validation_error));
 	}
 
-	
-	send_verification_email(&user);
-	
+	send_verification_email(&user)?;
 
 	user.create().await?;
 
 	Ok(())
 }
 
-pub fn send_verification_email(user: &User) -> Result<(), AppError>
-{
+pub fn send_verification_email(user: &User) -> Result<(), AppError> {
 	let app_url: String = env::var("APP_URL")?;
 
 	let html_text = format!("
-	<h2>One step closer to your matchas!</h2>
-	<br>
-	<p>
-	To finish your registeration please click <a href=\"http://127.0.0.1:8080/verify/{link}\">here</a> to confirm/activate your account
-	</p>",
-	link=user.link);
+		<h2>One step closer to your matchas!</h2>
+		<br>
+		<p>
+		To finish your registeration please click <a href=\"{}verify/{}\">here</a> to confirm/activate your account
+		</p>",
+	app_url,
+	user.link
+	);
 
 	let email = EmailBuilder::new()
 		.to(user.email_address.to_string())
 		.from("no-reply@matcha.com")
 		.subject("Matcha confirmation!")
 		.html(html_text)
-		.build()
-		.unwrap();
+		.build()?;
 	let email: SendableEmail = email.into();
 
 	let mut sender = SendmailTransport::new();
-	let result = sender.send(email);
-	assert!(result.is_ok());
+	sender.send(email)?;
+	Ok(())
 }
 
 pub async fn verify(link: &str) -> Result<(), AppError> {
@@ -78,19 +75,19 @@ pub async fn verify(link: &str) -> Result<(), AppError> {
 		"FOR u IN users filter u.link == '{}' return u",
 		link
 	))
-	.send()
-	.await?
-	.extract_all::<User>()
-	.await?;
+		.send()
+		.await?
+		.extract_all::<User>()
+		.await?;
 	if result.is_empty() {
-		return Err(AppError::LoginError(LoginError::new("Verification failed"))); // Create a new error Verification error instead
+		return Err(AppError::bad_request(
+			"Link is invalid or email address has already been validated",
+		)); // Create a new error Verification error instead
 	}
-	if !result.is_empty() {
-		if let Some(mut user) = result.pop() {
-			user.link = String::from("");
-			user.update().await?
-		}
+
+	if let Some(mut user) = result.pop() {
+		user.link = String::from("");
+		user.update().await?
 	}
 	Ok(())
 }
-

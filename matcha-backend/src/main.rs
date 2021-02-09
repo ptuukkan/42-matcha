@@ -6,7 +6,7 @@ mod errors;
 use actix_web::error::Error;
 use actix_web::web::Json;
 use dotenv::dotenv;
-use actix_web::{web, get, post, App, HttpResponse, HttpServer, Responder, HttpRequest};
+use actix_web::{web, get, post, App, HttpResponse, HttpServer, Responder};
 use actix_cors::Cors;
 use database::seed_data;
 
