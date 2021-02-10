@@ -20,7 +20,6 @@ const App = () => {
 		let i = Math.floor(Math.random() * Profiles.profiles.length);
 		setProfile(Profiles.profiles[i]);
 	};
-	console.log(profile);
 
 	return (
 		<div style={{ display:"flex", minHeight:"100vh", flexDirection:"column" }}>

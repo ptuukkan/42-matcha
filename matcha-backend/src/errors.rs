@@ -213,7 +213,6 @@ impl From<lettre::sendmail::error::Error> for AppError {
 	}
 }
 
-
 impl From<&str> for UnauthorizedError {
 	fn from(text: &str) -> Self {
 		Self {
