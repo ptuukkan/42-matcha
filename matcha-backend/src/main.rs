@@ -23,9 +23,9 @@ async fn seed() -> impl Responder {
 }
 
 #[post("/user/login")]
-async fn login(values: Json<models::user::LoginFormValues>) -> Result<String, Error> {
+async fn login(values: Json<models::user::LoginFormValues>) -> Result<HttpResponse, Error> {
     let token = application::user::login::login(values.into_inner()).await?;
-    Ok(String::from(token))
+    Ok(HttpResponse::Ok().json(token))
 }
 
 #[post("/user/register")]
