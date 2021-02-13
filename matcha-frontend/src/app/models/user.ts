@@ -14,6 +14,7 @@ export interface IUser {
 	interests: string[];
 /* 	pictures: string[]; */
 	pictures: IPicture[];
+	token?: string;
 }
 
 export interface ILocation {

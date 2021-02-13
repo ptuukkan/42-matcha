@@ -16,7 +16,8 @@ pub struct User {
 	pub email_address: String,
 	pub user_name: String,
 	password: String,
-	pub link: String
+	pub link: String,
+	pub token: Option<String>
 }
 
 #[derive(Deserialize, Debug)]
@@ -54,7 +55,8 @@ impl User {
 			email_address: String::from(email_address),
 			user_name: String::from(user_name),
 			password: User::hash_pw(&String::from(password)),
-			link: String::new()
+			link: String::new(),
+			token: None,
 		}
 	}
 
@@ -117,7 +119,8 @@ impl From<RegisterFormValues> for User {
 			first_name: values.first_name,
 			last_name: values.last_name,
 			password: User::hash_pw(&values.password),
-			link: nanoid!(10, &nanoid::alphabet::SAFE)
+			link: nanoid!(10, &nanoid::alphabet::SAFE),
+			token: None
 		}
 	}
 }

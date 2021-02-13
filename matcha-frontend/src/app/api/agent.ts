@@ -38,7 +38,7 @@ const requests = {
 const User = {
 	register: (user: IRegisterFormValues): Promise<void> =>
 		requests.post('/user/register', user),
-	login: (user: ILoginFormValues): Promise<string> =>
+	login: (user: ILoginFormValues): Promise<IUser> =>
 		requests.post('/user/login', user),
 	current: (): Promise<IUser> => requests.get('/user/current'),
 };

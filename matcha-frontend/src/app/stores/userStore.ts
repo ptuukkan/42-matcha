@@ -48,8 +48,11 @@ export default class UserStore {
 	loginUser = async (data: ILoginFormValues) => {
 		this.loading = true;
 		try {
-			const token = await agent.User.login(data);
-			this.setToken(token);
+			const user = await agent.User.login(data);
+			runInAction(() => {
+				this.user = user;
+			});
+			this.setToken(user.token);
 			this.stopLoading();
 			this.rootStore.modalStore.closeLogin();
 		} catch (error) {
