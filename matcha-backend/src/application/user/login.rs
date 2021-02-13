@@ -28,11 +28,11 @@ pub async fn login(values: LoginFormValues) -> Result<LoginResponse, AppError> {
 		.extract_all::<User>()
 		.await?;
 	if let Some(user) = result.pop() {
-		if user.link != "" {
-			return Err(AppError::unauthorized("Please verify your account!"));
-		}
 		if !user.verify_pw(&values.password) {
 			return Err(AppError::unauthorized("Login failed"));
+		}
+		if user.link != "" {
+			return Err(AppError::unauthorized("Please verify your account!"));
 		}
 		let my_claims = Claims { sub: user.email_address.to_owned(), exp: 7200 };
 		let key: String = env::var("SECRET")?;
