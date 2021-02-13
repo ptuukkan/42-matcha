@@ -17,7 +17,7 @@ pub struct User {
 	pub user_name: String,
 	password: String,
 	pub link: String,
-	pub token: Option<String>
+	// pub token: Option<String>
 }
 
 #[derive(Deserialize, Debug)]

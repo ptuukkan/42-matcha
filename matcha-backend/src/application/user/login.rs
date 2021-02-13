@@ -37,7 +37,7 @@ pub async fn login(values: LoginFormValues) -> Result<User, AppError> {
 		let my_claims = Claims { sub: user.email_address.to_owned(), exp: 7200 };
 		let key: String = env::var("SECRET")?;
 		let token = encode(&Header::default(), &my_claims, &EncodingKey::from_secret(key.as_ref()))?;
-		user.token = Some(token);
+		// user.token = Some(token);
 		Ok(user)
 	} else {
 		return Err(AppError::unauthorized("Login failed"));

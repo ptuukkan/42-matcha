@@ -46,13 +46,13 @@ const App = () => {
 									<Route exact path="/chat" component={Chat} />
 									<Route exact path="/settings" component={Settings} />
 									<Route exact path="/profile">
-										<Profile getProfile={getRandomUser} user={profile} />
+										<Profile getProfile={getRandomUser} profile={profile} />
 									</Route>
 									<Route exact path="/matches">
-										<Matches users={Profiles.profiles} />
+										<Matches profiles={Profiles.profiles} />
 									</Route>
 									<Route exact path="/browse">
-										<Browse users={Profiles.profiles} />
+										<Browse profiles={Profiles.profiles} />
 									</Route>
 									<Route exact path="/register" component={Register} />
 									<Route exact path="/login" component={Login} />

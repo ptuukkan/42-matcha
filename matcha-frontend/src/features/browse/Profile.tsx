@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from 'react'
 import './Profile.css'
 import { Header, Image, Card, Icon, Button } from 'semantic-ui-react'
-import { IUser } from '../../app/models/user'
+import { IProfile } from '../../app/models/profile'
 
 interface IProps {
-	user: IUser
+	profile: IProfile
 	getProfile(): void;
 }
 
-const Profile: React.FC<IProps> = ({ getProfile, user }) => {
-	console.log(user)
+const Profile: React.FC<IProps> = ({ getProfile, profile }) => {
+	console.log(profile)
 
 	const [location, setLocation] = useState({ lat: 0, lon: 0 })
 
-	const birth = new Date(user.birthday).getFullYear()
+	const birth = new Date(profile.birthday).getFullYear()
 	const nyt = new Date().getFullYear()
 
 	const getLocation = () => {
@@ -51,26 +51,26 @@ const Profile: React.FC<IProps> = ({ getProfile, user }) => {
 	return (
 		<div>
 			<Card fluid>
-				<Image src={`https://robohash.org/${user.firstName}1`} wrapped ui={false} />
-				<Image src={`https://robohash.org/${user.firstName}2`} wrapped ui={false} />
-				<Image src={`https://robohash.org/${user.firstName}3`} wrapped ui={false} />
+				<Image src={`https://robohash.org/${profile.firstName}1`} wrapped ui={false} />
+				<Image src={`https://robohash.org/${profile.firstName}2`} wrapped ui={false} />
+				<Image src={`https://robohash.org/${profile.firstName}3`} wrapped ui={false} />
 				<div className="profileinfo">
 					<Header as="h1">
-						{user.firstName} {user.lastName}
+						{profile.firstName} {profile.lastName}
 					</Header>
-					<Icon name={user.gender === 'male' ? 'mars' : 'venus'} />
+					<Icon name={profile.gender === 'male' ? 'mars' : 'venus'} />
 					<Card.Meta>
 						Distance:{' '}
 						{getDistance(
 							location.lat,
-							user.location.latitude,
+							profile.location.latitude,
 							location.lon,
-							user.location.longitude
+							profile.location.longitude
 						)}{' '}
 						km
 					</Card.Meta>
 					Age: {nyt - birth}
-					<Card.Description>{user.biography}</Card.Description>
+					<Card.Description>{profile.biography}</Card.Description>
 					<br></br>
 					<Button
 						circular

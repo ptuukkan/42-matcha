@@ -7,39 +7,39 @@ import {
 	Label,
 	Button,
 } from 'semantic-ui-react';
-import { IUser } from '../../app/models/user';
+import { IProfile } from '../../app/models/profile';
 
 interface IProps {
-	users: IUser[];
+	profiles: IProfile[];
 }
 
-const Matches: React.FC<IProps> = ({ users }) => {
+const Matches: React.FC<IProps> = ({ profiles }) => {
 	return (
 		<Container>
 			<Card.Group itemsPerRow={1}>
-				{users.map((user) => (
-					<Card key={user.location.latitude - Date.now()}>
+				{profiles.map((profile) => (
+					<Card key={profile.location.latitude - Date.now()}>
 						<Label
 							color={
-								Math.abs(Math.floor(user.location.latitude)) <
+								Math.abs(Math.floor(profile.location.latitude)) <
 								40
 									? 'red'
 									: 'green'
 							}
 							floating
 						>
-							{Math.abs(Math.floor(user.location.latitude)) < 40
+							{Math.abs(Math.floor(profile.location.latitude)) < 40
 								? 'Offline'
 								: 'Online'}
 						</Label>
 						<Image
-							src={`https://robohash.org/${user.firstName}`}
+							src={`https://robohash.org/${profile.firstName}`}
 							wrapped
 							ui={false}
 						/>
 						<Card.Content>
 							<Card.Header as="h5">
-								{user.firstName} {user.lastName}
+								{profile.firstName} {profile.lastName}
 							</Card.Header>
 							Distance: {Math.floor(Math.random() * 80)} km
 						</Card.Content>

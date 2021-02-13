@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { action, makeObservable, observable, runInAction } from 'mobx';
 import agent from '../api/agent';
 import { ILoginFormValues, IRegisterFormValues, IUser } from '../models/user';

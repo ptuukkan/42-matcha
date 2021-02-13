@@ -10,10 +10,10 @@ import {
 	Divider,
 	Grid,
 } from 'semantic-ui-react';
-import { IUser } from '../../app/models/user';
+import { IProfile } from '../../app/models/profile';
 
 interface IProps {
-	users: IUser[];
+	profiles: IProfile[];
 }
 
 const interests = [
@@ -37,7 +37,7 @@ const interests = [
 	{ key: 'ux', text: 'User Experience', value: 'ux' },
 ];
 
-const Browse: React.FC<IProps> = ({ users }) => {
+const Browse: React.FC<IProps> = ({ profiles }) => {
 	return (
 		<Container>
 			<Grid columns={2} relaxed="very" stackable>
@@ -87,25 +87,25 @@ const Browse: React.FC<IProps> = ({ users }) => {
 
 			<Divider />
 			<Card.Group itemsPerRow={3}>
-				{users.map((user) => (
+				{profiles.map((profile) => (
 					<Card
-						key={user.location.latitude - Date.now()}
+						key={profile.location.latitude - Date.now()}
 						as={Link}
 						to={'/profile'}
 					>
 						<Image
-							src={`https://robohash.org/${user.firstName}`}
+							src={`https://robohash.org/${profile.firstName}`}
 							wrapped
 							ui={false}
 						/>
 						<Header as="h5">
-							{user.firstName} {user.lastName}
+							{profile.firstName} {profile.lastName}
 						</Header>
 						<Card.Content>
 							Distance: {Math.floor(Math.random() * 80)} km
 							<Card.Meta>
 								Likes:{' '}
-								{Math.abs(Math.floor(user.location.latitude))}
+								{Math.abs(Math.floor(profile.location.latitude))}
 							</Card.Meta>
 						</Card.Content>
 					</Card>
