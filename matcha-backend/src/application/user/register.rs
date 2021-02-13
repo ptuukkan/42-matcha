@@ -20,10 +20,10 @@ pub async fn register(values: RegisterFormValues) -> Result<(), AppError> {
 	if !check_existing_email.is_empty() {
 		validation_error.add("emailAddress", "Email address is already in use");
 	}
-
+	println!("japaaaaoa");
 	let check_existing_username = CursorRequest::from(format!(
-		"FOR u IN users filter u.user_name == '{}' return u",
-		user.user_name
+		"FOR u IN users filter u.username == '{}' return u",
+		user.username
 	))
 		.send()
 		.await?
@@ -32,6 +32,7 @@ pub async fn register(values: RegisterFormValues) -> Result<(), AppError> {
 	if !check_existing_username.is_empty() {
 		validation_error.add("username", "Username is already in use");
 	}
+	println!("japoa");
 
 	if !validation_error.errors.is_empty() {
 		return Err(AppError::ValidationError(validation_error));

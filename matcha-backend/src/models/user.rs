@@ -14,10 +14,9 @@ pub struct User {
 	pub first_name: String,
 	pub last_name: String,
 	pub email_address: String,
-	pub user_name: String,
+	pub username: String,
 	password: String,
 	pub link: String,
-	// pub token: Option<String>
 }
 
 #[derive(Deserialize, Debug)]
@@ -44,6 +43,15 @@ pub struct LoginFormValues {
 	pub password: String
 }
 
+#[derive(Serialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct LoginResponse {
+	first_name: String,
+	last_name: String,
+	email_address: String,
+	token: String,
+}
+
 impl User {
 	pub fn new(first_name: &str, last_name: &str,
 				email_address: &str, password: &str, user_name: &str)
@@ -53,10 +61,18 @@ impl User {
 			first_name: String::from(first_name),
 			last_name: String::from(last_name),
 			email_address: String::from(email_address),
-			user_name: String::from(user_name),
+			username: String::from(user_name),
 			password: User::hash_pw(&String::from(password)),
 			link: String::new(),
-			token: None,
+		}
+	}
+
+	pub fn login_response(&self, token: String) -> LoginResponse {
+		LoginResponse {
+			first_name: self.first_name.to_owned(),
+			last_name: self.last_name.to_owned(),
+			email_address: self.email_address.to_owned(),
+			token: token
 		}
 	}
 
@@ -115,12 +131,11 @@ impl From<RegisterFormValues> for User {
 		Self {
 			key: "".to_owned(),
 			email_address: values.email_address,
-			user_name: values.username,
+			username: values.username,
 			first_name: values.first_name,
 			last_name: values.last_name,
 			password: User::hash_pw(&values.password),
 			link: nanoid!(10, &nanoid::alphabet::SAFE),
-			token: None
 		}
 	}
 }
