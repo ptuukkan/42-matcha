@@ -72,7 +72,7 @@ impl User {
 			first_name: self.first_name.to_owned(),
 			last_name: self.last_name.to_owned(),
 			email_address: self.email_address.to_owned(),
-			token: token
+			token
 		}
 	}
 
@@ -94,7 +94,7 @@ impl User {
 		Ok(())
 	}
 
-	fn hash_pw(password: &String) -> String {
+	fn hash_pw(password: &str) -> String {
 		sodiumoxide::init().unwrap();
     	let hash = argon2id13::pwhash(
        		password.as_bytes(),
@@ -109,7 +109,7 @@ impl User {
 		Ok(())
 	}
 
-	pub fn verify_pw(&self, password: &String) -> bool {
+	pub fn verify_pw(&self, password: &str) -> bool {
 		sodiumoxide::init().unwrap();
 		let mut padded = [0u8; 128];
 		self.password
@@ -117,7 +117,7 @@ impl User {
 			.iter()
 			.enumerate()
 			.for_each(|(i, val)| {
-				padded[i] = val.clone();
+				padded[i] = *val;
 		});
 		match argon2id13::HashedPassword::from_slice(&padded) {
 			Some(pw_hash) => argon2id13::pwhash_verify(&pw_hash, password.as_bytes()),

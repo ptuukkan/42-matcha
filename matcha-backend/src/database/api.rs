@@ -41,7 +41,7 @@ async fn arango_login() -> Result<String, Error> {
 }
 
 pub async fn post<I: Serialize, O: de::DeserializeOwned>
-					(url: &String, data: &I) -> Result<O, Error> {
+					(url: &str, data: &I) -> Result<O, Error> {
 	let jwt = get_arango_jwt().await.expect("DB Login failed");
 	let client = Client::default();
 	let response = client.post(url)
@@ -54,7 +54,7 @@ pub async fn post<I: Serialize, O: de::DeserializeOwned>
 
 }
 
-pub async fn get<O: de::DeserializeOwned>(url: &String)
+pub async fn get<O: de::DeserializeOwned>(url: &str)
 					-> Result<O, Error> {
 	let jwt = get_arango_jwt().await.expect("DB Login failed");
 	let client = Client::default();
@@ -67,7 +67,7 @@ pub async fn get<O: de::DeserializeOwned>(url: &String)
 	Ok(res)
 }
 
-pub async fn patch<I: Serialize>(url: &String, data: &I) -> Result<(), Error> {
+pub async fn patch<I: Serialize>(url: &str, data: &I) -> Result<(), Error> {
 	let jwt = get_arango_jwt().await.expect("DB Login failed");
 	let client = Client::default();
 	client.patch(url)

@@ -5,7 +5,6 @@ use std::convert::From;
 use super::api;
 use std::env;
 use actix_web::client::Client;
-use serde_json;
 use crate::errors::{AppError};
 
 
@@ -58,7 +57,7 @@ impl CursorRequest {
 			.body()
 			.await?;
 		let mut cursor_response: CursorResponse = serde_json::from_slice(&bytes)?;
-		if cursor_response.error == true {
+		if cursor_response.error {
 			return Err(AppError::internal(cursor_response));
 		}
 		cursor_response.bytes = bytes;
@@ -86,7 +85,7 @@ impl CursorResponse {
 				.body()
 				.await?;
 			let cursor_response: CursorResponse = serde_json::from_slice(&bytes)?;
-			if cursor_response.error == true {
+			if cursor_response.error {
 				return Err(AppError::internal(cursor_response));
 			}
 			let mut cursor: Cursor<T> = serde_json::from_slice(&bytes)?;
@@ -110,7 +109,7 @@ impl From<&str> for CursorRequest {
 impl From<String> for CursorRequest {
 	fn from(cursor_query: String) -> Self {
 		CursorRequest {
-			query: cursor_query.to_owned(),
+			query: cursor_query,
 			count: true,
 			batch_size: 2
 		}

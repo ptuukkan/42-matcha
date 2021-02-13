@@ -31,7 +31,7 @@ pub async fn login(values: LoginFormValues) -> Result<LoginResponse, AppError> {
 		if !user.verify_pw(&values.password) {
 			return Err(AppError::unauthorized("Login failed"));
 		}
-		if user.link != "" {
+		if !user.link.is_empty() {
 			return Err(AppError::unauthorized("Please verify your account!"));
 		}
 		let my_claims = Claims { sub: user.email_address.to_owned(), exp: 7200 };

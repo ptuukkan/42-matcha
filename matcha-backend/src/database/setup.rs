@@ -39,7 +39,7 @@ pub async fn arango_setup() {
 		let db_result = create_arango_db(&db_name, &db_base_url)
 			.await
 			.expect("Database creation failed");
-		if db_result.result != true {
+		if !db_result.result {
 			panic!("Database creation failed");
 		}
 		create_arango_collection("users", "2", &db_url)
@@ -49,23 +49,23 @@ pub async fn arango_setup() {
 
 }
 
-async fn get_arango_dbs(db_base_url: &String) -> Result<DbList, Error> {
+async fn get_arango_dbs(db_base_url: &str) -> Result<DbList, Error> {
 	let url = db_base_url.to_owned() + "_api/database";
 	let res = api::get::<DbList>(&url).await?;
 	Ok(res)
 }
 
-async fn create_arango_db(db_name: &String, db_base_url: &String)
+async fn create_arango_db(db_name: &str, db_base_url: &str)
 						-> Result<ArangoDbCreateResponse, Error> {
 	let url = db_base_url.to_owned() + "_api/database";
 	let mut map = HashMap::new();
 	map.insert("name", db_name);
 
-	let res = api::post::<HashMap<&str, &std::string::String>, ArangoDbCreateResponse>(&url, &map).await?;
+	let res = api::post::<HashMap<&str, &str>, ArangoDbCreateResponse>(&url, &map).await?;
 	Ok(res)
 }
 
-async fn create_arango_collection(collection_name: &str, collection_type: &str, db_url: &String)
+async fn create_arango_collection(collection_name: &str, collection_type: &str, db_url: &str)
 								-> Result<ArangoCollectionCreateResponse, Error> {
 	let url = db_url.to_owned() + "_api/collection";
 	let mut map = HashMap::new();
