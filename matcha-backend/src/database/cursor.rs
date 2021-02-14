@@ -1,19 +1,18 @@
-use core::fmt::Debug;
-use actix_web::web::Bytes;
-use serde::{Deserialize, Serialize, de};
-use std::convert::From;
 use super::api;
-use std::env;
+use crate::errors::AppError;
 use actix_web::client::Client;
-use crate::errors::{AppError};
-
+use actix_web::web::Bytes;
+use core::fmt::Debug;
+use serde::{de, Deserialize, Serialize};
+use std::convert::From;
+use std::env;
 
 #[derive(Serialize, Debug)]
 pub struct CursorRequest {
 	query: String,
 	count: bool,
 	#[serde(rename = "batchSize")]
-	batch_size: i32
+	batch_size: i32,
 }
 
 #[derive(Deserialize, Debug)]
@@ -25,7 +24,7 @@ pub struct CursorResponse {
 	#[serde(rename = "errorNum")]
 	pub error_num: Option<i32>,
 	#[serde(skip)]
-	bytes: Bytes
+	bytes: Bytes,
 }
 
 #[derive(Deserialize, Debug)]
@@ -36,21 +35,20 @@ pub struct Cursor<T> {
 	pub count: i32,
 	pub error: bool,
 	pub code: i32,
-	pub result: Vec<T>
+	pub result: Vec<T>,
 }
 
 impl CursorRequest {
 	fn url() -> String {
-		let db_url: String = env::var("DB_URL")
-			.expect("Missing env variable DB_URL");
+		let db_url: String = env::var("DB_URL").expect("Missing env variable DB_URL");
 		db_url + "_api/cursor"
 	}
 
 	pub async fn send(&self) -> Result<CursorResponse, AppError> {
-
 		let jwt = api::get_arango_jwt().await.expect("DB Login failed");
 		let client = Client::default();
-		let bytes = client.post(&Self::url())
+		let bytes = client
+			.post(&Self::url())
 			.set_header("Authorization", "bearer ".to_owned() + &jwt)
 			.send_json(&self)
 			.await?
@@ -78,7 +76,8 @@ impl CursorResponse {
 			let jwt = api::get_arango_jwt().await.expect("DB Login failed");
 			let url = CursorRequest::url() + "/" + &id;
 			let client = Client::default();
-			let bytes = client.put(url)
+			let bytes = client
+				.put(url)
 				.set_header("Authorization", "bearer ".to_owned() + &jwt)
 				.send()
 				.await?
@@ -101,7 +100,7 @@ impl From<&str> for CursorRequest {
 		CursorRequest {
 			query: cursor_query.to_owned(),
 			count: true,
-			batch_size: 2
+			batch_size: 2,
 		}
 	}
 }
@@ -111,10 +110,7 @@ impl From<String> for CursorRequest {
 		CursorRequest {
 			query: cursor_query,
 			count: true,
-			batch_size: 2
+			batch_size: 2,
 		}
 	}
 }
-
-
-

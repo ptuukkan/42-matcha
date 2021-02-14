@@ -1,10 +1,8 @@
-
+use crate::errors::AppError;
+use crate::models::user::{LoginFormValues, LoginResponse, User};
 use actix_web::HttpRequest;
+use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
 use serde::{Deserialize, Serialize};
-use crate::errors::{AppError};
-use crate::models::user::{LoginFormValues, User, LoginResponse};
-use crate::database::cursor::{CursorRequest};
-use jsonwebtoken::{ encode, decode, EncodingKey, DecodingKey, Header, Validation };
 use std::env;
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -12,7 +10,6 @@ struct Claims {
 	sub: String,
 	exp: usize,
 }
-
 
 /* pub async fn current_user(req: HttpRequest) -> Result<User, AppError> {
 	if let Some(auth) = req.headers().get("Authorization") {
@@ -22,21 +19,26 @@ struct Claims {
 } */
 
 pub async fn login(values: LoginFormValues) -> Result<LoginResponse, AppError> {
-	let mut result = CursorRequest::from(format!("FOR u IN users filter u.email_address == '{}'return u", values.email_address))
-		.send()
+	if let Some(user) = User::find("email_address", &values.email_address)
 		.await?
-		.extract_all::<User>()
-		.await?;
-	if let Some(user) = result.pop() {
+		.pop()
+	{
 		if !user.verify_pw(&values.password) {
 			return Err(AppError::unauthorized("Login failed"));
 		}
 		if !user.link.is_empty() {
 			return Err(AppError::unauthorized("Please verify your account!"));
 		}
-		let my_claims = Claims { sub: user.email_address.to_owned(), exp: 7200 };
+		let my_claims = Claims {
+			sub: user.email_address.to_owned(),
+			exp: 7200,
+		};
 		let key: String = env::var("SECRET")?;
-		let token = encode(&Header::default(), &my_claims, &EncodingKey::from_secret(key.as_ref()))?;
+		let token = encode(
+			&Header::default(),
+			&my_claims,
+			&EncodingKey::from_secret(key.as_ref()),
+		)?;
 
 		Ok(user.login_response(token))
 	} else {

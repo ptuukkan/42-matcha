@@ -1,10 +1,11 @@
-
 use crate::database::api;
-use serde::{Deserialize, Serialize};
-use std::env;
-use crate::errors::{AppError};
-use sodiumoxide::crypto::pwhash::argon2id13;
+use crate::database::cursor::CursorRequest;
+use crate::errors::AppError;
 use nanoid::nanoid;
+use serde::{Deserialize, Serialize};
+use sodiumoxide::crypto::pwhash::argon2id13;
+use std::collections::HashMap;
+use std::env;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct User {
@@ -23,7 +24,7 @@ pub struct User {
 struct CreateUserResponse {
 	_id: String,
 	_key: String,
-	_rev: String
+	_rev: String,
 }
 
 #[derive(Deserialize, Debug)]
@@ -33,14 +34,14 @@ pub struct RegisterFormValues {
 	last_name: String,
 	email_address: String,
 	username: String,
-	password: String
+	password: String,
 }
 
 #[derive(Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct LoginFormValues {
 	pub email_address: String,
-	pub password: String
+	pub password: String,
 }
 
 #[derive(Serialize, Debug)]
@@ -53,9 +54,13 @@ pub struct LoginResponse {
 }
 
 impl User {
-	pub fn new(first_name: &str, last_name: &str,
-				email_address: &str, password: &str, user_name: &str)
-				-> User {
+	pub fn new(
+		first_name: &str,
+		last_name: &str,
+		email_address: &str,
+		password: &str,
+		user_name: &str,
+	) -> User {
 		User {
 			key: String::new(),
 			first_name: String::from(first_name),
@@ -72,37 +77,38 @@ impl User {
 			first_name: self.first_name.to_owned(),
 			last_name: self.last_name.to_owned(),
 			email_address: self.email_address.to_owned(),
-			token
+			token,
 		}
 	}
 
 	fn url() -> String {
-		let db_url: String = env::var("DB_URL")
-			.expect("Missing env variable DB_URL");
+		let db_url: String = env::var("DB_URL").expect("Missing env variable DB_URL");
 		db_url + "_api/document/users/"
 	}
 
 	fn key_url(&self) -> String {
-		let db_url: String = env::var("DB_URL")
-			.expect("Missing env variable DB_URL");
+		let db_url: String = env::var("DB_URL").expect("Missing env variable DB_URL");
 		format!("{}_api/document/users/{}", db_url, self.key)
 	}
 
 	pub async fn create(&self) -> Result<(), AppError> {
-		api::post::<User, CreateUserResponse>(&User::url(), &self)
-			.await?;
+		api::post::<User, CreateUserResponse>(&User::url(), &self).await?;
 		Ok(())
 	}
 
 	fn hash_pw(password: &str) -> String {
 		sodiumoxide::init().unwrap();
-    	let hash = argon2id13::pwhash(
-       		password.as_bytes(),
-        	argon2id13::OPSLIMIT_INTERACTIVE,
-        	argon2id13::MEMLIMIT_INTERACTIVE,
-    	).unwrap();
-    	let texthash = std::str::from_utf8(&hash.0).unwrap().trim_end_matches('\u{0}').to_string();
- 		texthash
+		let hash = argon2id13::pwhash(
+			password.as_bytes(),
+			argon2id13::OPSLIMIT_INTERACTIVE,
+			argon2id13::MEMLIMIT_INTERACTIVE,
+		)
+		.unwrap();
+		let texthash = std::str::from_utf8(&hash.0)
+			.unwrap()
+			.trim_end_matches('\u{0}')
+			.to_string();
+		texthash
 	}
 	pub async fn update(&self) -> Result<(), AppError> {
 		api::patch(&self.key_url(), &self).await?;
@@ -118,11 +124,21 @@ impl User {
 			.enumerate()
 			.for_each(|(i, val)| {
 				padded[i] = *val;
-		});
+			});
 		match argon2id13::HashedPassword::from_slice(&padded) {
 			Some(pw_hash) => argon2id13::pwhash_verify(&pw_hash, password.as_bytes()),
 			_ => false,
 		}
+	}
+
+	pub async fn find(key: &str, value: &str) -> Result<Vec<Self>, AppError> {
+		let query = format!("FOR u IN users filter u.{} == '{}' return u", key, value);
+		let result = CursorRequest::from(query)
+			.send()
+			.await?
+			.extract_all::<Self>()
+			.await?;
+		Ok(result)
 	}
 }
 
