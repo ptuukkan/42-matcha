@@ -6,16 +6,12 @@ use actix_web::{
 	test::{self, TestRequest},
 	App,
 };
-use serde_json::json;
 
 #[actix_rt::test]
-async fn correct() {
+async fn valid() {
 	init().await;
 	let mut app = test::init_service(App::new().service(login)).await;
-	let body = json!({
-		"emailAddress": "bob.matthews@email.com",
-		"password": "Password123!"
-	});
+	let body = test_models::LoginValues::valid();
 	let resp = TestRequest::post()
 		.uri("/user/login")
 		.set_json(&body)
@@ -29,13 +25,10 @@ async fn correct() {
 }
 
 #[actix_rt::test]
-async fn incorrect_password() {
+async fn invalid_password() {
 	init().await;
 	let mut app = test::init_service(App::new().service(login)).await;
-	let body = json!({
-		"emailAddress": "bob.matthews@email.com",
-		"password": "Paaaaaaaa"
-	});
+	let body = test_models::LoginValues::invalid_password();
 	let resp = TestRequest::post()
 		.uri("/user/login")
 		.set_json(&body)
@@ -49,13 +42,10 @@ async fn incorrect_password() {
 }
 
 #[actix_rt::test]
-async fn incorrect_email() {
+async fn invalid_email() {
 	init().await;
 	let mut app = test::init_service(App::new().service(login)).await;
-	let body = json!({
-		"emailAddress": "bob.mataaathews@email.com",
-		"password": "Password123!"
-	});
+	let body = test_models::LoginValues::invalid_email();
 	let resp = TestRequest::post()
 		.uri("/user/login")
 		.set_json(&body)
@@ -69,13 +59,10 @@ async fn incorrect_email() {
 }
 
 #[actix_rt::test]
-async fn incorrect_both() {
+async fn invalid_email_password() {
 	init().await;
 	let mut app = test::init_service(App::new().service(login)).await;
-	let body = json!({
-		"emailAddress": "bob.matathews@email.com",
-		"password": "Passaword123!"
-	});
+	let body = test_models::LoginValues::invalid_password_email();
 	let resp = TestRequest::post()
 		.uri("/user/login")
 		.set_json(&body)
@@ -85,5 +72,22 @@ async fn incorrect_both() {
 		resp.status(),
 		StatusCode::UNAUTHORIZED,
 		"Login with incorrect email and password does not fail"
+	);
+}
+
+#[actix_rt::test]
+async fn empty() {
+	init().await;
+	let mut app = test::init_service(App::new().service(login)).await;
+	let body = test_models::LoginValues::empty();
+	let resp = TestRequest::post()
+		.uri("/user/login")
+		.set_json(&body)
+		.send_request(&mut app)
+		.await;
+	assert_eq!(
+		resp.status(),
+		StatusCode::UNAUTHORIZED,
+		"Login with empty values does not fail"
 	);
 }

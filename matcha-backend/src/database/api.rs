@@ -81,6 +81,7 @@ pub async fn patch<I: Serialize>(url: &str, data: &I) -> Result<(), Error> {
 	Ok(())
 }
 
+#[allow(dead_code)]
 pub async fn delete(url: &str) -> Result<(), Error> {
 	let jwt = get_arango_jwt().await.expect("DB Login failed");
 	let client = Client::default();
