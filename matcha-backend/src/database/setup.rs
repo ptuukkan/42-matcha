@@ -20,7 +20,6 @@ struct ArangoDbCreateResponse {
 struct ArangoCollectionCreateResponse {
 	error: bool,
 	code: i32,
-	r#type: i8,
 }
 
 pub async fn arango_setup() {
