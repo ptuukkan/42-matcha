@@ -2,16 +2,21 @@ mod application;
 mod database;
 mod errors;
 mod models;
+#[cfg(test)]
+mod tests;
 
 use actix_cors::Cors;
 use actix_web::error::Error;
+use actix_web::middleware::Logger;
 use actix_web::web::Json;
 use actix_web::{get, post, web, App, HttpResponse, HttpServer, Responder};
 use database::seed_data;
 use dotenv::dotenv;
+use log::info;
 
 #[get("/")]
 async fn hello() -> impl Responder {
+	info!("hello!");
 	HttpResponse::Ok().body("Hello world!")
 }
 
@@ -42,9 +47,11 @@ async fn verify(web::Path(link): web::Path<String>) -> Result<HttpResponse, Erro
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
 	dotenv().ok();
+	env_logger::init();
 	database::setup::arango_setup().await;
-	HttpServer::new(|| {
+	let server = HttpServer::new(|| {
 		App::new()
+			.wrap(Logger::new("%a \"%r\" %s"))
 			.wrap(Cors::permissive())
 			.service(hello)
 			.service(seed)
@@ -52,7 +59,8 @@ async fn main() -> std::io::Result<()> {
 			.service(login)
 			.service(verify)
 	})
-	.bind("127.0.0.1:8080")?
-	.run()
-	.await
+	.bind("127.0.0.1:8080")?;
+	info!("Starting server");
+	server.run().await
 }
+

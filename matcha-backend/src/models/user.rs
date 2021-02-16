@@ -4,7 +4,6 @@ use crate::errors::AppError;
 use nanoid::nanoid;
 use serde::{Deserialize, Serialize};
 use sodiumoxide::crypto::pwhash::argon2id13;
-use std::collections::HashMap;
 use std::env;
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -44,13 +43,13 @@ pub struct LoginFormValues {
 	pub password: String,
 }
 
-#[derive(Serialize, Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct LoginResponse {
 	first_name: String,
 	last_name: String,
 	email_address: String,
-	token: String,
+	pub token: String,
 }
 
 impl User {
