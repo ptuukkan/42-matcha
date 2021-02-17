@@ -30,7 +30,7 @@ pub async fn register(values: RegisterFormValues) -> Result<(), AppError> {
 
 pub fn send_verification_email(user: &User) -> Result<(), AppError> {
 	let app_url: String = env::var("APP_URL")?;
-
+	let link = user.link.as_ref().unwrap();
 	let html_text = format!("
 		<h2>One step closer to your matchas!</h2>
 		<br>
@@ -38,7 +38,7 @@ pub fn send_verification_email(user: &User) -> Result<(), AppError> {
 		To finish your registeration please click <a href=\"{}verify/{}\">here</a> to confirm/activate your account
 		</p>",
 	app_url,
-	user.link
+	link
 	);
 
 	let email = EmailBuilder::new()
@@ -70,7 +70,7 @@ pub async fn verify(link: &str) -> Result<(), AppError> {
 	}
 
 	if let Some(mut user) = result.pop() {
-		user.link = String::from("");
+		user.link = None;
 		user.update().await?
 	}
 	Ok(())

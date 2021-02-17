@@ -10,13 +10,13 @@ use std::env;
 pub struct User {
 	#[serde(skip_serializing)]
 	#[serde(rename = "_key")]
-	key: String,
+	pub key: String,
 	pub first_name: String,
 	pub last_name: String,
 	pub email_address: String,
 	pub username: String,
 	password: String,
-	pub link: String,
+	pub link: Option<String>,
 }
 
 #[derive(Deserialize, Debug)]
@@ -67,7 +67,7 @@ impl User {
 			email_address: String::from(email_address),
 			username: String::from(user_name),
 			password: User::hash_pw(&String::from(password)),
-			link: String::new(),
+			link: None,
 		}
 	}
 
@@ -150,7 +150,7 @@ impl From<RegisterFormValues> for User {
 			first_name: values.first_name,
 			last_name: values.last_name,
 			password: User::hash_pw(&values.password),
-			link: nanoid!(10, &nanoid::alphabet::SAFE),
+			link: Some(nanoid!(10, &nanoid::alphabet::SAFE)),
 		}
 	}
 }
