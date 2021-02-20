@@ -1,7 +1,7 @@
 use crate::errors::AppError;
 use crate::models::user::{LoginFormValues, LoginResponse, User};
 use actix_web::{HttpRequest};
-//use std::time::SystemTime;
+use std::time::SystemTime;
 use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
 use serde::{Deserialize, Serialize};
 use std::env;
@@ -37,13 +37,16 @@ pub async fn login(values: LoginFormValues) -> Result<LoginResponse, AppError> {
 		if user.link.is_some() {
 			return Err(AppError::unauthorized("Please verify your account!"));
 		}
-
+		let iat = SystemTime::now()
+			.duration_since(SystemTime::UNIX_EPOCH)
+			.unwrap()
+			.as_secs() as usize;
+		
+		let exp =  iat + 86400;
 		let my_claims = Claims {
-
-			// Create new claims: iat SystemTime::now() as usize && exp SystemTime::now() + 1 day maybe?
 			sub: user.key.to_owned(),
-			//iat: 161614909200,
-			exp: 1616149092000,
+			exp: exp,
+			//iat: iat
 		};
 
 		let key: String = env::var("SECRET")?;
