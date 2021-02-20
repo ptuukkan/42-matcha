@@ -66,7 +66,7 @@ pub async fn verify(link: &str) -> Result<(), AppError> {
 	if result.is_empty() {
 		return Err(AppError::bad_request(
 			"Link is invalid or email address has already been validated",
-		)); // Create a new error Verification error instead
+		));
 	}
 
 	if let Some(mut user) = result.pop() {
