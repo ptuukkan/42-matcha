@@ -2,7 +2,11 @@ import React from 'react'
 import { Icon, Menu, Label } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
 
-const Navigation = () => {
+interface IProps {
+	logout(): void;
+}
+
+const Navigation: React.FC<IProps> = ({logout}) => {
 	return (
 		<Menu
 			fixed="top"
@@ -52,6 +56,12 @@ const Navigation = () => {
 						/>
 						<Icon name="comments" />
 						Chat
+					</Menu.Item>
+				</Link>
+				<Link to="/" onClick={() => logout()}>
+					<Menu.Item name="logout">
+						<Icon name="times" />
+						Logout
 					</Menu.Item>
 				</Link>
 			</Menu.Menu>

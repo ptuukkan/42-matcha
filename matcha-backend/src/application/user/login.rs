@@ -9,7 +9,7 @@ use std::env;
 #[derive(Debug, Serialize, Deserialize)]
 struct Claims {
 	sub: String,
-	//iat: usize,
+	iat: usize,
 	exp: usize,
 }
 
@@ -22,7 +22,7 @@ pub async fn current_user(req: HttpRequest) -> Result<LoginResponse, AppError> {
 		println!("{:#?}", token_data);
 		Ok(user.login_response(token_data.claims.sub))		
 	} else {
-		Err(AppError::bad_request("dojong"))
+		Err(AppError::bad_request("Ivalid token"))
 	}
 }
 
@@ -46,7 +46,7 @@ pub async fn login(values: LoginFormValues) -> Result<LoginResponse, AppError> {
 		let my_claims = Claims {
 			sub: user.key.to_owned(),
 			exp: exp,
-			//iat: iat
+			iat: iat
 		};
 
 		let key: String = env::var("SECRET")?;

@@ -17,6 +17,7 @@ export default class UserStore {
 			user: observable,
 			registerUser: action,
 			loginUser: action,
+			logoutUser: action,
 			getUser: action,
 			stopLoading: action,
 			setToken: action,
@@ -26,6 +27,11 @@ export default class UserStore {
 	stopLoading = () => {
 		this.loading = false;
 	};
+
+	logoutUser = () => {
+		this.token = null;
+		window.localStorage.removeItem('jwt');
+	}
 
 	setToken = (token: string) => {
 		this.token = token;

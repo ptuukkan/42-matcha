@@ -1,5 +1,10 @@
 import React, { Fragment, useContext, useEffect, useState } from 'react';
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import {
+	BrowserRouter as Router,
+	Switch,
+	Route,
+	Redirect,
+} from 'react-router-dom';
 import Navigation from '../../features/nav/Navigation';
 import { Container } from 'semantic-ui-react';
 import Profiles from '../../testProfiles1.json';
@@ -17,7 +22,7 @@ import { RootStoreContext } from '../stores/rootStore';
 const App = () => {
 	const [profile, setProfile] = useState(Profiles.profiles[0]);
 	const rootStore = useContext(RootStoreContext);
-	const { token, getUser } = rootStore.userStore;
+	const { token, getUser, logoutUser } = rootStore.userStore;
 
 	const getRandomUser = () => {
 		let i = Math.floor(Math.random() * Profiles.profiles.length);
@@ -26,40 +31,49 @@ const App = () => {
 
 	useEffect(() => {
 		if (token) {
-			getUser();
+			getUser().catch(() => logoutUser());
 		}
 	});
 
-	return (
+	const logout = () => {
+		logoutUser();
+	};
+
+	return token == null ? (
+		<div
+			style={{ display: 'flex', minHeight: '100vh', flexDirection: 'column' }}
+		>
+			<Container className="main_container">
+				<Landing />
+			</Container>
+		</div>
+	) : (
 		<div
 			style={{ display: 'flex', minHeight: '100vh', flexDirection: 'column' }}
 		>
 			<Container className="main_container">
 				<Router>
-					<Route exact path="/" component={Landing} />
-					<Route
-						path={'/(.+)'}
-						render={() => (
-							<Fragment>
-								<Navigation />
-								<Switch>
-									<Route exact path="/chat" component={Chat} />
-									<Route exact path="/settings" component={Settings} />
-									<Route exact path="/profile">
-										<Profile getProfile={getRandomUser} profile={profile} />
-									</Route>
-									<Route exact path="/matches">
-										<Matches profiles={Profiles.profiles} />
-									</Route>
-									<Route exact path="/browse">
-										<Browse profiles={Profiles.profiles} />
-									</Route>
-									<Route exact path="/register" component={Register} />
-									<Route exact path="/login" component={Login} />
-								</Switch>
-							</Fragment>
-						)}
-					/>
+					<Fragment>
+						<Navigation logout={logout} />
+						<Switch>
+							<Route exact path="/">
+								<Redirect to="/profile" />
+							</Route>
+							<Route exact path="/chat" component={Chat} />
+							<Route exact path="/settings" component={Settings} />
+							<Route exact path="/profile">
+								<Profile getProfile={getRandomUser} profile={profile} />
+							</Route>
+							<Route exact path="/matches">
+								<Matches profiles={Profiles.profiles} />
+							</Route>
+							<Route exact path="/browse">
+								<Browse profiles={Profiles.profiles} />
+							</Route>
+							<Route exact path="/register" component={Register} />
+							<Route exact path="/login" component={Login} />
+						</Switch>
+					</Fragment>
 				</Router>
 			</Container>
 			<Footer />

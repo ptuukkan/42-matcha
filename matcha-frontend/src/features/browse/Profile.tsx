@@ -9,7 +9,6 @@ interface IProps {
 }
 
 const Profile: React.FC<IProps> = ({ getProfile, profile }) => {
-	console.log(profile)
 
 	const [location, setLocation] = useState({ lat: 0, lon: 0 })
 
