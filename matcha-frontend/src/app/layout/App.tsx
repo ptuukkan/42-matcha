@@ -6,7 +6,7 @@ import {
 	Redirect,
 } from 'react-router-dom';
 import Navigation from '../../features/nav/Navigation';
-import { Container } from 'semantic-ui-react';
+import { Container, Dimmer, Loader } from 'semantic-ui-react';
 import Profiles from '../../testProfiles1.json';
 import Chat from '../../features/chat/Chat';
 import Settings from '../../features/profile/Settings';
@@ -18,11 +18,13 @@ import Login from '../../features/user/Login';
 import Register from '../../features/user/Register';
 import Landing from '../../features/home/Landing';
 import { RootStoreContext } from '../stores/rootStore';
+import { observer } from 'mobx-react-lite';
 
 const App = () => {
 	const [profile, setProfile] = useState(Profiles.profiles[0]);
+	const [appLoaded, setAppLoaded] = useState(false);
 	const rootStore = useContext(RootStoreContext);
-	const { token, getUser, logoutUser } = rootStore.userStore;
+	const { token, getUser, logoutUser, user } = rootStore.userStore;
 
 	const getRandomUser = () => {
 		let i = Math.floor(Math.random() * Profiles.profiles.length);
@@ -31,15 +33,26 @@ const App = () => {
 
 	useEffect(() => {
 		if (token) {
-			getUser().catch(() => logoutUser());
+			getUser()
+				.catch(() => logoutUser())
+				.finally(() => setAppLoaded(true));
+		} else {
+			setAppLoaded(true);
 		}
-	});
+	}, [getUser, token, setAppLoaded, logoutUser]);
 
 	const logout = () => {
 		logoutUser();
 	};
 
-	return token == null ? (
+	if (!appLoaded)
+		return (
+			<Dimmer active inverted>
+				<Loader />
+			</Dimmer>
+		);
+
+	return user == null ? (
 		<div
 			style={{ display: 'flex', minHeight: '100vh', flexDirection: 'column' }}
 		>
@@ -81,4 +94,4 @@ const App = () => {
 	);
 };
 
-export default App;
+export default observer(App);
