@@ -1,118 +1,94 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import './browse.style.css';
-import {
-	Container,
-	Card,
-	Image,
-	Header,
-	Dropdown,
-	Divider,
-	Grid,
-} from 'semantic-ui-react';
-import { IProfile } from '../../app/models/profile';
+import React, { useState, useEffect } from 'react'
+import './browse.css'
+import { Header, Image, Card, Icon, Button } from 'semantic-ui-react'
+import { IProfile } from '../../app/models/profile'
 
 interface IProps {
-	profiles: IProfile[];
+	profile: IProfile
+	getProfile(): void;
 }
 
-const interests = [
-	{ key: 'angular', text: 'Angular', value: 'angular' },
-	{ key: 'css', text: 'CSS', value: 'css' },
-	{ key: 'design', text: 'Graphic Design', value: 'design' },
-	{ key: 'ember', text: 'Ember', value: 'ember' },
-	{ key: 'html', text: 'HTML', value: 'html' },
-	{ key: 'ia', text: 'Information Architecture', value: 'ia' },
-	{ key: 'javascript', text: 'Javascript', value: 'javascript' },
-	{ key: 'mech', text: 'Mechanical Engineering', value: 'mech' },
-	{ key: 'meteor', text: 'Meteor', value: 'meteor' },
-	{ key: 'node', text: 'NodeJS', value: 'node' },
-	{ key: 'plumbing', text: 'Plumbing', value: 'plumbing' },
-	{ key: 'python', text: 'Python', value: 'python' },
-	{ key: 'rails', text: 'Rails', value: 'rails' },
-	{ key: 'react', text: 'React', value: 'react' },
-	{ key: 'repair', text: 'Kitchen Repair', value: 'repair' },
-	{ key: 'ruby', text: 'Ruby', value: 'ruby' },
-	{ key: 'ui', text: 'UI Design', value: 'ui' },
-	{ key: 'ux', text: 'User Experience', value: 'ux' },
-];
+const Browse: React.FC<IProps> = ({ getProfile, profile }) => {
 
-const Browse: React.FC<IProps> = ({ profiles }) => {
+	const [location, setLocation] = useState({ lat: 0, lon: 0 })
+
+	const birth = new Date(profile.birthday).getFullYear()
+	const nyt = new Date().getFullYear()
+
+	const getLocation = () => {
+		navigator.geolocation.getCurrentPosition((position) => {
+			console.log(position.coords.latitude)
+			console.log(position.coords.longitude)
+			setLocation({
+				lat: position.coords.latitude,
+				lon: position.coords.longitude,
+			})
+		})
+	}
+
+	useEffect(() => {
+		getLocation()
+	}, [])
+
+	const getDistance = (latA: number, latB: number, lonA: number, lonB: number) => {
+		let dLat = ((latA - latB) * Math.PI) / 180.0
+		let dLon = ((lonA - lonB) * Math.PI) / 180.0
+
+		latA = (latA * Math.PI) / 180.0
+		latB = (latB * Math.PI) / 180.0
+
+		let a =
+			Math.pow(Math.sin(dLat / 2), 2) +
+			Math.pow(Math.sin(dLon / 2), 2) * Math.cos(latA) * Math.cos(latB)
+
+		let rad = 6371
+		let c = Math.asin(Math.sqrt(a))
+
+		return rad * c
+	}
+
 	return (
-		<Container>
-			<Grid columns={2} relaxed="very" stackable>
-				<Grid.Column>
-					<Header as="h3">Sort</Header>
-					<Dropdown
-						placeholder="Sort"
-						scrolling
-						text="Sort"
-						icon="filter"
-						labeled
-						button
-						className="icon"
-						options={[
-							{ key: 'age', value: 'age', text: 'Age' },
-							{
-								key: 'location',
-								value: 'location',
-								text: 'Location',
-							},
-							{
-								key: 'fame_rating',
-								value: 'fame_rating',
-								text: 'Fame rating',
-							},
-						]}
+		<div>
+			<Card fluid>
+				<Image src={`https://robohash.org/${profile.firstName}1`} wrapped ui={false} />
+				<Image src={`https://robohash.org/${profile.firstName}2`} wrapped ui={false} />
+				<Image src={`https://robohash.org/${profile.firstName}3`} wrapped ui={false} />
+				<div className="profileinfo">
+					<Header as="h1">
+						{profile.firstName} {profile.lastName}
+					</Header>
+					<Icon name={profile.gender === 'male' ? 'mars' : 'venus'} />
+					<Card.Meta>
+						Distance:{' '}
+						{getDistance(
+							location.lat,
+							profile.location.latitude,
+							location.lon,
+							profile.location.longitude
+						)}{' '}
+						km
+					</Card.Meta>
+					Age: {nyt - birth}
+					<Card.Description>{profile.biography}</Card.Description>
+					<br></br>
+					<Button
+						circular
+						icon="cancel"
+						size="massive"
+						color="black"
 					/>
-				</Grid.Column>
-				<Grid.Column textAlign="right">
-					<Header as="h3">Filter by tag</Header>
-					<Dropdown
-						multiple
-						search
-						name="selectInterest"
-						selection
-						options={interests}
-						/* value={inters.selectedIterest} */
-						allowAdditions
-						additionLabel={
-							<i style={{ color: 'red' }}>New interest: </i>
-						}
-						/* 						onAddItem={handleAddition}
-										onChange={handleMultiChange} */
-					></Dropdown>
-				</Grid.Column>
-			</Grid>
+					<Button
+						circular
+						icon="like"
+						floated="right"
+						size="massive"
+						color="red"
+						onClick={getProfile}
+					/>
+				</div>
+			</Card>
+		</div>
+	)
+}
 
-			<Divider />
-			<Card.Group itemsPerRow={3}>
-				{profiles.map((profile) => (
-					<Card
-						key={profile.location.latitude - Date.now()}
-						as={Link}
-						to={'/profile'}
-					>
-						<Image
-							src={`https://robohash.org/${profile.firstName}`}
-							wrapped
-							ui={false}
-						/>
-						<Header as="h5">
-							{profile.firstName} {profile.lastName}
-						</Header>
-						<Card.Content>
-							Distance: {Math.floor(Math.random() * 80)} km
-							<Card.Meta>
-								Likes:{' '}
-								{Math.abs(Math.floor(profile.location.latitude))}
-							</Card.Meta>
-						</Card.Content>
-					</Card>
-				))}
-			</Card.Group>
-		</Container>
-	);
-};
-
-export default Browse;
+export default Browse

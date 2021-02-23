@@ -30,6 +30,7 @@ export default class UserStore {
 
 	logoutUser = () => {
 		this.token = null;
+		this.user = null;
 		window.localStorage.removeItem('jwt');
 	}
 

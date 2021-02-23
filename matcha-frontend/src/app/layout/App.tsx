@@ -9,9 +9,9 @@ import Navigation from '../../features/nav/Navigation';
 import { Container, Dimmer, Loader } from 'semantic-ui-react';
 import Profiles from '../../testProfiles1.json';
 import Chat from '../../features/chat/Chat';
-import Settings from '../../features/profile/Settings';
-import Profile from '../../features/browse/Profile';
+import Profile from '../../features/profile/Profile';
 import Browse from '../../features/browse/Browse';
+import Research from '../../features/research/Research';
 import Matches from '../../features/matches/Matches';
 import Footer from '../../features/nav/Footer';
 import Login from '../../features/user/Login';
@@ -19,6 +19,7 @@ import Register from '../../features/user/Register';
 import Landing from '../../features/home/Landing';
 import { RootStoreContext } from '../stores/rootStore';
 import { observer } from 'mobx-react-lite';
+import NotFound from './NotFound';
 
 const App = () => {
 	const [profile, setProfile] = useState(Profiles.profiles[0]);
@@ -52,7 +53,7 @@ const App = () => {
 			</Dimmer>
 		);
 
-	return user == null ? (
+	return user === null ? (
 		<div
 			style={{ display: 'flex', minHeight: '100vh', flexDirection: 'column' }}
 		>
@@ -70,21 +71,19 @@ const App = () => {
 						<Navigation logout={logout} />
 						<Switch>
 							<Route exact path="/">
-								<Redirect to="/profile" />
+								<Browse getProfile={getRandomUser} profile={profile} />
 							</Route>
 							<Route exact path="/chat" component={Chat} />
-							<Route exact path="/settings" component={Settings} />
-							<Route exact path="/profile">
-								<Profile getProfile={getRandomUser} profile={profile} />
-							</Route>
+							<Route exact path="/profile" component={Profile} />
 							<Route exact path="/matches">
 								<Matches profiles={Profiles.profiles} />
 							</Route>
-							<Route exact path="/browse">
-								<Browse profiles={Profiles.profiles} />
+							<Route exact path="/research">
+								<Research profiles={Profiles.profiles} />
 							</Route>
 							<Route exact path="/register" component={Register} />
 							<Route exact path="/login" component={Login} />
+							<Route component={NotFound} />
 						</Switch>
 					</Fragment>
 				</Router>

@@ -214,6 +214,19 @@ impl From<jsonwebtoken::errors::Error> for AppError {
 	}
 }
 
+impl From<std::time::SystemTimeError> for AppError {
+	fn from(from_error: std::time::SystemTimeError) -> Self {
+		Self::InternalError(InternalError::from(from_error.to_string()))
+	}
+}
+
+impl From<actix_web::http::header::ToStrError> for AppError {
+	fn from(from_error: actix_web::http::header::ToStrError) -> Self {
+		Self::InternalError(InternalError::from(from_error.to_string()))
+	}
+}
+
+
 impl From<&str> for UnauthorizedError {
 	fn from(text: &str) -> Self {
 		Self {
@@ -222,3 +235,5 @@ impl From<&str> for UnauthorizedError {
 		}
 	}
 }
+
+
