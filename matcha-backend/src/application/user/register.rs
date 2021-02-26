@@ -9,30 +9,15 @@ pub async fn register(values: RegisterFormValues) -> Result<(), AppError> {
 	let user = User::from(values);
 	let mut validation_error = ValidationError::empty();
 
-	let check_existing_email = CursorRequest::from(format!(
-		"FOR u IN users filter u.email_address == '{}' return u",
-		user.email_address
-	))
-		.send()
+	if !User::find("email_address", &user.email_address)
 		.await?
-		.extract_all::<User>()
-		.await?;
-	if !check_existing_email.is_empty() {
+		.is_empty()
+	{
 		validation_error.add("emailAddress", "Email address is already in use");
 	}
-
-	let check_existing_username = CursorRequest::from(format!(
-		"FOR u IN users filter u.user_name == '{}' return u",
-		user.user_name
-	))
-		.send()
-		.await?
-		.extract_all::<User>()
-		.await?;
-	if !check_existing_username.is_empty() {
+	if !User::find("username", &user.username).await?.is_empty() {
 		validation_error.add("username", "Username is already in use");
 	}
-
 	if !validation_error.errors.is_empty() {
 		return Err(AppError::ValidationError(validation_error));
 	}
@@ -45,7 +30,7 @@ pub async fn register(values: RegisterFormValues) -> Result<(), AppError> {
 
 pub fn send_verification_email(user: &User) -> Result<(), AppError> {
 	let app_url: String = env::var("APP_URL")?;
-
+	let link = user.link.as_ref().unwrap();
 	let html_text = format!("
 		<h2>One step closer to your matchas!</h2>
 		<br>
@@ -53,7 +38,7 @@ pub fn send_verification_email(user: &User) -> Result<(), AppError> {
 		To finish your registeration please click <a href=\"{}verify/{}\">here</a> to confirm/activate your account
 		</p>",
 	app_url,
-	user.link
+	link
 	);
 
 	let email = EmailBuilder::new()
@@ -74,18 +59,18 @@ pub async fn verify(link: &str) -> Result<(), AppError> {
 		"FOR u IN users filter u.link == '{}' return u",
 		link
 	))
-		.send()
-		.await?
-		.extract_all::<User>()
-		.await?;
+	.send()
+	.await?
+	.extract_all::<User>()
+	.await?;
 	if result.is_empty() {
 		return Err(AppError::bad_request(
 			"Link is invalid or email address has already been validated",
-		)); // Create a new error Verification error instead
+		));
 	}
 
 	if let Some(mut user) = result.pop() {
-		user.link = String::from("");
+		user.link = None;
 		user.update().await?
 	}
 	Ok(())

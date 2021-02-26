@@ -1,16 +1,11 @@
-
+use crate::database::cursor::CursorResponse;
 use actix_web::{
-	dev::HttpResponseBuilder,
-	http::header, http::StatusCode,
-	HttpResponse, ResponseError,
-	client::SendRequestError,
-	error::PayloadError,
-	Error
+	client::SendRequestError, dev::HttpResponseBuilder, error::PayloadError, http::header,
+	http::StatusCode, HttpResponse, ResponseError,
 };
+use derive_more::Display;
 use serde::Serialize;
 use std::env;
-use crate::database::cursor::CursorResponse;
-use derive_more::{Display};
 
 #[derive(Serialize, Debug, Display)]
 pub enum AppError {
@@ -38,31 +33,31 @@ pub enum AppErrorType {
 #[derive(Serialize, Debug)]
 pub struct ValidationError {
 	error_type: AppErrorType,
-	pub errors: Vec<FieldError>
+	pub errors: Vec<FieldError>,
 }
 
 #[derive(Serialize, Debug)]
 pub struct FieldError {
 	field: String,
-    message: String
+	message: String,
 }
 
 #[derive(Serialize, Debug)]
 pub struct InternalError {
 	error_type: AppErrorType,
-	message: String
+	message: String,
 }
 
 #[derive(Serialize, Debug)]
 pub struct BadRequestError {
 	error_type: AppErrorType,
-	message: String
+	message: String,
 }
 
 #[derive(Serialize, Debug)]
 pub struct UnauthorizedError {
 	error_type: AppErrorType,
-	message: String
+	message: String,
 }
 
 impl ValidationError {
@@ -80,14 +75,14 @@ impl ValidationError {
 	pub fn empty() -> Self {
 		Self {
 			error_type: AppErrorType::ValidationError,
-			errors: Vec::new()
+			errors: Vec::new(),
 		}
 	}
 
 	pub fn add(&mut self, field: &str, message: &str) {
 		let field_error = FieldError {
 			field: field.to_owned(),
-			message: message.to_owned()
+			message: message.to_owned(),
 		};
 		self.errors.push(field_error);
 	}
@@ -130,7 +125,7 @@ impl ResponseError for AppError {
 				.json(e),
 			AppError::BadRequestError(e) => HttpResponseBuilder::new(self.status_code())
 				.set_header(header::CONTENT_TYPE, "application/json")
-				.json(e)
+				.json(e),
 		}
 	}
 }
@@ -148,7 +143,7 @@ impl From<&str> for InternalError {
 	fn from(text: &str) -> Self {
 		Self {
 			error_type: AppErrorType::InternalError,
-			message: text.to_owned()
+			message: text.to_owned(),
 		}
 	}
 }
@@ -157,7 +152,7 @@ impl From<&str> for BadRequestError {
 	fn from(text: &str) -> Self {
 		Self {
 			error_type: AppErrorType::BadRequestError,
-			message: text.to_owned()
+			message: text.to_owned(),
 		}
 	}
 }
@@ -166,7 +161,7 @@ impl From<String> for InternalError {
 	fn from(text: String) -> Self {
 		Self {
 			error_type: AppErrorType::InternalError,
-			message: text
+			message: text,
 		}
 	}
 }
@@ -177,8 +172,8 @@ impl From<SendRequestError> for AppError {
 	}
 }
 
-impl From<Error> for AppError {
-	fn from(from_error: Error) -> Self {
+impl From<actix_web::error::Error> for AppError {
+	fn from(from_error: actix_web::error::Error) -> Self {
 		Self::InternalError(InternalError::from(from_error.to_string()))
 	}
 }
@@ -213,12 +208,32 @@ impl From<lettre::sendmail::error::Error> for AppError {
 	}
 }
 
+impl From<jsonwebtoken::errors::Error> for AppError {
+	fn from(from_error: jsonwebtoken::errors::Error) -> Self {
+		Self::InternalError(InternalError::from(from_error.to_string()))
+	}
+}
+
+impl From<std::time::SystemTimeError> for AppError {
+	fn from(from_error: std::time::SystemTimeError) -> Self {
+		Self::InternalError(InternalError::from(from_error.to_string()))
+	}
+}
+
+impl From<actix_web::http::header::ToStrError> for AppError {
+	fn from(from_error: actix_web::http::header::ToStrError) -> Self {
+		Self::InternalError(InternalError::from(from_error.to_string()))
+	}
+}
+
 
 impl From<&str> for UnauthorizedError {
 	fn from(text: &str) -> Self {
 		Self {
 			error_type: AppErrorType::UnauthorizedError,
-			message: text.to_owned()
+			message: text.to_owned(),
 		}
 	}
 }
+
+

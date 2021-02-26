@@ -1,20 +1,18 @@
-use core::fmt::Debug;
-use actix_web::web::Bytes;
-use serde::{Deserialize, Serialize, de};
-use std::convert::From;
 use super::api;
-use std::env;
+use crate::errors::AppError;
 use actix_web::client::Client;
-use serde_json;
-use crate::errors::{AppError};
-
+use actix_web::web::Bytes;
+use core::fmt::Debug;
+use serde::{de, Deserialize, Serialize};
+use std::convert::From;
+use std::env;
 
 #[derive(Serialize, Debug)]
 pub struct CursorRequest {
 	query: String,
 	count: bool,
 	#[serde(rename = "batchSize")]
-	batch_size: i32
+	batch_size: i32,
 }
 
 #[derive(Deserialize, Debug)]
@@ -26,7 +24,7 @@ pub struct CursorResponse {
 	#[serde(rename = "errorNum")]
 	pub error_num: Option<i32>,
 	#[serde(skip)]
-	bytes: Bytes
+	bytes: Bytes,
 }
 
 #[derive(Deserialize, Debug)]
@@ -37,28 +35,27 @@ pub struct Cursor<T> {
 	pub count: i32,
 	pub error: bool,
 	pub code: i32,
-	pub result: Vec<T>
+	pub result: Vec<T>,
 }
 
 impl CursorRequest {
 	fn url() -> String {
-		let db_url: String = env::var("DB_URL")
-			.expect("Missing env variable DB_URL");
+		let db_url: String = env::var("DB_URL").expect("Missing env variable DB_URL");
 		db_url + "_api/cursor"
 	}
 
 	pub async fn send(&self) -> Result<CursorResponse, AppError> {
-
 		let jwt = api::get_arango_jwt().await.expect("DB Login failed");
 		let client = Client::default();
-		let bytes = client.post(&Self::url())
+		let bytes = client
+			.post(&Self::url())
 			.set_header("Authorization", "bearer ".to_owned() + &jwt)
 			.send_json(&self)
 			.await?
 			.body()
 			.await?;
 		let mut cursor_response: CursorResponse = serde_json::from_slice(&bytes)?;
-		if cursor_response.error == true {
+		if cursor_response.error {
 			return Err(AppError::internal(cursor_response));
 		}
 		cursor_response.bytes = bytes;
@@ -79,14 +76,15 @@ impl CursorResponse {
 			let jwt = api::get_arango_jwt().await.expect("DB Login failed");
 			let url = CursorRequest::url() + "/" + &id;
 			let client = Client::default();
-			let bytes = client.put(url)
+			let bytes = client
+				.put(url)
 				.set_header("Authorization", "bearer ".to_owned() + &jwt)
 				.send()
 				.await?
 				.body()
 				.await?;
 			let cursor_response: CursorResponse = serde_json::from_slice(&bytes)?;
-			if cursor_response.error == true {
+			if cursor_response.error {
 				return Err(AppError::internal(cursor_response));
 			}
 			let mut cursor: Cursor<T> = serde_json::from_slice(&bytes)?;
@@ -102,7 +100,7 @@ impl From<&str> for CursorRequest {
 		CursorRequest {
 			query: cursor_query.to_owned(),
 			count: true,
-			batch_size: 2
+			batch_size: 2,
 		}
 	}
 }
@@ -110,12 +108,9 @@ impl From<&str> for CursorRequest {
 impl From<String> for CursorRequest {
 	fn from(cursor_query: String) -> Self {
 		CursorRequest {
-			query: cursor_query.to_owned(),
+			query: cursor_query,
 			count: true,
-			batch_size: 2
+			batch_size: 2,
 		}
 	}
 }
-
-
-

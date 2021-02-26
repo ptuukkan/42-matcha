@@ -23,7 +23,7 @@ const interests_data = [
 	{ key: 'ux', text: 'User Experience', value: 'ux' },
 ]
 
-const Settings = () => {
+const Profile = () => {
 	/* 	const [location, setLocation] = useState('') */
 	const [radius, setRadius] = useState(1)
 	const [interests, setInterest] = useState(interests_data)
@@ -164,4 +164,4 @@ const Settings = () => {
 	)
 }
 
-export default Settings
+export default Profile
