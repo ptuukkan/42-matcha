@@ -41,6 +41,7 @@ const User = {
 	login: (user: ILoginFormValues): Promise<IUser> =>
 		requests.post('/user/login', user),
 	current: (): Promise<IUser> => requests.get('/user/current'),
+	verify: (link: string): Promise<void> => requests.get(`/user/verify/${link}`)
 };
 
 const agent = {

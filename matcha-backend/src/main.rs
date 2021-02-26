@@ -38,7 +38,7 @@ async fn register(values: Json<models::user::RegisterFormValues>) -> Result<Http
 	Ok(HttpResponse::Created().finish())
 }
 
-#[get("/verify/{link}")] // <- define path parameters
+#[get("/user/verify/{link}")] // <- define path parameters
 async fn verify(web::Path(link): web::Path<String>) -> Result<HttpResponse, Error> {
 	application::user::register::verify(&link).await?;
 	Ok(HttpResponse::Ok().finish())

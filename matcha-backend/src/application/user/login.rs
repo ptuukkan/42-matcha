@@ -50,7 +50,7 @@ pub async fn login(values: LoginFormValues) -> Result<LoginResponse, AppError> {
 			.duration_since(SystemTime::UNIX_EPOCH)?
 			.as_secs() as usize;
 
-		let exp = iat + 86400;
+		let exp = iat + 3600;
 		let my_claims = Claims {
 			sub: user.key.to_owned(),
 			exp,

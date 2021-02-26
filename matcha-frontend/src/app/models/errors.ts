@@ -3,6 +3,11 @@ export interface IValidationError {
 	message: string
 }
 
+export interface IBackendError {
+	error_type: string,
+	message: string
+}
+
 export class BackendError {
 	message: string
 
