@@ -19,3 +19,7 @@ export interface ILoginFormValues {
 	username: string,
 	password: string
 }
+
+export interface IForgetPassword {
+	email: string
+}
