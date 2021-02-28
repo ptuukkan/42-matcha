@@ -58,25 +58,25 @@ impl User {
 		last_name: &str,
 		email_address: &str,
 		password: &str,
-		user_name: &str,
+		username: &str,
 	) -> User {
 		User {
 			key: String::new(),
 			first_name: String::from(first_name),
 			last_name: String::from(last_name),
 			email_address: String::from(email_address),
-			username: String::from(user_name),
+			username: String::from(username),
 			password: User::hash_pw(&String::from(password)),
 			link: None,
 		}
 	}
 
-	pub fn login_response(&self, token: String) -> LoginResponse {
+	pub fn login_response(&self, token: &str) -> LoginResponse {
 		LoginResponse {
 			first_name: self.first_name.to_owned(),
 			last_name: self.last_name.to_owned(),
 			email_address: self.email_address.to_owned(),
-			token,
+			token: token.to_owned(),
 		}
 	}
 

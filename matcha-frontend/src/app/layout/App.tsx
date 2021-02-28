@@ -1,9 +1,5 @@
 import React, { Fragment, useContext, useEffect, useState } from 'react';
-import {
-	BrowserRouter as Router,
-	Switch,
-	Route,
-} from 'react-router-dom';
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import Navigation from '../../features/nav/Navigation';
 import { Container, Dimmer, Loader } from 'semantic-ui-react';
 import Profiles from '../../testProfiles1.json';
@@ -59,10 +55,10 @@ const App = () => {
 			style={{ display: 'flex', minHeight: '100vh', flexDirection: 'column' }}
 		>
 			<Container className="main_container">
-				<LandingNavigation />
 				<Router>
+					<LandingNavigation />
 					<Switch>
-						<Route path="/verify/:link" component={EmailVerification}/>
+						<Route path="/verify/:link" component={EmailVerification} />
 						<Route component={Landing} />
 					</Switch>
 				</Router>

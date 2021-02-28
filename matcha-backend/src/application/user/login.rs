@@ -23,7 +23,7 @@ pub async fn current_user(req: HttpRequest) -> Result<LoginResponse, AppError> {
 				&Validation::default(),
 			)?;
 			if let Some(user) = User::find("_key", &token_data.claims.sub).await?.pop() {
-				Ok(user.login_response(token_data.claims.sub))
+				Ok(user.login_response(token))
 			} else {
 				Err(AppError::bad_request("User not found"))
 			}
@@ -64,7 +64,7 @@ pub async fn login(values: LoginFormValues) -> Result<LoginResponse, AppError> {
 			&EncodingKey::from_secret(key.as_ref()),
 		)?;
 
-		Ok(user.login_response(token))
+		Ok(user.login_response(&token))
 	} else {
 		return Err(AppError::unauthorized("Login failed"));
 	}

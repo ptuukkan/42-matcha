@@ -7,24 +7,41 @@ import { ILoginFormValues } from '../../app/models/user';
 import TextInput from './TextInput';
 import { BackendError } from '../../app/models/errors';
 import { ErrorMessage } from '@hookform/error-message';
+import { useHistory } from 'react-router-dom';
 
 const Login = () => {
 	const rootStore = useContext(RootStoreContext);
 	const { loginOpen, closeLogin } = rootStore.modalStore;
 	const { loginUser, loading } = rootStore.userStore;
-	const { register, handleSubmit, errors, setError, reset, clearErrors } = useForm();
+	const {
+		register,
+		handleSubmit,
+		errors,
+		setError,
+		reset,
+		clearErrors,
+	} = useForm();
+	const history = useHistory();
 
 	const onSubmit = (data: ILoginFormValues) => {
-		loginUser(data).catch((error: BackendError) => {
-			setError('global', { type: 'manual', message: error.message });
-		});
+		loginUser(data)
+			.then(() => {
+				history.push('/');
+			})
+			.catch((error: BackendError) => {
+				setError('global', { type: 'manual', message: error.message });
+			});
 	};
 
 	return (
-		<Modal size="tiny" open={loginOpen} onClose={()=> {
-			closeLogin()
-			reset()
-		}}>
+		<Modal
+			size="tiny"
+			open={loginOpen}
+			onClose={() => {
+				closeLogin();
+				reset();
+			}}
+		>
 			<Modal.Header>Login to Matcha</Modal.Header>
 			<Modal.Content>
 				<Form onSubmit={handleSubmit(onSubmit)}>
@@ -55,7 +72,12 @@ const Login = () => {
 						name="global"
 						render={({ message }) => <Message negative>{message}</Message>}
 					/>
-					<Button primary type="submit" loading={loading} onClick={() => clearErrors()}>
+					<Button
+						primary
+						type="submit"
+						loading={loading}
+						onClick={() => clearErrors()}
+					>
 						Login
 					</Button>
 				</Form>
