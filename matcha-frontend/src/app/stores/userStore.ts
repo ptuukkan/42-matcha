@@ -1,6 +1,6 @@
 import { action, makeObservable, observable, runInAction } from 'mobx';
 import agent from '../api/agent';
-import { IForgetPassword, ILoginFormValues, IRegisterFormValues, IUser } from '../models/user';
+import { ILoginFormValues, IRegisterFormValues, IUser } from '../models/user';
 import { RootStore } from './rootStore';
 
 export default class UserStore {
@@ -66,14 +66,6 @@ export default class UserStore {
 			throw error;
 		}
 	};
-
-	forgetPassword = async (data: IForgetPassword) => {
-		try {
-			const res = await agent.User.forget(data.email);
-		} catch (error) {
-			throw error;
-		}
-	}
 
 	getUser = async () => {
 		try {
