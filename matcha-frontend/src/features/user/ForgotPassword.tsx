@@ -11,7 +11,7 @@ import TextInput from './TextInput';
 
 const ForgotPassword = () => {
 	const rootStore = useContext(RootStoreContext);
-	const { forgetOpen, closeForget } = rootStore.modalStore;
+	const { forgetOpen, closeForget, successOpen, openSuccess, closeSuccess } = rootStore.modalStore;
 	const [loading, setLoading] = useState(false);
 
 	const { register, handleSubmit, errors, setError, clearErrors } = useForm();
@@ -22,7 +22,10 @@ const ForgotPassword = () => {
 			.catch((error: BackendError) => {
 				setError('global', { type: 'manual', message: error.message });
 			})
-			.finally(() => setLoading(false));
+			.finally(() => {
+				setLoading(false);
+				openSuccess();
+			});
 	};
 
 	return (
@@ -57,6 +60,12 @@ const ForgotPassword = () => {
 					/>
 				</Form>
 			</Modal.Content>
+			<Modal open={successOpen} onClose={closeSuccess}>
+				<Modal.Header>Password request sended</Modal.Header>
+				<Modal.Content>
+					Please check your email!
+				</Modal.Content>
+			</Modal>
 		</Modal>
 	);
 };

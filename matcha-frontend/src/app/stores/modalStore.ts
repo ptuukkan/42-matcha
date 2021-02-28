@@ -7,6 +7,8 @@ export default class ModalStore {
 	forgetOpen = false;
 	registerFinishOpen = false;
 	loginOpen = false;
+	successOpen = false;
+
 
 	constructor(rootStore: RootStore) {
 		this.rootStore = rootStore;
@@ -19,6 +21,8 @@ export default class ModalStore {
 			closeRegister: action,
 			openForget: action,
 			closeForget: action,
+			openSuccess: action,
+			closeSuccess: action,
 			openRegisterFinish: action,
 			closeRegisterFinish: action,
 			openLogin: action,
@@ -40,6 +44,14 @@ export default class ModalStore {
 
 	closeForget = () => {
 		this.forgetOpen = false;
+	}
+
+	openSuccess = () => {
+		this.successOpen = true;
+	}
+
+	closeSuccess = () => {
+		this.successOpen = false;
 	}
 
 	openRegisterFinish = () => {
