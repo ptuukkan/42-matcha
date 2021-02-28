@@ -4,6 +4,7 @@ import { RootStore } from "./rootStore";
 export default class ModalStore {
 	rootStore: RootStore;
 	registerOpen = false;
+	forgetOpen = false;
 	registerFinishOpen = false;
 	loginOpen = false;
 
@@ -13,8 +14,11 @@ export default class ModalStore {
 			registerOpen: observable,
 			registerFinishOpen: observable,
 			loginOpen: observable,
+			forgetOpen: observable,
 			openRegister: action,
 			closeRegister: action,
+			openForget: action,
+			closeForget: action,
 			openRegisterFinish: action,
 			closeRegisterFinish: action,
 			openLogin: action,
@@ -28,6 +32,14 @@ export default class ModalStore {
 
 	closeRegister = () => {
 		this.registerOpen = false;
+	}
+
+	openForget = () => {
+		this.forgetOpen = true;
+	}
+
+	closeForget = () => {
+		this.forgetOpen = false;
 	}
 
 	openRegisterFinish = () => {
