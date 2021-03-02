@@ -1,10 +1,5 @@
 import React, { Fragment, useContext, useEffect, useState } from 'react';
-import {
-	BrowserRouter as Router,
-	Switch,
-	Route,
-	Redirect,
-} from 'react-router-dom';
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import Navigation from '../../features/nav/Navigation';
 import { Container, Dimmer, Loader } from 'semantic-ui-react';
 import Profiles from '../../testProfiles1.json';
@@ -20,6 +15,11 @@ import Landing from '../../features/home/Landing';
 import { RootStoreContext } from '../stores/rootStore';
 import { observer } from 'mobx-react-lite';
 import NotFound from './NotFound';
+import EmailVerification from '../../features/user/EmailVerification';
+import LandingNavigation from '../../features/home/LandingNavigation';
+import ChangePassword from '../../features/user/ChangePassword';
+import { ToastContainer } from 'react-toastify';
+
 
 const App = () => {
 	const [profile, setProfile] = useState(Profiles.profiles[0]);
@@ -58,8 +58,21 @@ const App = () => {
 			style={{ display: 'flex', minHeight: '100vh', flexDirection: 'column' }}
 		>
 			<Container className="main_container">
-				<Landing />
+				<Router>
+					<LandingNavigation />
+					<Switch>
+						<Route path="/verify/:link" component={EmailVerification} />
+						<Route
+							exact
+							path="/resetpassword/:link"
+							component={ChangePassword}
+						/>
+						<Route component={Landing} />
+					</Switch>
+				</Router>
+			<ToastContainer style={{ marginTop: '5%' }} position="top-right" />
 			</Container>
+			<Footer />
 		</div>
 	) : (
 		<div
