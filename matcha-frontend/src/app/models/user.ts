@@ -20,6 +20,10 @@ export interface ILoginFormValues {
 	password: string
 }
 
+export interface IResetPassword {
+	password: string
+}
+
 export interface IForgetPassword {
 	email: string
 }

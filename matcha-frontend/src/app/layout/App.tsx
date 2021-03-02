@@ -17,6 +17,7 @@ import { observer } from 'mobx-react-lite';
 import NotFound from './NotFound';
 import EmailVerification from '../../features/user/EmailVerification';
 import LandingNavigation from '../../features/home/LandingNavigation';
+import ChangePassword from '../../features/user/ChangePassword';
 
 const App = () => {
 	const [profile, setProfile] = useState(Profiles.profiles[0]);
@@ -59,6 +60,7 @@ const App = () => {
 					<LandingNavigation />
 					<Switch>
 						<Route path="/verify/:link" component={EmailVerification} />
+						<Route exact path="/changePassword/:link" component={ChangePassword} />
 						<Route component={Landing} />
 					</Switch>
 				</Router>

@@ -1,6 +1,6 @@
 import axios, { AxiosResponse } from 'axios';
 import { BackendError } from '../models/errors';
-import { IForgetPassword, ILoginFormValues, IRegisterFormValues, IUser } from '../models/user';
+import { IForgetPassword, ILoginFormValues, IRegisterFormValues, IResetPassword, IUser } from '../models/user';
 
 axios.defaults.baseURL = process.env.REACT_APP_API_URL;
 
@@ -42,7 +42,8 @@ const User = {
 		requests.post('/user/login', user),
 	current: (): Promise<IUser> => requests.get('/user/current'),
 	verify: (link: string): Promise<void> => requests.get(`/user/verify/${link}`),
-	forget: (data: IForgetPassword): Promise<void> => requests.post(`/user/resetpassword`, data)
+	forget: (data: IForgetPassword): Promise<void> => requests.post(`/user/resetpassword`, data),
+	reset: (link: string, data: IResetPassword): Promise<void> => requests.post(`/user/reset_password/${link}`, data)
 };
 
 const agent = {

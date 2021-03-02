@@ -38,6 +38,18 @@ async fn register(values: Json<models::user::RegisterFormValues>) -> Result<Http
 	Ok(HttpResponse::Created().finish())
 }
 
+#[post("user/resetpassword")]
+async fn reset(values: Json<models::user::ResetFormValues>) -> Result<HttpResponse, Error> {
+	application::user::login::reset(values.into_inner()).await?;
+	Ok(HttpResponse::Created().finish())
+}
+
+#[post("user/reset_password/{reset_link}")]
+async fn reset_password(web::Path(link): web::Path<String>, values: Json<models::user::ResetPasswordValues>) -> Result<HttpResponse, Error> {
+	application::user::login::reset_password(&link, values.into_inner()).await?;
+	Ok(HttpResponse::Created().finish())
+}
+
 #[get("/user/verify/{link}")] // <- define path parameters
 async fn verify(web::Path(link): web::Path<String>) -> Result<HttpResponse, Error> {
 	application::user::register::verify(&link).await?;
@@ -64,6 +76,8 @@ async fn main() -> std::io::Result<()> {
 			.service(register)
 			.service(login)
 			.service(verify)
+			.service(reset_password)
+			.service(reset)
 			.service(current_user)
 	})
 	.bind("127.0.0.1:8080")?;

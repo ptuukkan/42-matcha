@@ -17,6 +17,7 @@ export default class ModalStore {
 			registerFinishOpen: observable,
 			loginOpen: observable,
 			forgetOpen: observable,
+			successOpen: observable,
 			openRegister: action,
 			closeRegister: action,
 			openForget: action,
