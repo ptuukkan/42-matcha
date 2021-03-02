@@ -1,6 +1,8 @@
 import axios, { AxiosResponse } from 'axios';
+import { toast } from 'react-toastify';
 import { BackendError } from '../models/errors';
-import { ILoginFormValues, IRegisterFormValues, IUser } from '../models/user';
+import { IForgetPassword, ILoginFormValues, IRegisterFormValues, IResetPassword, IUser } from '../models/user';
+import { history } from '../..';
 
 axios.defaults.baseURL = process.env.REACT_APP_API_URL;
 
@@ -22,6 +24,13 @@ axios.interceptors.response.use(undefined, (error) => {
 		const e = new BackendError('Network Error');
 		throw e;
 	}
+	const { status, data } = error.response;
+	if (status === 401 && data.message === 'Token expired') {
+		console.log(error.response)
+		window.localStorage.removeItem('jwt');
+		history.push('/');
+		toast.error('Your session has expired, please login again');
+	}
 	if (error.response && error.response.data) {
 		throw error.response.data;
 	}
@@ -41,6 +50,9 @@ const User = {
 	login: (user: ILoginFormValues): Promise<IUser> =>
 		requests.post('/user/login', user),
 	current: (): Promise<IUser> => requests.get('/user/current'),
+	verify: (link: string): Promise<void> => requests.get(`/user/verify/${link}`),
+	forget: (data: IForgetPassword): Promise<void> => requests.post(`/user/password/reset`, data),
+	reset: (link: string, data: IResetPassword): Promise<void> => requests.post(`/user/password/reset/${link}`, data)
 };
 
 const agent = {

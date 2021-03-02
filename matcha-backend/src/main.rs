@@ -6,9 +6,9 @@ mod models;
 mod tests;
 
 use actix_cors::Cors;
-use actix_web::{HttpRequest, error::Error};
 use actix_web::middleware::Logger;
 use actix_web::web::Json;
+use actix_web::{error::Error, HttpRequest};
 use actix_web::{get, post, web, App, HttpResponse, HttpServer, Responder};
 use database::seed_data;
 use dotenv::dotenv;
@@ -38,7 +38,22 @@ async fn register(values: Json<models::user::RegisterFormValues>) -> Result<Http
 	Ok(HttpResponse::Created().finish())
 }
 
-#[get("/verify/{link}")] // <- define path parameters
+#[post("user/password/reset")]
+async fn reset(values: Json<models::user::ResetFormValues>) -> Result<HttpResponse, Error> {
+	application::user::password::reset(values.into_inner()).await?;
+	Ok(HttpResponse::Created().finish())
+}
+
+#[post("user/password/reset/{reset_link}")]
+async fn reset_password(
+	web::Path(link): web::Path<String>,
+	values: Json<models::user::ResetPasswordValues>,
+) -> Result<HttpResponse, Error> {
+	application::user::password::reset_password(&link, values.into_inner()).await?;
+	Ok(HttpResponse::Created().finish())
+}
+
+#[get("/user/verify/{link}")] // <- define path parameters
 async fn verify(web::Path(link): web::Path<String>) -> Result<HttpResponse, Error> {
 	application::user::register::verify(&link).await?;
 	Ok(HttpResponse::Ok().finish())
@@ -64,10 +79,11 @@ async fn main() -> std::io::Result<()> {
 			.service(register)
 			.service(login)
 			.service(verify)
+			.service(reset_password)
+			.service(reset)
 			.service(current_user)
 	})
 	.bind("127.0.0.1:8080")?;
 	info!("Starting server");
 	server.run().await
 }
-
