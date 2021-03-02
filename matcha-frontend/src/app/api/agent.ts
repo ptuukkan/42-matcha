@@ -24,11 +24,12 @@ axios.interceptors.response.use(undefined, (error) => {
 		const e = new BackendError('Network Error');
 		throw e;
 	}
-	const {status, headers} = error.response;
-	if (status === 401 && headers['www-authenticate'].includes('Bearer error="invalid_token", error_description="The token expired')) {
+	const { status, data } = error.response;
+	if (status === 401 && data.message === 'Token expired') {
+		console.log(error.response)
 		window.localStorage.removeItem('jwt');
 		history.push('/');
-		toast.info('Your session has expired, please login again');
+		toast.error('Your session has expired, please login again');
 	}
 	if (error.response && error.response.data) {
 		throw error.response.data;

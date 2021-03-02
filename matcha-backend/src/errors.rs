@@ -210,7 +210,10 @@ impl From<lettre::sendmail::error::Error> for AppError {
 
 impl From<jsonwebtoken::errors::Error> for AppError {
 	fn from(from_error: jsonwebtoken::errors::Error) -> Self {
-		Self::InternalError(InternalError::from(from_error.to_string()))
+		match from_error.kind() {
+			jsonwebtoken::errors::ErrorKind::ExpiredSignature => Self::unauthorized("Token expired"),
+			_ => Self::InternalError(InternalError::from(from_error.to_string()))
+		}
 	}
 }
 
