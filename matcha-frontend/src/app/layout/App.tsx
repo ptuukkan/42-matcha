@@ -18,6 +18,7 @@ import NotFound from './NotFound';
 import EmailVerification from '../../features/user/EmailVerification';
 import LandingNavigation from '../../features/home/LandingNavigation';
 import ChangePassword from '../../features/user/ChangePassword';
+import { ToastContainer } from 'react-toastify';
 
 const App = () => {
 	const [profile, setProfile] = useState(Profiles.profiles[0]);
@@ -60,7 +61,7 @@ const App = () => {
 					<LandingNavigation />
 					<Switch>
 						<Route path="/verify/:link" component={EmailVerification} />
-						<Route exact path="/changePassword/:link" component={ChangePassword} />
+						<Route exact path="/resetpassword/:link" component={ChangePassword} />
 						<Route component={Landing} />
 					</Switch>
 				</Router>
@@ -74,6 +75,7 @@ const App = () => {
 			<Container className="main_container">
 				<Router>
 					<Fragment>
+						<ToastContainer position='bottom-right' />
 						<Navigation logout={logout} />
 						<Switch>
 							<Route exact path="/">

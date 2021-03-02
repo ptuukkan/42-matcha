@@ -23,10 +23,11 @@ const validatePassword = (value: string) => {
 	return true;
 };
 
-const ChangePassword: React.FC<IParams> = () => {
+const ChangePassword = () => {
 	const { register, handleSubmit, errors, setError, clearErrors } = useForm();
 	const [loading, setLoading] = useState(false);
 	const [finish, setFinish] = useState(false);
+	const { link } = useParams<IParams>();
 
 	const onSubmit = (data: IResetPassword) => {
 		setLoading(true);
@@ -40,9 +41,9 @@ const ChangePassword: React.FC<IParams> = () => {
 			});
 	};
 
-	const { link } = useParams<IParams>();
+	if (finish) return <Header>Password successfully changed!</Header>;
 
-	return !finish ? (
+	return (
 		<div>
 			<Header>Reset your password</Header>
 			<Form onSubmit={handleSubmit(onSubmit)}>
@@ -69,10 +70,6 @@ const ChangePassword: React.FC<IParams> = () => {
 					onClick={() => clearErrors()}
 				/>
 			</Form>
-		</div>
-	) : (
-		<div>
-			<Header>Password successfully changed!</Header>
 		</div>
 	);
 };

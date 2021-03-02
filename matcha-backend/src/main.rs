@@ -6,9 +6,9 @@ mod models;
 mod tests;
 
 use actix_cors::Cors;
-use actix_web::{HttpRequest, error::Error};
 use actix_web::middleware::Logger;
 use actix_web::web::Json;
+use actix_web::{error::Error, HttpRequest};
 use actix_web::{get, post, web, App, HttpResponse, HttpServer, Responder};
 use database::seed_data;
 use dotenv::dotenv;
@@ -38,15 +38,18 @@ async fn register(values: Json<models::user::RegisterFormValues>) -> Result<Http
 	Ok(HttpResponse::Created().finish())
 }
 
-#[post("user/resetpassword")]
+#[post("user/password/reset")]
 async fn reset(values: Json<models::user::ResetFormValues>) -> Result<HttpResponse, Error> {
-	application::user::login::reset(values.into_inner()).await?;
+	application::user::password::reset(values.into_inner()).await?;
 	Ok(HttpResponse::Created().finish())
 }
 
-#[post("user/reset_password/{reset_link}")]
-async fn reset_password(web::Path(link): web::Path<String>, values: Json<models::user::ResetPasswordValues>) -> Result<HttpResponse, Error> {
-	application::user::login::reset_password(&link, values.into_inner()).await?;
+#[post("user/password/reset/{reset_link}")]
+async fn reset_password(
+	web::Path(link): web::Path<String>,
+	values: Json<models::user::ResetPasswordValues>,
+) -> Result<HttpResponse, Error> {
+	application::user::password::reset_password(&link, values.into_inner()).await?;
 	Ok(HttpResponse::Created().finish())
 }
 
@@ -84,4 +87,3 @@ async fn main() -> std::io::Result<()> {
 	info!("Starting server");
 	server.run().await
 }
-
