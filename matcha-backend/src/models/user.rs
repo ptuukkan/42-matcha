@@ -17,6 +17,7 @@ pub struct User {
 	pub username: String,
 	password: String,
 	pub link: Option<String>,
+	pub profile: Option<String>,
 }
 
 #[derive(Deserialize, Debug)]
@@ -62,6 +63,7 @@ pub struct LoginResponse {
 	last_name: String,
 	email_address: String,
 	pub token: String,
+	has_profile: bool,
 }
 
 impl User {
@@ -80,6 +82,7 @@ impl User {
 			username: String::from(username),
 			password: User::hash_pw(&String::from(password)),
 			link: None,
+			profile: None,
 		}
 	}
 
@@ -96,6 +99,7 @@ impl User {
 			last_name: self.last_name.to_owned(),
 			email_address: self.email_address.to_owned(),
 			token: token.to_owned(),
+			has_profile: self.profile.is_some(),
 		}
 	}
 
@@ -170,6 +174,7 @@ impl From<RegisterFormValues> for User {
 			last_name: values.last_name,
 			password: User::hash_pw(&values.password),
 			link: Some(nanoid!(10, &nanoid::alphabet::SAFE)),
+			profile: None,
 		}
 	}
 }

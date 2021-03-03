@@ -2,6 +2,7 @@ mod application;
 mod database;
 mod errors;
 mod models;
+mod infrastructure;
 #[cfg(test)]
 mod tests;
 
@@ -38,13 +39,13 @@ async fn register(values: Json<models::user::RegisterFormValues>) -> Result<Http
 	Ok(HttpResponse::Created().finish())
 }
 
-#[post("user/password/reset")]
+#[post("/user/password/reset")]
 async fn reset(values: Json<models::user::ResetFormValues>) -> Result<HttpResponse, Error> {
 	application::user::password::reset(values.into_inner()).await?;
 	Ok(HttpResponse::Created().finish())
 }
 
-#[post("user/password/reset/{reset_link}")]
+#[post("/user/password/reset/{reset_link}")]
 async fn reset_password(
 	web::Path(link): web::Path<String>,
 	values: Json<models::user::ResetPasswordValues>,
@@ -63,6 +64,15 @@ async fn verify(web::Path(link): web::Path<String>) -> Result<HttpResponse, Erro
 async fn current_user(req: HttpRequest) -> Result<HttpResponse, Error> {
 	let user = application::user::login::current_user(req).await?;
 	Ok(HttpResponse::Ok().json(user))
+}
+
+#[post("/profile")]
+async fn create_profile(
+	req: HttpRequest,
+	values: Json<models::profile::ProfileFormValues>,
+) -> Result<HttpResponse, Error> {
+	application::profile::create::create(values.into_inner()).await?;
+	Ok(HttpResponse::Created().finish())
 }
 
 #[actix_web::main]
