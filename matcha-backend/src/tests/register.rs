@@ -1,11 +1,11 @@
 use super::*;
-use crate::*;
 use init::init;
 use actix_web::{
 	http::StatusCode,
 	test::{self, TestRequest},
 	App,
 };
+use crate::api::controllers::user::{register, login};
 
 #[actix_rt::test]
 async fn valid() {
