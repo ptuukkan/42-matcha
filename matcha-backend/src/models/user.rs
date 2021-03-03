@@ -118,6 +118,27 @@ impl User {
 		Ok(())
 	}
 
+	pub async fn update(&self) -> Result<(), AppError> {
+		api::patch(&self.key_url(), &self).await?;
+		Ok(())
+	}
+
+	pub async fn find(key: &str, value: &str) -> Result<Vec<Self>, AppError> {
+		let query = format!("FOR u IN users filter u.{} == '{}' return u", key, value);
+		let result = CursorRequest::from(query)
+			.send()
+			.await?
+			.extract_all::<Self>()
+			.await?;
+		Ok(result)
+	}
+
+	pub async fn get(key: &str) -> Result<Self, AppError> {
+		let url = format!("{}{}", User::url(), key);
+		let user = api::get::<Self>(&url).await?;
+		Ok(user)
+	}
+
 	fn hash_pw(password: &str) -> String {
 		sodiumoxide::init().unwrap();
 		let hash = argon2id13::pwhash(
@@ -131,10 +152,6 @@ impl User {
 			.trim_end_matches('\u{0}')
 			.to_string();
 		texthash
-	}
-	pub async fn update(&self) -> Result<(), AppError> {
-		api::patch(&self.key_url(), &self).await?;
-		Ok(())
 	}
 
 	pub fn verify_pw(&self, password: &str) -> bool {
@@ -151,16 +168,6 @@ impl User {
 			Some(pw_hash) => argon2id13::pwhash_verify(&pw_hash, password.as_bytes()),
 			_ => false,
 		}
-	}
-
-	pub async fn find(key: &str, value: &str) -> Result<Vec<Self>, AppError> {
-		let query = format!("FOR u IN users filter u.{} == '{}' return u", key, value);
-		let result = CursorRequest::from(query)
-			.send()
-			.await?
-			.extract_all::<Self>()
-			.await?;
-		Ok(result)
 	}
 }
 

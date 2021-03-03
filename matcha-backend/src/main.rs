@@ -62,7 +62,7 @@ async fn verify(web::Path(link): web::Path<String>) -> Result<HttpResponse, Erro
 
 #[get("/user/current")]
 async fn current_user(req: HttpRequest) -> Result<HttpResponse, Error> {
-	let user = application::user::login::current_user(req).await?;
+	let user = application::user::current::current_user(req).await?;
 	Ok(HttpResponse::Ok().json(user))
 }
 
@@ -71,7 +71,7 @@ async fn create_profile(
 	req: HttpRequest,
 	values: Json<models::profile::ProfileFormValues>,
 ) -> Result<HttpResponse, Error> {
-	application::profile::create::create(values.into_inner()).await?;
+	application::profile::create::create(req, values.into_inner()).await?;
 	Ok(HttpResponse::Created().finish())
 }
 
