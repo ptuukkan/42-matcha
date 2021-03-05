@@ -229,6 +229,11 @@ impl From<actix_web::http::header::ToStrError> for AppError {
 	}
 }
 
+impl From<awmp::Error> for AppError {
+	fn from(from_error: awmp::Error) -> Self {
+		Self::InternalError(InternalError::from(from_error.to_string()))
+	}
+}
 
 impl From<&str> for UnauthorizedError {
 	fn from(text: &str) -> Self {
@@ -238,5 +243,3 @@ impl From<&str> for UnauthorizedError {
 		}
 	}
 }
-
-

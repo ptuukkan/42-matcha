@@ -13,6 +13,12 @@ async fn create_profile(
 	Ok(HttpResponse::Created().finish())
 }
 
+#[post("/profile/image")]
+async fn create_image(parts: awmp::Parts) -> Result<HttpResponse, Error> {
+	profile::image::create(parts).await?;
+	Ok(actix_web::HttpResponse::Created().finish())
+}
+
 pub fn routes(config: &mut web::ServiceConfig) {
-	config.service(create_profile);
+	config.service(create_profile).service(create_image);
 }
