@@ -1,16 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { Button, Header, Form, Dropdown } from 'semantic-ui-react';
+import { Button, Header, Form, Dropdown, TextArea } from 'semantic-ui-react';
+import agent from '../../app/api/agent';
+import { IUser } from '../../app/models/user';
 import TextInput from '../user/TextInput';
-
-interface IFormValues {
-	firstname: String;
-	lastname: String;
-	gender: String;
-	sexualpreference: String;
-	interests: String[];
-	radius: Number;
-}
 
 const mockUpInterest = [
 	{ text: 'angular', value: 'angular' },
@@ -18,27 +11,31 @@ const mockUpInterest = [
 	{ text: 'piercing', value: 'piercing' },
 ];
 
-const Profile = () => {
+interface IProps {
+	user: IUser;
+}
+
+const Profile: React.FC<IProps> = ({ user }) => {
 	/* 	const [location, setLocation] = useState('') */
 	const [radius, setRadius] = useState(1);
 	const [interestsList, setInterest] = useState(mockUpInterest);
 	const [interests, setInterestSelect] = useState([]);
-	const {
-		register,
-		handleSubmit,
-		reset,
-		setValue,
-		errors,
-	} = useForm<IFormValues>({});
+	const [biography, setBiography] = useState('');
+	const { register, handleSubmit, reset, setValue, errors } = useForm({});
 
 	useEffect(() => {
 		reset({
-			firstname: 'firstnameFromDatabase',
-			lastname: 'lastnameFromDatabase',
+			firstName: user['firstName'],
+			lastName: user['lastName'],
 			gender: '',
 			sexualpreference: '',
 		});
-	}, [reset]);
+	}, [reset, user]);
+
+	useEffect(() => {
+		register({ name: 'interests' });
+		register({ name: 'biography' });
+	}, [register])
 
 	/* 	const getLocation = () => {
 		navigator.geolocation.getCurrentPosition((position) => {
@@ -62,17 +59,20 @@ const Profile = () => {
 		setInterest(newInterests);
 	};
 
+	const handleBiography = (
+		e: React.ChangeEvent<HTMLTextAreaElement>,
+		{ value }: any
+	) => {
+		setBiography(value);
+		setValue('biography', value);
+	};
 	const handleRadius = (e: React.ChangeEvent<HTMLInputElement>) => {
 		e.preventDefault();
 		setRadius(Number(e.target.value));
 	};
 
-	useEffect(() => {
-		register({ name: 'interests' });
-	}, [register]);
-
 	const onSubmit = (data: any) => {
-		console.log(data);
+		agent.Profile.create(data);
 	};
 
 	return (
@@ -82,7 +82,7 @@ const Profile = () => {
 				<Header>Account Settings</Header>
 				<TextInput
 					type="text"
-					name="firstname"
+					name="firstName"
 					label="First name"
 					errors={errors}
 					register={register({
@@ -92,7 +92,7 @@ const Profile = () => {
 				<TextInput
 					label="Last name"
 					type="text"
-					name="lastname"
+					name="lastName"
 					errors={errors}
 					register={register({
 						required: 'Lastname is required',
@@ -101,19 +101,18 @@ const Profile = () => {
 				<Header>Preferences</Header>
 				<label>Your gender</label>
 				<select required name="gender" ref={register({ required: true })}>
-					<option value="male">Male</option>
-					<option value="female">Female</option>
-					<option value="other">Other</option>
+					<option value="Male">Male</option>
+					<option value="Female">Female</option>
 				</select>
 				<label>Your sexual preference</label>
 				<select
 					required
-					name="sexualpreference"
+					name="sexualPreference"
 					ref={register({ required: true })}
 				>
-					<option value="male">Male</option>
-					<option value="female">Female</option>
-					<option value="other">Other</option>
+					<option value="Male">Male</option>
+					<option value="Female">Female</option>
+					<option value="Other">Other</option>
 				</select>
 				<h3>Interests</h3>
 				<Dropdown
@@ -129,13 +128,23 @@ const Profile = () => {
 					onAddItem={handleAddition}
 					onChange={handleMultiChange}
 				></Dropdown>
+				<h3>Biography</h3>
+				<TextArea
+					placeholder="Tell us more"
+					name="biography"
+					value={biography}
+					onChange={handleBiography}
+				/>
+
 				<Header as="h4">Location</Header>
-				<label>Search radius: <b>{radius} km</b></label>
+				<label>
+					Search radius: <b>{radius} km</b>
+				</label>
 				<Form.Group>
 					<br></br>
 					<input
 						type="range"
-						style={{width: '100%'}}
+						style={{ width: '100%' }}
 						min={1}
 						max={100}
 						name="radius"

@@ -1,7 +1,14 @@
 import axios, { AxiosResponse } from 'axios';
 import { toast } from 'react-toastify';
 import { BackendError } from '../models/errors';
-import { IForgetPassword, ILoginFormValues, IRegisterFormValues, IResetPassword, IUser } from '../models/user';
+import {
+	IForgetPassword,
+	ILoginFormValues,
+	IRegisterFormValues,
+	IResetPassword,
+	IUser,
+	IProfile,
+} from '../models/user';
 import { history } from '../..';
 
 axios.defaults.baseURL = process.env.REACT_APP_API_URL;
@@ -26,7 +33,7 @@ axios.interceptors.response.use(undefined, (error) => {
 	}
 	const { status, data } = error.response;
 	if (status === 401 && data.message === 'Token expired') {
-		console.log(error.response)
+		console.log(error.response);
 		window.localStorage.removeItem('jwt');
 		history.push('/');
 		toast.error('Your session has expired, please login again');
@@ -51,12 +58,19 @@ const User = {
 		requests.post('/user/login', user),
 	current: (): Promise<IUser> => requests.get('/user/current'),
 	verify: (link: string): Promise<void> => requests.get(`/user/verify/${link}`),
-	forget: (data: IForgetPassword): Promise<void> => requests.post(`/user/password/reset`, data),
-	reset: (link: string, data: IResetPassword): Promise<void> => requests.post(`/user/password/reset/${link}`, data)
+	forget: (data: IForgetPassword): Promise<void> =>
+		requests.post(`/user/password/reset`, data),
+	reset: (link: string, data: IResetPassword): Promise<void> =>
+		requests.post(`/user/password/reset/${link}`, data),
+};
+
+const Profile = {
+	create: (data: IProfile): Promise<void> => requests.post('/profile', data),
 };
 
 const agent = {
 	User,
+	Profile,
 };
 
 export default agent;

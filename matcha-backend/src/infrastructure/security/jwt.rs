@@ -17,7 +17,7 @@ pub fn create_token(user: &User) -> Result<String, AppError> {
 	let iat = SystemTime::now()
 		.duration_since(SystemTime::UNIX_EPOCH)?
 		.as_secs() as usize;
-	let exp = iat + 10;
+	let exp = iat + 390000;
 	let my_claims = Claims {
 		sub: user.key.to_owned(),
 		exp,

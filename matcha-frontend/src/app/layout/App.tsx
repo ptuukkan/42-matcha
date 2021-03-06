@@ -78,12 +78,12 @@ const App = () => {
 			style={{ display: 'flex', minHeight: '100vh', flexDirection: 'column' }}
 		>
 			<Container className="main_container">
-				{user.hasProfile === false ? (
-					<Profile />
-				) : (
-					<Router>
-						<Fragment>
-							<Navigation logout={logout} />
+				<Router>
+					<Fragment>
+						<Navigation logout={logout} />
+						{user.hasProfile === false ? (
+							<Profile user={user}/>
+						) : (
 							<Switch>
 								<Route exact path="/">
 									<Browse getProfile={getRandomUser} profile={profile} />
@@ -100,9 +100,9 @@ const App = () => {
 								<Route exact path="/login" component={Login} />
 								<Route component={NotFound} />
 							</Switch>
-						</Fragment>
-					</Router>
-				)}
+						)}
+					</Fragment>
+				</Router>
 			</Container>
 			<Footer />
 		</div>

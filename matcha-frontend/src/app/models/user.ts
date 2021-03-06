@@ -20,6 +20,16 @@ export interface IProfile {
 	profilePhoto: string,
 }
 
+export interface IProfileFormValues {
+	firstname: String;
+	lastname: String;
+	gender: String;
+	biography: String,
+	sexualpreference: String;
+	interests: String[];
+	radius: Number;
+}
+
 export interface IRegisterFormValues {
 	emailAddress: string,
 	username: string,
