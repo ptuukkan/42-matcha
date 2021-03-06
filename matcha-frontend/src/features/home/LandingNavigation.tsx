@@ -1,6 +1,6 @@
 import { useContext } from 'react';
 import { toast } from 'react-toastify';
-import { Button, Menu } from 'semantic-ui-react';
+import { Button, Menu, Image } from 'semantic-ui-react';
 import { RootStoreContext } from '../../app/stores/rootStore';
 import Login from '../user/Login';
 import Register from '../user/Register';
@@ -13,7 +13,7 @@ const LandingNavigation = () => {
 		<>
 			<Menu fixed="top" icon="labeled" size="mini" borderless className="navi">
 				<Menu.Item header style={{ fontSize: 32, padding: 0 }}>
-					Matcha
+					<Image size="small" src="/logo.png" style={{ marginRight: '1.5em' }} />
 				</Menu.Item>
 				<Menu.Item position="right">
 					<Button size="huge" secondary content="Login" onClick={openLogin} />
@@ -31,7 +31,7 @@ const LandingNavigation = () => {
 						size="huge"
 						secondary
 						content="Toaster"
-						onClick={() => toast.info("This is a test")}
+						onClick={() => toast.info('This is a test')}
 					/>
 				</Menu.Item>
 			</Menu>
