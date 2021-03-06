@@ -235,6 +235,12 @@ impl From<awmp::Error> for AppError {
 	}
 }
 
+impl From<actix_web::client::JsonPayloadError> for AppError {
+	fn from(from_error: actix_web::client::JsonPayloadError) -> Self {
+		Self::InternalError(InternalError::from(from_error.to_string()))
+	}
+}
+
 impl From<&str> for UnauthorizedError {
 	fn from(text: &str) -> Self {
 		Self {
@@ -243,3 +249,4 @@ impl From<&str> for UnauthorizedError {
 		}
 	}
 }
+

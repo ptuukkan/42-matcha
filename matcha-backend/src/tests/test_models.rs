@@ -16,7 +16,7 @@ impl User {
 			first_name: "Teppo".to_owned(),
 			last_name: "Testaaja".to_owned(),
 			username: "tepe".to_owned(),
-			email_address: "tepe@localhost".to_owned(),
+			email_address: "tepe@localhost.com".to_owned(),
 			password: "Password123!".to_owned(),
 		}
 	}

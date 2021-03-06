@@ -1,3 +1,4 @@
+use crate::errors::AppError;
 use actix_web::client::Client;
 use actix_web::Error;
 use serde::{de, Deserialize, Serialize};
@@ -10,7 +11,7 @@ struct Jwt {
 	token: String,
 }
 
-pub async fn get_arango_jwt() -> Result<String, Error> {
+pub async fn get_arango_jwt() -> Result<String, AppError> {
 	let jwt: String;
 
 	match env::var("DB_JWT") {
@@ -21,16 +22,16 @@ pub async fn get_arango_jwt() -> Result<String, Error> {
 	Ok(jwt)
 }
 
-async fn arango_login() -> Result<String, Error> {
-	let db_base_url: String = env::var("DB_BASE_URL").expect("Missing env variable DB_BASE_URL");
+async fn arango_login() -> Result<String, AppError> {
+	let db_base_url: String = env::var("DB_BASE_URL")?;
 	let mut map = HashMap::new();
 	map.insert(
 		"username",
-		env::var("DB_USER").expect("DB_USER must be set"),
+		env::var("DB_USER")?,
 	);
 	map.insert(
 		"password",
-		env::var("DB_PASSWORD").expect("DB_PASSWORD must be set"),
+		env::var("DB_PASSWORD")?,
 	);
 	let url = db_base_url.to_owned() + "_open/auth";
 
@@ -44,8 +45,8 @@ async fn arango_login() -> Result<String, Error> {
 	Ok(response.token)
 }
 
-pub async fn post<I: Serialize, O: de::DeserializeOwned>(url: &str, data: &I) -> Result<O, Error> {
-	let jwt = get_arango_jwt().await.expect("DB Login failed");
+pub async fn post<I: Serialize, O: de::DeserializeOwned>(url: &str, data: &I) -> Result<O, AppError> {
+	let jwt = get_arango_jwt().await?;
 	let client = Client::default();
 	let response = client
 		.post(url)
@@ -57,8 +58,8 @@ pub async fn post<I: Serialize, O: de::DeserializeOwned>(url: &str, data: &I) ->
 	Ok(response)
 }
 
-pub async fn get<O: de::DeserializeOwned>(url: &str) -> Result<O, Error> {
-	let jwt = get_arango_jwt().await.expect("DB Login failed");
+pub async fn get<O: de::DeserializeOwned>(url: &str) -> Result<O, AppError> {
+	let jwt = get_arango_jwt().await?;
 	let client = Client::default();
 	let res = client
 		.get(url)
@@ -70,8 +71,8 @@ pub async fn get<O: de::DeserializeOwned>(url: &str) -> Result<O, Error> {
 	Ok(res)
 }
 
-pub async fn patch<I: Serialize>(url: &str, data: &I) -> Result<(), Error> {
-	let jwt = get_arango_jwt().await.expect("DB Login failed");
+pub async fn patch<I: Serialize>(url: &str, data: &I) -> Result<(), AppError> {
+	let jwt = get_arango_jwt().await?;
 	let client = Client::default();
 	client
 		.patch(url)
@@ -81,9 +82,8 @@ pub async fn patch<I: Serialize>(url: &str, data: &I) -> Result<(), Error> {
 	Ok(())
 }
 
-#[allow(dead_code)]
-pub async fn delete(url: &str) -> Result<(), Error> {
-	let jwt = get_arango_jwt().await.expect("DB Login failed");
+pub async fn delete(url: &str) -> Result<(), AppError> {
+	let jwt = get_arango_jwt().await?;
 	let client = Client::default();
 	client
 		.delete(url)

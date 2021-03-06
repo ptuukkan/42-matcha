@@ -1,6 +1,9 @@
-use crate::errors::AppError;
-use serde::{Deserialize, Serialize};
 use crate::database::api;
+use crate::database::cursor::CursorRequest;
+use crate::errors::AppError;
+use crate::models::base::CreateResponse;
+use crate::models::image::Image;
+use serde::{Deserialize, Serialize};
 use std::env;
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -14,8 +17,7 @@ pub struct Profile {
 	sexual_preference: SexualPreference,
 	biography: String,
 	interests: Vec<String>,
-	pictures: Vec<String>,
-	profile_picture: String,
+	pub images: Vec<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -46,20 +48,52 @@ pub struct ProfileFormValues {
 	sexual_preference: SexualPreference,
 	biography: String,
 	interests: Vec<String>,
-	pictures: Vec<String>,
-	profile_picture: String,
+	images: Vec<String>,
 }
 
-
 impl Profile {
-	fn url() -> String {
-		let db_url: String = env::var("DB_URL").expect("Missing env variable DB_URL");
-		db_url + "_api/document/profiles/"
+	fn url() -> Result<String, AppError> {
+		let db_url: String = env::var("DB_URL")?;
+		Ok(db_url + "_api/document/profiles/")
 	}
 
-	pub async fn create(&self) -> Result<String, AppError> {
-		let res = api::post::<Profile, CreateProfileResponse>(&Profile::url(), &self).await?;
-		Ok(res.key)
+	fn key_url(&self) -> Result<String, AppError> {
+		Ok(format!("{}{}", &Self::url()?, self.key))
+	}
+
+	pub async fn create(&mut self) -> Result<(), AppError> {
+		let res = api::post::<Profile, CreateResponse>(&Profile::url()?, &self).await?;
+		self.key = res.key;
+		Ok(())
+	}
+
+	pub async fn update(&self) -> Result<(), AppError> {
+		api::patch(&self.key_url()?, &self).await?;
+		Ok(())
+	}
+
+	pub async fn get(key: &str) -> Result<Self, AppError> {
+		let url = format!("{}{}", Self::url()?, key);
+		let profile = api::get::<Self>(&url).await?;
+		Ok(profile)
+	}
+
+	pub async fn delete(&self) -> Result<(), AppError> {
+		api::delete(&self.key_url()?).await?;
+		Ok(())
+	}
+
+	pub async fn get_images(&self) -> Result<Vec<Image>, AppError> {
+		let query = format!(
+			"FOR p IN users filter p._key == '{}' return DOCUMENT(\"images\", p.images)",
+			&self.key
+		);
+		let result = CursorRequest::from(query)
+			.send()
+			.await?
+			.extract_all::<Image>()
+			.await?;
+		Ok(result)
 	}
 }
 
@@ -73,8 +107,7 @@ impl From<ProfileFormValues> for Profile {
 			sexual_preference: values.sexual_preference,
 			biography: values.biography,
 			interests: values.interests,
-			pictures: values.pictures,
-			profile_picture: values.profile_picture
+			images: values.images,
 		}
 	}
 }

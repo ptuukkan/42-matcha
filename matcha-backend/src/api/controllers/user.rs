@@ -1,8 +1,8 @@
+use actix_web_validator::Json;
 use crate::application::user;
 use crate::models::user::{
 	LoginFormValues, RegisterFormValues, ResetFormValues, ResetPasswordValues,
 };
-use actix_web::web::Json;
 use actix_web::{error::Error, HttpRequest};
 use actix_web::{get, post, web, HttpResponse};
 

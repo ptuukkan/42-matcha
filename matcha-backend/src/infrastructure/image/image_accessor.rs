@@ -1,10 +1,12 @@
 use awmp::File;
 use crate::errors::AppError;
-use nanoid::nanoid;
 
-pub fn save_image(image: File) -> Result<String, AppError> {
-	let id = nanoid!(10, &nanoid::alphabet::SAFE);
-	let file_path = format!("tmp/{}", id);
-	image.persist_at(&file_path)?;
-	Ok(file_path)
+pub fn save_image(image_file: File, image_key: &str) -> Result<(), AppError> {
+	let file_path = format!("/tmp/{}.jpg", image_key);
+	image_file.persist_at(&file_path)?;
+	Ok(())
+}
+
+pub fn delete_image(image_key: &str) -> Result<(), AppError> {
+	Ok(())
 }

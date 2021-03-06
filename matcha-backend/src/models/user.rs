@@ -1,3 +1,4 @@
+use crate::models::profile::Profile;
 use crate::database::api;
 use crate::database::cursor::CursorRequest;
 use crate::errors::AppError;
@@ -5,6 +6,7 @@ use nanoid::nanoid;
 use serde::{Deserialize, Serialize};
 use sodiumoxide::crypto::pwhash::argon2id13;
 use std::env;
+use actix_web_validator::Validate;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct User {
@@ -27,30 +29,35 @@ struct CreateUserResponse {
 	_rev: String,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct RegisterFormValues {
+	#[validate(length(min = 1))]
 	first_name: String,
+	#[validate(length(min = 1))]
 	last_name: String,
+	#[validate(email)]
 	email_address: String,
+	#[validate(length(min = 1))]
 	username: String,
+	#[validate(length(min = 6))]
 	password: String,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct LoginFormValues {
 	pub email_address: String,
 	pub password: String,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct ResetFormValues {
 	pub email_address: String,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct ResetPasswordValues {
 	pub password: String,
@@ -103,23 +110,22 @@ impl User {
 		}
 	}
 
-	fn url() -> String {
-		let db_url: String = env::var("DB_URL").expect("Missing env variable DB_URL");
-		db_url + "_api/document/users/"
+	fn url() -> Result<String, AppError> {
+		let db_url: String = env::var("DB_URL")?;
+		Ok(db_url + "_api/document/users/")
 	}
 
-	fn key_url(&self) -> String {
-		let db_url: String = env::var("DB_URL").expect("Missing env variable DB_URL");
-		format!("{}_api/document/users/{}", db_url, self.key)
+	fn key_url(&self) -> Result<String, AppError> {
+		Ok(format!("{}{}", &Self::url()?, self.key))
 	}
 
 	pub async fn create(&self) -> Result<(), AppError> {
-		api::post::<User, CreateUserResponse>(&User::url(), &self).await?;
+		api::post::<Self, CreateUserResponse>(&Self::url()?, &self).await?;
 		Ok(())
 	}
 
 	pub async fn update(&self) -> Result<(), AppError> {
-		api::patch(&self.key_url(), &self).await?;
+		api::patch(&self.key_url()?, &self).await?;
 		Ok(())
 	}
 
@@ -134,7 +140,7 @@ impl User {
 	}
 
 	pub async fn get(key: &str) -> Result<Self, AppError> {
-		let url = format!("{}{}", User::url(), key);
+		let url = format!("{}{}", User::url()?, key);
 		let user = api::get::<Self>(&url).await?;
 		Ok(user)
 	}
@@ -167,6 +173,15 @@ impl User {
 		match argon2id13::HashedPassword::from_slice(&padded) {
 			Some(pw_hash) => argon2id13::pwhash_verify(&pw_hash, password.as_bytes()),
 			_ => false,
+		}
+	}
+
+	pub async fn get_profile(&self) -> Result<Option<Profile>, AppError> {
+		if let Some(profile_key) = &self.profile {
+			let profile = Profile::get(&profile_key).await?;
+			Ok(Some(profile))
+		} else {
+			Ok(None)
 		}
 	}
 }
