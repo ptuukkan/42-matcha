@@ -8,6 +8,7 @@ use serde::{Deserialize, Serialize};
 use std::env;
 
 #[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Profile {
 	#[serde(skip_serializing)]
 	#[serde(rename = "_key")]

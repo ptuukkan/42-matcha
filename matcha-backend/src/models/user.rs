@@ -9,6 +9,7 @@ use std::env;
 use actix_web_validator::Validate;
 
 #[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct User {
 	#[serde(skip_serializing)]
 	#[serde(rename = "_key")]
