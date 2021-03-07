@@ -1,8 +1,9 @@
+import { ErrorMessage } from '@hookform/error-message';
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { Button, Header, Form, Dropdown, TextArea } from 'semantic-ui-react';
+import { Button, Header, Form, Dropdown, TextArea, Message } from 'semantic-ui-react';
 import agent from '../../app/api/agent';
-import { IUser } from '../../app/models/user';
+import { IProfileFormValues } from '../../app/models/user';
 import TextInput from '../user/TextInput';
 
 const mockUpInterest = [
@@ -11,13 +12,7 @@ const mockUpInterest = [
 	{ text: 'piercing', value: 'piercing' },
 ];
 
-interface IProps {
-	user: IUser;
-}
-
-const Profile: React.FC<IProps> = ({ user }) => {
-	/* 	const [location, setLocation] = useState('') */
-	const [radius, setRadius] = useState(1);
+const Profile = () => {
 	const [interestsList, setInterest] = useState(mockUpInterest);
 	const [interests, setInterestSelect] = useState([]);
 	const [biography, setBiography] = useState('');
@@ -25,25 +20,17 @@ const Profile: React.FC<IProps> = ({ user }) => {
 
 	useEffect(() => {
 		reset({
-			firstName: user['firstName'],
-			lastName: user['lastName'],
+			firstName: '',
+			lastName: '',
 			gender: '',
-			sexualpreference: '',
+			sexualPreference: ''
 		});
-	}, [reset, user]);
+	}, [reset]);
 
 	useEffect(() => {
 		register({ name: 'interests' });
 		register({ name: 'biography' });
-	}, [register])
-
-	/* 	const getLocation = () => {
-		navigator.geolocation.getCurrentPosition((position) => {
-			setLocation(
-				`Latitude: ${position.coords.longitude} Longitude: ${position.coords.longitude}`
-			)
-		})
-	} */
+	}, [register]);
 
 	const handleMultiChange = (e: any, selectedOption: any) => {
 		let interests = selectedOption.value;
@@ -66,13 +53,11 @@ const Profile: React.FC<IProps> = ({ user }) => {
 		setBiography(value);
 		setValue('biography', value);
 	};
-	const handleRadius = (e: React.ChangeEvent<HTMLInputElement>) => {
-		e.preventDefault();
-		setRadius(Number(e.target.value));
-	};
 
-	const onSubmit = (data: any) => {
-		agent.Profile.create(data);
+	const onSubmit = (data: IProfileFormValues) => {
+		agent.Profile.create(data).then(
+
+		);
 	};
 
 	return (
@@ -100,15 +85,18 @@ const Profile: React.FC<IProps> = ({ user }) => {
 				/>
 				<Header>Preferences</Header>
 				<label>Your gender</label>
-				<select required name="gender" ref={register({ required: true })}>
+				<ErrorMessage errors={errors} name="gender" render={({ message }) => <Message negative>{message}</Message>}/>
+				<select name="gender" ref={register({ required: 'This is required field!' })}>
 					<option value="Male">Male</option>
 					<option value="Female">Female</option>
 				</select>
+				
+				<br></br>
 				<label>Your sexual preference</label>
+				<ErrorMessage errors={errors} name="sexualPreference" render={({ message }) => <Message negative>{message}</Message>}/>
 				<select
-					required
 					name="sexualPreference"
-					ref={register({ required: true })}
+					ref={register({ required: 'This field is required' })}
 				>
 					<option value="Male">Male</option>
 					<option value="Female">Female</option>
@@ -135,24 +123,6 @@ const Profile: React.FC<IProps> = ({ user }) => {
 					value={biography}
 					onChange={handleBiography}
 				/>
-
-				<Header as="h4">Location</Header>
-				<label>
-					Search radius: <b>{radius} km</b>
-				</label>
-				<Form.Group>
-					<br></br>
-					<input
-						type="range"
-						style={{ width: '100%' }}
-						min={1}
-						max={100}
-						name="radius"
-						value={radius}
-						onChange={handleRadius}
-						ref={register()}
-					></input>
-				</Form.Group>
 				<Button type="submit">Save</Button>
 			</Form>
 		</div>

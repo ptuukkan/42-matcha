@@ -1,6 +1,10 @@
 import { action, makeObservable, observable, runInAction } from 'mobx';
 import agent from '../api/agent';
-import { ILoginFormValues, IRegisterFormValues, IUser } from '../models/user';
+import {
+	ILoginFormValues,
+	IRegisterFormValues,
+	IUser,
+} from '../models/user';
 import { RootStore } from './rootStore';
 
 export default class UserStore {
@@ -32,7 +36,7 @@ export default class UserStore {
 		this.token = null;
 		this.user = null;
 		window.localStorage.removeItem('jwt');
-	}
+	};
 
 	setToken = (token: string) => {
 		this.token = token;

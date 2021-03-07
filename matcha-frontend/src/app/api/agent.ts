@@ -7,7 +7,7 @@ import {
 	IRegisterFormValues,
 	IResetPassword,
 	IUser,
-	IProfile,
+	IProfileFormValues,
 } from '../models/user';
 import { history } from '../..';
 
@@ -49,6 +49,7 @@ const responseBody = (response: AxiosResponse) => response.data;
 const requests = {
 	get: (url: string) => axios.get(url).then(responseBody),
 	post: (url: string, body: {}) => axios.post(url, body).then(responseBody),
+	put: (url: string, body: {}) => axios.put(url, body).then(responseBody),
 };
 
 const User = {
@@ -65,7 +66,7 @@ const User = {
 };
 
 const Profile = {
-	create: (data: IProfile): Promise<void> => requests.post('/profile', data),
+	create: (data: IProfileFormValues): Promise<void> => requests.put('/profile', data),
 };
 
 const agent = {

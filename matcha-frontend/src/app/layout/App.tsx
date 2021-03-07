@@ -10,6 +10,7 @@ import Research from '../../features/research/Research';
 import Matches from '../../features/matches/Matches';
 import Footer from '../../features/nav/Footer';
 import Login from '../../features/user/Login';
+import AddPhoto from '../../features/user/AddPhoto';
 import Register from '../../features/user/Register';
 import Landing from '../../features/home/Landing';
 import { RootStoreContext } from '../stores/rootStore';
@@ -75,15 +76,16 @@ const App = () => {
 		</div>
 	) : (
 		<div
-			style={{ display: 'flex', minHeight: '100vh', flexDirection: 'column' }}
+		style={{ display: 'flex', minHeight: '100vh', flexDirection: 'column' }}
 		>
 			<Container className="main_container">
 				<Router>
 					<Fragment>
 						<Navigation logout={logout} />
+						<Route path="/addphoto" component={AddPhoto} />
 						{user.hasProfile === false ? (
-							<Profile user={user}/>
-						) : (
+							<Profile/>
+							) : (
 							<Switch>
 								<Route exact path="/">
 									<Browse getProfile={getRandomUser} profile={profile} />

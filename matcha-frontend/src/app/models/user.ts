@@ -21,14 +21,14 @@ export interface IProfile {
 }
 
 export interface IProfileFormValues {
-	firstname: String;
-	lastname: String;
+	firstName: String;
+	lastName: String;
 	gender: String;
 	biography: String,
-	sexualpreference: String;
+	sexualPreference: String;
 	interests: String[];
-	radius: Number;
 }
+
 
 export interface IRegisterFormValues {
 	emailAddress: string,
