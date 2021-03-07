@@ -3,7 +3,7 @@ use crate::infrastructure::security::jwt;
 use crate::models::user::{LoginFormValues, LoginResponse, User};
 
 pub async fn login(values: LoginFormValues) -> Result<LoginResponse, AppError> {
-	if let Some(user) = User::find("email_address", &values.email_address)
+	if let Some(user) = User::find("emailAddress", &values.email_address)
 		.await?
 		.pop()
 	{

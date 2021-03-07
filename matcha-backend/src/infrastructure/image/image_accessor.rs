@@ -7,6 +7,6 @@ pub fn save_image(image_file: File, image_key: &str) -> Result<(), AppError> {
 	Ok(())
 }
 
-pub fn delete_image(image_key: &str) -> Result<(), AppError> {
+pub fn delete_image(_image_key: &str) -> Result<(), AppError> {
 	Ok(())
 }

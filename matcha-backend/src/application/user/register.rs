@@ -11,7 +11,7 @@ use std::env;
 pub async fn register(values: RegisterFormValues) -> Result<(), AppError> {
 	let mut user = User::from(&values);
 	let mut validation_error = ValidationError::empty();
-	if !User::find("email_address", &user.email_address)
+	if !User::find("emailAddress", &user.email_address)
 		.await?
 		.is_empty()
 	{

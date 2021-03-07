@@ -25,7 +25,7 @@ async fn profile_exists_after_register() {
 		StatusCode::CREATED,
 		"Failed to register user"
 	);
-	let result = User::find("email_address", "profile@localhost.com").await;
+	let result = User::find("emailAddress", "profile@localhost.com").await;
 	assert!(result.is_ok(), "Could not search for user");
 	let mut users = result.unwrap();
 	let maybe_user = users.pop();
