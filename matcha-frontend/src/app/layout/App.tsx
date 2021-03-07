@@ -10,7 +10,6 @@ import Research from '../../features/research/Research';
 import Matches from '../../features/matches/Matches';
 import Footer from '../../features/nav/Footer';
 import Login from '../../features/user/Login';
-import AddPhoto from '../../features/user/AddPhoto';
 import Register from '../../features/user/Register';
 import Landing from '../../features/home/Landing';
 import { RootStoreContext } from '../stores/rootStore';
@@ -20,6 +19,7 @@ import EmailVerification from '../../features/user/EmailVerification';
 import LandingNavigation from '../../features/home/LandingNavigation';
 import ChangePassword from '../../features/user/ChangePassword';
 import { ToastContainer } from 'react-toastify';
+import AddPhoto from '../../features/user/AddPhoto';
 
 const App = () => {
 	const [profile, setProfile] = useState(Profiles.profiles[0]);
@@ -76,33 +76,29 @@ const App = () => {
 		</div>
 	) : (
 		<div
-		style={{ display: 'flex', minHeight: '100vh', flexDirection: 'column' }}
+			style={{ display: 'flex', minHeight: '100vh', flexDirection: 'column' }}
 		>
 			<Container className="main_container">
 				<Router>
 					<Fragment>
 						<Navigation logout={logout} />
-						<Route path="/addphoto" component={AddPhoto} />
-						{user.hasProfile === false ? (
-							<Profile/>
-							) : (
-							<Switch>
-								<Route exact path="/">
-									<Browse getProfile={getRandomUser} profile={profile} />
-								</Route>
-								<Route exact path="/chat" component={Chat} />
-								<Route exact path="/profile" component={Profile} />
-								<Route exact path="/matches">
-									<Matches profiles={Profiles.profiles} />
-								</Route>
-								<Route exact path="/research">
-									<Research profiles={Profiles.profiles} />
-								</Route>
-								<Route exact path="/register" component={Register} />
-								<Route exact path="/login" component={Login} />
-								<Route component={NotFound} />
-							</Switch>
-						)}
+						<Switch>
+							<Route exact path="/">
+								<Browse getProfile={getRandomUser} profile={profile} />
+							</Route>
+							<Route exact path="/chat" component={Chat} />
+							<Route exact path="/profile" component={Profile} />
+							<Route exact path="/pictures" component={AddPhoto} />
+							<Route exact path="/matches">
+								<Matches profiles={Profiles.profiles} />
+							</Route>
+							<Route exact path="/research">
+								<Research profiles={Profiles.profiles} />
+							</Route>
+							<Route exact path="/register" component={Register} />
+							<Route exact path="/login" component={Login} />
+							<Route component={NotFound} />
+						</Switch>
 					</Fragment>
 				</Router>
 			</Container>

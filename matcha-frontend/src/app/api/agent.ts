@@ -67,6 +67,7 @@ const User = {
 
 const Profile = {
 	create: (data: IProfileFormValues): Promise<void> => requests.put('/profile', data),
+	addImage: (data: FormData): Promise<void> => requests.post('/profile/image', data)
 };
 
 const agent = {

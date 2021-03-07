@@ -9,6 +9,7 @@ export default class ModalStore {
 	registerFinishOpen = false;
 	loginOpen = false;
 	successOpen = false;
+	profilePhotoOpen = false;
 
 
 	constructor(rootStore: RootStore) {
@@ -19,6 +20,9 @@ export default class ModalStore {
 			loginOpen: observable,
 			forgetOpen: observable,
 			successOpen: observable,
+			profilePhotoOpen: observable,
+			closeProfilePhoto: action,
+			openProfilePhoto: action,
 			openRegister: action,
 			closeRegister: action,
 			openForget: action,
@@ -50,6 +54,15 @@ export default class ModalStore {
 
 	closeForget = () => {
 		this.forgetOpen = false;
+	}
+
+	closeProfilePhoto = () => {
+		this.profilePhotoOpen = false;
+	}
+	
+	openProfilePhoto = () => {
+		console.log('here')
+		this.profilePhotoOpen = true;
 	}
 
 	openSuccess = () => {

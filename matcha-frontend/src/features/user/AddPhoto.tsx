@@ -1,107 +1,93 @@
-import React, { useCallback, useContext, useState } from 'react';
-import {
-	Button,
-	Container,
-	Header,
-	Modal,
-	Image,
-	Grid,
-} from 'semantic-ui-react';
-import { RootStoreContext } from '../../app/stores/rootStore';
 import { useDropzone } from 'react-dropzone';
+import { Grid, Header, Image, Icon, Modal, Button } from 'semantic-ui-react';
+import agent from '../../app/api/agent';
+import { useCallback, useContext, useState } from 'react';
+import { RootStoreContext } from '../../app/stores/rootStore';
+import { observer } from 'mobx-react-lite';
 
-export interface FirstLoginProps {}
-
-const FirstLogin: React.FC<FirstLoginProps> = () => {
+const ProfilePhotos = () => {
+	const rootStore = useContext(RootStoreContext);
+	const { profilePhotoOpen, closeProfilePhoto } = rootStore.modalStore;
 	const [images, setImages] = useState<any[]>([]);
+
+	const dropzoneStyles = {
+		border: 'dashed 3px',
+		borderColor: '#eee',
+		borderRadius: '5px',
+		paddingTop: '30px',
+		textAlign: 'center' as 'center',
+		height: '200px',
+	};
+
+	const dropzoneActive = {
+		borderColor: 'green',
+	};
 
 	const onDrop = useCallback((acceptedFiles) => {
 		if (acceptedFiles.length > 5) {
-			console.log('Max 5 photos!');
-		} else {
-			setImages(acceptedFiles);
+			return alert('Max 5 Photos!!');
 		}
+		const formdata = new FormData();
+		acceptedFiles.forEach((file: Blob) => {
+			formdata.append('image', file);
+		});
+		setImages(acceptedFiles);
+		console.log(acceptedFiles);
+		agent.Profile.addImage(formdata)
+			.then(() => console.log('success'))
+			.catch((e) => console.log(e));
 	}, []);
 
-	const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
-	const rootStore = useContext(RootStoreContext);
-	const { firstLogin } = rootStore.modalStore;
+	const { getRootProps, getInputProps, isDragActive } = useDropzone({
+		onDrop,
+		accept: 'image/jpeg, image/png',
+	});
+
 	return (
-		<>
-			<Modal open={firstLogin}>
-				<Modal.Header>Please add your profile photo!</Modal.Header>
-				<Modal.Content>
-					<div>
-						{images.length > 0 ? (
-							<div>
-								<Header>Please select your profile photo</Header>
-								<Container>
-									<Grid container columns={3}>
-										{images.map((im) => (
-											<Image key={im.name} src={URL.createObjectURL(im)} />
-										))}
-									</Grid>
-									<br></br>
-									<Button
-										content="Back"
-										onClick={() => setImages([])}
-										negative
-									/>
-									<Button
-										content="Next"
-										floated="right"
-										onClick={() => setImages([])}
-										positive
-									/>
-								</Container>
-							</div>
-						) : (
-							<div>
-								<Container>
-									<Header floated="left">Step 1. Add photos</Header>
-								</Container>
-								<p>max 5 pcs</p>
-								<div
-									style={{
-										display: 'flex',
-										alignItems: 'center',
-										justifyContent: 'center',
-									}}
-								>
-									<div
-										style={{
-											display: 'flex',
-											alignItems: 'center',
-											justifyContent: 'center',
-											background: '#E7E7E7',
-											width: '80%',
-											height: '80px',
-											color: '#707070',
-											borderRadius: '5px',
-											padding: '20px',
-											border: '1px dashed #bdbdbd',
-											fontSize: '14px',
-											cursor: 'pointer',
-										}}
-										{...getRootProps()}
-									>
-										<input {...getInputProps()} />
-										{isDragActive ? (
-											<p>Drop the files here ...</p>
-										) : (
-											<p>
-												Drag 'n' drop some files here, or click to select files
-											</p>
-										)}
-									</div>
-								</div>
-							</div>
-						)}
-					</div>
-				</Modal.Content>
-			</Modal>
-		</>
+		<Modal size="large" open={profilePhotoOpen} onClose={closeProfilePhoto}>
+			<Header as="h4">Profile photo</Header>
+			<div
+				{...getRootProps()}
+				style={
+					isDragActive
+						? { ...dropzoneStyles, ...dropzoneActive }
+						: dropzoneStyles
+				}
+			>
+				<input {...getInputProps()} />
+				<Icon name="upload" size="huge" />
+				<Header content="Drop image here" />
+			</div>
+			<Header>Select your profile photo below</Header>
+			<Grid container columns={5}>
+				{images.length > 0 ? (
+					images.map((im) => (
+						<Grid.Column key={im.lastModified + Date.now()}>
+							<Image src={URL.createObjectURL(im)} />
+							<Button
+								name={im.lastModified}
+								onClick={() => console.log('delete')}
+								basic
+								negative
+								icon="trash"
+							/>
+						</Grid.Column>
+					))
+				) : (
+					<Image.Group size="medium">
+						<Image src={'/logo.png'} />
+						<Button
+							name={'a'}
+							onClick={() => console.log('delete')}
+							basic
+							negative
+							icon="trash"
+						/>
+					</Image.Group>
+				)}
+			</Grid>
+		</Modal>
 	);
 };
 
-export default FirstLogin;
+export default observer(ProfilePhotos);
