@@ -1,5 +1,5 @@
 import React from 'react';
-import { Icon, Menu, Label } from 'semantic-ui-react';
+import { Icon, Menu, Label, Image } from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
 
 interface IProps {
@@ -9,11 +9,15 @@ interface IProps {
 const Navigation: React.FC<IProps> = ({ logout }) => {
 	return (
 		<Menu fixed="top" icon="labeled" size="mini" borderless className="navi">
+			<Menu.Item as={Link} to="/">
+				<Image
+					size="small"
+					src="/logo.png"
+					floated="left"
+					style={{ marginRight: '1.5em' }}
+				/>
+			</Menu.Item>
 			<Menu.Menu position="right">
-				<Menu.Item as={Link} to="/" name="heart">
-					<Icon name="heart" color="red" />
-					Browse
-				</Menu.Item>
 				<Menu.Item as={Link} to="/matches" name="matches">
 					<Label
 						circular

@@ -20,7 +20,6 @@ import LandingNavigation from '../../features/home/LandingNavigation';
 import ChangePassword from '../../features/user/ChangePassword';
 import { ToastContainer } from 'react-toastify';
 
-
 const App = () => {
 	const [profile, setProfile] = useState(Profiles.profiles[0]);
 	const [appLoaded, setAppLoaded] = useState(false);
@@ -70,7 +69,7 @@ const App = () => {
 						<Route component={Landing} />
 					</Switch>
 				</Router>
-			<ToastContainer style={{ marginTop: '5%' }} position="top-right" />
+				<ToastContainer style={{ marginTop: '5%' }} position="top-right" />
 			</Container>
 			<Footer />
 		</div>
@@ -82,22 +81,26 @@ const App = () => {
 				<Router>
 					<Fragment>
 						<Navigation logout={logout} />
-						<Switch>
-							<Route exact path="/">
-								<Browse getProfile={getRandomUser} profile={profile} />
-							</Route>
-							<Route exact path="/chat" component={Chat} />
-							<Route exact path="/profile" component={Profile} />
-							<Route exact path="/matches">
-								<Matches profiles={Profiles.profiles} />
-							</Route>
-							<Route exact path="/research">
-								<Research profiles={Profiles.profiles} />
-							</Route>
-							<Route exact path="/register" component={Register} />
-							<Route exact path="/login" component={Login} />
-							<Route component={NotFound} />
-						</Switch>
+						{user.hasProfile === false ? (
+							<Profile user={user}/>
+						) : (
+							<Switch>
+								<Route exact path="/">
+									<Browse getProfile={getRandomUser} profile={profile} />
+								</Route>
+								<Route exact path="/chat" component={Chat} />
+								<Route exact path="/profile" component={Profile} />
+								<Route exact path="/matches">
+									<Matches profiles={Profiles.profiles} />
+								</Route>
+								<Route exact path="/research">
+									<Research profiles={Profiles.profiles} />
+								</Route>
+								<Route exact path="/register" component={Register} />
+								<Route exact path="/login" component={Login} />
+								<Route component={NotFound} />
+							</Switch>
+						)}
 					</Fragment>
 				</Router>
 			</Container>
