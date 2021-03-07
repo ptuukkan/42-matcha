@@ -167,8 +167,8 @@ impl User {
 	}
 
 	pub async fn get_profile(&self) -> Result<Profile, AppError> {
-		let profile = Profile::get(&self.key).await?;
-			Ok(profile)
+		let profile = Profile::get(&self.profile).await?;
+		Ok(profile)
 	}
 }
 
