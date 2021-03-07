@@ -9,23 +9,18 @@ pub async fn create(req: HttpRequest, mut parts: awmp::Parts) -> Result<(), AppE
 	let user_key = jwt::decode_from_header(req)?;
 	let user = User::get(&user_key).await?;
 	if let Some(image_file) = parts.files.take("image").pop() {
-		if let Some(mut profile) = user.get_profile().await? {
-			if profile.images.len() > 5 {
-				return Err(AppError::bad_request("Only five images allowerd"));
-			}
-			let mut image = Image::new();
-			if profile.images.len() == 0 {
-				image.is_main = true;
-			}
-			image.create().await?;
-			image_accessor::save_image(image_file, &image.key)?;
-			profile.images.push(image.key);
-			profile.update().await?;
-		} else {
-			return Err(AppError::bad_request(
-				"Cannot add image because no profile exists",
-			));
+		let mut profile = user.get_profile().await?;
+		if profile.images.len() > 5 {
+			return Err(AppError::bad_request("Only five images allowerd"));
 		}
+		let mut image = Image::new();
+		if profile.images.len() == 0 {
+			image.is_main = true;
+		}
+		image.create().await?;
+		image_accessor::save_image(image_file, &image.key)?;
+		profile.images.push(image.key);
+		profile.update().await?;
 	} else {
 		return Err(AppError::bad_request("No image found in input data"));
 	}
@@ -35,44 +30,38 @@ pub async fn create(req: HttpRequest, mut parts: awmp::Parts) -> Result<(), AppE
 pub async fn set_main(req: HttpRequest, id: &str) -> Result<(), AppError> {
 	let user_key = jwt::decode_from_header(req)?;
 	let user = User::get(&user_key).await?;
-	if let Some(profile) = user.get_profile().await? {
-		if !profile.images.contains(&id.to_owned()) {
-			return Err(AppError::unauthorized(
-				"Cannot set main other images than yours",
-			));
-		}
-		let images = profile.get_images().await?;
-		let mut new_main = Image::get(id).await?;
-		new_main.is_main = true;
-		new_main.update().await?;
-		if let Some(mut old_main) = images.into_iter().find(|x| x.is_main == true) {
-			old_main.is_main = false;
-			old_main.update().await?;
-		}
-	} else {
-		return Err(AppError::bad_request("Could not find profile"));
+	let profile = user.get_profile().await?;
+	if !profile.images.contains(&id.to_owned()) {
+		return Err(AppError::unauthorized(
+			"Cannot set main other images than yours",
+		));
+	}
+	let images = profile.get_images().await?;
+	let mut new_main = Image::get(id).await?;
+	new_main.is_main = true;
+	new_main.update().await?;
+	if let Some(mut old_main) = images.into_iter().find(|x| x.is_main == true) {
+		old_main.is_main = false;
+		old_main.update().await?;
 	}
 	Ok(())
 }
 pub async fn delete(req: HttpRequest, id: &str) -> Result<(), AppError> {
 	let user_key = jwt::decode_from_header(req)?;
 	let user = User::get(&user_key).await?;
-	if let Some(mut profile) = user.get_profile().await? {
-		if !profile.images.contains(&id.to_owned()) {
-			return Err(AppError::unauthorized(
-				"Cannot delete other images than yours",
-			));
-		}
-		let image = Image::get(id).await?;
-		if image.is_main {
-			return Err(AppError::bad_request("Cannot delete main image"));
-		}
-		profile.images.retain(|x| x != id);
-		profile.update().await?;
-		image.delete().await?;
-		image_accessor::delete_image(id)?;
-	} else {
-		return Err(AppError::bad_request("Could not find profile"));
+	let mut profile = user.get_profile().await?;
+	if !profile.images.contains(&id.to_owned()) {
+		return Err(AppError::unauthorized(
+			"Cannot delete other images than yours",
+		));
 	}
+	let image = Image::get(id).await?;
+	if image.is_main {
+		return Err(AppError::bad_request("Cannot delete main image"));
+	}
+	profile.images.retain(|x| x != id);
+	profile.update().await?;
+	image.delete().await?;
+	image_accessor::delete_image(id)?;
 	Ok(())
 }

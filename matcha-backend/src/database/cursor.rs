@@ -56,7 +56,7 @@ impl CursorRequest {
 			.await?;
 		let mut cursor_response: CursorResponse = serde_json::from_slice(&bytes)?;
 		if cursor_response.error {
-			return Err(AppError::internal(cursor_response));
+			return Err(AppError::cursor(cursor_response));
 		}
 		cursor_response.bytes = bytes;
 		Ok(cursor_response)
@@ -85,7 +85,7 @@ impl CursorResponse {
 				.await?;
 			let cursor_response: CursorResponse = serde_json::from_slice(&bytes)?;
 			if cursor_response.error {
-				return Err(AppError::internal(cursor_response));
+				return Err(AppError::cursor(cursor_response));
 			}
 			let mut cursor: Cursor<T> = serde_json::from_slice(&bytes)?;
 			return_data.append(&mut cursor.result);

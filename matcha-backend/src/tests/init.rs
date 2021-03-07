@@ -20,8 +20,6 @@ pub async fn init() {
 			.expect("Failed to delete test db");
 		database::setup::arango_setup().await;
 		let bob = models::user::User::new(
-			"Bob",
-			"Matthews",
 			"bob.matthews@email.com",
 			"Password123!",
 			"bob",

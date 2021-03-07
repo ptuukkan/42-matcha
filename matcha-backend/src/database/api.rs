@@ -1,6 +1,5 @@
 use crate::errors::AppError;
 use actix_web::client::Client;
-use actix_web::Error;
 use serde::{de, Deserialize, Serialize};
 use std::collections::HashMap;
 use std::env;

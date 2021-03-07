@@ -1,14 +1,16 @@
+use crate::models::user::RegisterFormValues;
 use crate::database::cursor::CursorRequest;
 use crate::errors::{AppError, ValidationError};
-use crate::models::user::{RegisterFormValues, User};
+use crate::models::profile::Profile;
+use crate::models::user::User;
 use lettre::{SendableEmail, SendmailTransport, Transport};
 use lettre_email::EmailBuilder;
 use std::env;
 
-pub async fn register(values: RegisterFormValues) -> Result<(), AppError> {
-	let user = User::from(values);
-	let mut validation_error = ValidationError::empty();
 
+pub async fn register(values: RegisterFormValues) -> Result<(), AppError> {
+	let mut user = User::from(&values);
+	let mut validation_error = ValidationError::empty();
 	if !User::find("email_address", &user.email_address)
 		.await?
 		.is_empty()
@@ -21,10 +23,14 @@ pub async fn register(values: RegisterFormValues) -> Result<(), AppError> {
 	if !validation_error.errors.is_empty() {
 		return Err(AppError::ValidationError(validation_error));
 	}
+	let mut profile = Profile::from(&values);
+	profile.create().await?;
+	user.profile = profile.key.to_owned();
+	if user.create().await.is_err() {
+		profile.delete().await?;
+		return Err(AppError::internal("Cannot create user"));
+	}
 	send_verification_email(&user)?;
-
-	user.create().await?;
-
 	Ok(())
 }
 

@@ -13,13 +13,11 @@ pub struct User {
 	#[serde(skip_serializing)]
 	#[serde(rename = "_key")]
 	pub key: String,
-	pub first_name: String,
-	pub last_name: String,
 	pub email_address: String,
 	pub username: String,
 	password: String,
 	pub link: Option<String>,
-	pub profile: Option<String>,
+	pub profile: String,
 }
 
 #[derive(Deserialize, Debug)]
@@ -33,9 +31,9 @@ struct CreateUserResponse {
 #[serde(rename_all = "camelCase")]
 pub struct RegisterFormValues {
 	#[validate(length(min = 1))]
-	first_name: String,
+	pub first_name: String,
 	#[validate(length(min = 1))]
-	last_name: String,
+	pub last_name: String,
 	#[validate(email)]
 	email_address: String,
 	#[validate(length(min = 1))]
@@ -66,8 +64,6 @@ pub struct ResetPasswordValues {
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct LoginResponse {
-	first_name: String,
-	last_name: String,
 	email_address: String,
 	pub token: String,
 	has_profile: bool,
@@ -75,21 +71,17 @@ pub struct LoginResponse {
 
 impl User {
 	pub fn new(
-		first_name: &str,
-		last_name: &str,
 		email_address: &str,
 		password: &str,
 		username: &str,
 	) -> User {
 		User {
 			key: String::new(),
-			first_name: String::from(first_name),
-			last_name: String::from(last_name),
 			email_address: String::from(email_address),
 			username: String::from(username),
 			password: User::hash_pw(&String::from(password)),
 			link: None,
-			profile: None,
+			profile: String::new(),
 		}
 	}
 
@@ -102,11 +94,9 @@ impl User {
 
 	pub fn login_response(&self, token: &str) -> LoginResponse {
 		LoginResponse {
-			first_name: self.first_name.to_owned(),
-			last_name: self.last_name.to_owned(),
 			email_address: self.email_address.to_owned(),
 			token: token.to_owned(),
-			has_profile: self.profile.is_some(),
+			has_profile: false,
 		}
 	}
 
@@ -176,27 +166,21 @@ impl User {
 		}
 	}
 
-	pub async fn get_profile(&self) -> Result<Option<Profile>, AppError> {
-		if let Some(profile_key) = &self.profile {
-			let profile = Profile::get(&profile_key).await?;
-			Ok(Some(profile))
-		} else {
-			Ok(None)
-		}
+	pub async fn get_profile(&self) -> Result<Profile, AppError> {
+		let profile = Profile::get(&self.key).await?;
+			Ok(profile)
 	}
 }
 
-impl From<RegisterFormValues> for User {
-	fn from(values: RegisterFormValues) -> Self {
+impl From<&RegisterFormValues> for User {
+	fn from(values: &RegisterFormValues) -> Self {
 		Self {
 			key: "".to_owned(),
-			email_address: values.email_address,
-			username: values.username,
-			first_name: values.first_name,
-			last_name: values.last_name,
+			email_address: values.email_address.to_owned(),
+			username: values.username.to_owned(),
 			password: User::hash_pw(&values.password),
 			link: Some(nanoid!(10, &nanoid::alphabet::SAFE)),
-			profile: None,
+			profile: String::new(),
 		}
 	}
 }

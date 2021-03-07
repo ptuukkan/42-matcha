@@ -1,3 +1,4 @@
+use crate::models::user::RegisterFormValues;
 use crate::database::api;
 use crate::database::cursor::CursorRequest;
 use crate::errors::AppError;
@@ -13,9 +14,9 @@ pub struct Profile {
 	pub key: String,
 	first_name: String,
 	last_name: String,
-	gender: Gender,
+	gender: Option<Gender>,
 	sexual_preference: SexualPreference,
-	biography: String,
+	biography: Option<String>,
 	interests: Vec<String>,
 	pub images: Vec<String>,
 }
@@ -39,16 +40,15 @@ struct CreateProfileResponse {
 	key: String,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct ProfileFormValues {
-	first_name: String,
-	last_name: String,
-	gender: Gender,
-	sexual_preference: SexualPreference,
-	biography: String,
-	interests: Vec<String>,
-	images: Vec<String>,
+	first_name: Option<String>,
+	last_name: Option<String>,
+	gender: Option<Gender>,
+	sexual_preference: Option<SexualPreference>,
+	biography: Option<String>,
+	interests: Option<Vec<String>>,
 }
 
 impl Profile {
@@ -69,6 +69,11 @@ impl Profile {
 
 	pub async fn update(&self) -> Result<(), AppError> {
 		api::patch(&self.key_url()?, &self).await?;
+		Ok(())
+	}
+
+	pub async fn update_from_form(&self, values: &ProfileFormValues) -> Result<(), AppError> {
+		api::patch(&self.key_url()?, values).await?;
 		Ok(())
 	}
 
@@ -97,17 +102,17 @@ impl Profile {
 	}
 }
 
-impl From<ProfileFormValues> for Profile {
-	fn from(values: ProfileFormValues) -> Self {
+impl From<&RegisterFormValues> for Profile {
+	fn from(values: &RegisterFormValues) -> Self {
 		Self {
 			key: "".to_owned(),
-			first_name: values.first_name,
-			last_name: values.last_name,
-			gender: values.gender,
-			sexual_preference: values.sexual_preference,
-			biography: values.biography,
-			interests: values.interests,
-			images: values.images,
+			first_name: values.first_name.to_owned(),
+			last_name: values.last_name.to_owned(),
+			gender: None,
+			sexual_preference: SexualPreference::Both,
+			biography: None,
+			interests: vec![],
+			images: vec![],
 		}
 	}
 }

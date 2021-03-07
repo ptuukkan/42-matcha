@@ -93,8 +93,12 @@ impl AppError {
 		AppError::UnauthorizedError(UnauthorizedError::from(text))
 	}
 
-	pub fn internal(cursor_response: CursorResponse) -> AppError {
+	pub fn cursor(cursor_response: CursorResponse) -> AppError {
 		AppError::InternalError(InternalError::from(cursor_response))
+	}
+
+	pub fn internal(text: &str) -> AppError {
+		AppError::InternalError(InternalError::from(text))
 	}
 
 	pub fn bad_request(text: &str) -> AppError {

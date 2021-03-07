@@ -4,12 +4,12 @@ use actix_web::web::{Json, Path};
 use actix_web::{delete, post, put, web, HttpResponse};
 use actix_web::{error::Error, HttpRequest};
 
-#[post("/profile")]
-async fn create_profile(
+#[put("/profile")]
+async fn edit_profile(
 	req: HttpRequest,
 	values: Json<ProfileFormValues>,
 ) -> Result<HttpResponse, Error> {
-	profile::create(req, values.into_inner()).await?;
+	profile::edit(req, values.into_inner()).await?;
 	Ok(HttpResponse::Created().finish())
 }
 
@@ -33,7 +33,7 @@ async fn set_main(req: HttpRequest, Path(id): Path<String>) -> Result<HttpRespon
 
 pub fn routes(config: &mut web::ServiceConfig) {
 	config
-		.service(create_profile)
+		.service(edit_profile)
 		.service(create_image)
 		.service(delete_image);
 }
