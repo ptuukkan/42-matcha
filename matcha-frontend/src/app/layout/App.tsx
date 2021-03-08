@@ -20,6 +20,7 @@ import LandingNavigation from '../../features/home/LandingNavigation';
 import ChangePassword from '../../features/user/ChangePassword';
 import { ToastContainer } from 'react-toastify';
 import AddPhoto from '../../features/user/AddPhoto';
+import ImageViewer from './ImageViewer';
 
 const App = () => {
 	const [profile, setProfile] = useState(Profiles.profiles[0]);
@@ -97,6 +98,7 @@ const App = () => {
 							</Route>
 							<Route exact path="/register" component={Register} />
 							<Route exact path="/login" component={Login} />
+							<Route path="/image/:link" component={ImageViewer} />
 							<Route component={NotFound} />
 						</Switch>
 					</Fragment>

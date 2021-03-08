@@ -70,9 +70,14 @@ const Profile = {
 	addImage: (data: FormData): Promise<void> => requests.post('/profile/image', data)
 };
 
+const Image = {
+	get: (id: string): Promise<string> => requests.get(`/image/${id}`)
+}
+
 const agent = {
 	User,
 	Profile,
+	Image,
 };
 
 export default agent;

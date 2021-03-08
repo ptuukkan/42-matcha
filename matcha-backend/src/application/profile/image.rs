@@ -66,9 +66,9 @@ pub async fn delete(req: HttpRequest, id: &str) -> Result<(), AppError> {
 	Ok(())
 }
 
-pub async fn get(req: HttpRequest, id: &str) -> Result<Vec<u8>, AppError> {
-	let user_key = jwt::decode_from_header(req)?;
-	User::get(&user_key).await?;
+pub async fn get(req: HttpRequest, id: &str) -> Result<String, AppError> {
+//	let user_key = jwt::decode_from_header(req)?;
+//	User::get(&user_key).await?;
 	Image::get(id).await?;
 	Ok(image_accessor::read_image(id)?)
 }

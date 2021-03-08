@@ -1309,6 +1309,7 @@ dependencies = [
  "actix-web-validator",
  "async-mutex",
  "awmp",
+ "base64 0.13.0",
  "derive_more",
  "dotenv",
  "env_logger",
