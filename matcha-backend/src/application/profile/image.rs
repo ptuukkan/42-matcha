@@ -3,7 +3,6 @@ use crate::infrastructure::image::image_accessor;
 use crate::infrastructure::security::jwt;
 use crate::models::image::Image;
 use crate::models::user::User;
-use std::fs;
 use actix_web::HttpRequest;
 
 pub async fn create(req: HttpRequest, mut parts: awmp::Parts) -> Result<(), AppError> {
@@ -71,6 +70,5 @@ pub async fn get(req: HttpRequest, id: &str) -> Result<Vec<u8>, AppError> {
 	let user_key = jwt::decode_from_header(req)?;
 	User::get(&user_key).await?;
 	Image::get(id).await?;
-	let image_data = fs::read(format!("/tmp/{}", id))?;
-	Ok(image_data)
+	Ok(image_accessor::read_image(id)?)
 }
