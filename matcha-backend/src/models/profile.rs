@@ -1,9 +1,9 @@
-use crate::models::user::RegisterFormValues;
 use crate::database::api;
 use crate::database::cursor::CursorRequest;
 use crate::errors::AppError;
 use crate::models::base::CreateResponse;
-use crate::models::image::Image;
+use crate::models::image::{Image, ImageDto};
+use crate::models::user::RegisterFormValues;
 use serde::{Deserialize, Serialize};
 use std::env;
 
@@ -35,12 +35,6 @@ enum SexualPreference {
 	Both,
 }
 
-#[derive(Deserialize, Debug)]
-struct CreateProfileResponse {
-	#[serde(rename = "_key")]
-	key: String,
-}
-
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct ProfileFormValues {
@@ -50,6 +44,18 @@ pub struct ProfileFormValues {
 	sexual_preference: Option<SexualPreference>,
 	biography: Option<String>,
 	interests: Option<Vec<String>>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ProfileDto {
+	first_name: String,
+	last_name: String,
+	gender: Option<Gender>,
+	sexual_preference: SexualPreference,
+	biography: Option<String>,
+	interests: Vec<String>,
+	images: Vec<ImageDto>,
 }
 
 impl Profile {
@@ -91,7 +97,7 @@ impl Profile {
 
 	pub async fn get_images(&self) -> Result<Vec<Image>, AppError> {
 		let query = format!(
-			"FOR p IN users filter p._key == '{}' return DOCUMENT(\"images\", p.images)",
+			"FOR p IN profiles filter p._key == '{}' return DOCUMENT(\"images\", p.images)",
 			&self.key
 		);
 		let result = CursorRequest::from(query)

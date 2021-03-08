@@ -13,13 +13,6 @@ pub struct Image {
 	pub is_main: bool,
 }
 
-#[derive(Serialize, Debug)]
-pub struct IdImage {
-	id: String,
-	url: String,
-	is_main: bool,
-}
-
 impl Image {
 	pub fn new() -> Self {
 		Self {
@@ -37,19 +30,12 @@ impl Image {
 		Ok(format!("{}{}", &Self::url()?, self.key))
 	}
 
-	pub fn with_id(&self) -> IdImage {
-		IdImage {
-			id: self.key.to_owned(),
-			url: self.url.to_owned(),
-			is_main: self.is_main,
-		}
-	}
-
 	pub async fn create(&mut self) -> Result<(), AppError> {
 		let res = api::post::<Self, CreateResponse>(&Self::url()?, &self).await?;
 		let img_base_url = env::var("IMG_BASE_URL")?;
 		self.key = res.key;
 		self.url = format!("{}{}", img_base_url, self.key);
+		self.update().await?;
 		Ok(())
 	}
 
@@ -67,5 +53,23 @@ impl Image {
 	pub async fn delete(&self) -> Result<(), AppError> {
 		api::delete(&self.key_url()?).await?;
 		Ok(())
+	}
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct ImageDto {
+	#[serde(rename(deserialize = "_key"))]
+	id: String,
+	url: String,
+	is_main: bool,
+}
+
+impl From<&Image> for ImageDto {
+	fn from(image: &Image) -> Self {
+		Self {
+			id: image.key.to_owned(),
+			url: image.url.to_owned(),
+			is_main: image.is_main,
+		}
 	}
 }

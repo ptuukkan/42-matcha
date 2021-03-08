@@ -1,4 +1,4 @@
-use crate::models::image::IdImage;
+use crate::models::image::ImageDto;
 use crate::errors::AppError;
 use crate::infrastructure::image::image_accessor;
 use crate::infrastructure::security::jwt;
@@ -6,7 +6,7 @@ use crate::models::image::Image;
 use crate::models::user::User;
 use actix_web::HttpRequest;
 
-pub async fn create(req: HttpRequest, mut parts: awmp::Parts) -> Result<IdImage, AppError> {
+pub async fn create(req: HttpRequest, mut parts: awmp::Parts) -> Result<ImageDto, AppError> {
 	let user_key = jwt::decode_from_header(req)?;
 	let user = User::get(&user_key).await?;
 	if let Some(image_file) = parts.files.take("image").pop() {
@@ -22,7 +22,7 @@ pub async fn create(req: HttpRequest, mut parts: awmp::Parts) -> Result<IdImage,
 		image_accessor::save_image(image_file, &image.key)?;
 		profile.images.push(image.key.to_owned());
 		profile.update().await?;
-		Ok(image.with_id())
+		Ok(ImageDto::from(&image))
 	} else {
 		return Err(AppError::bad_request("No image found in input data"));
 	}
