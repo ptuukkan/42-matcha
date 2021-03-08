@@ -16,8 +16,8 @@ async fn edit_profile(
 #[post("/profile/image")]
 async fn create_image(req: HttpRequest, parts: awmp::Parts) -> Result<HttpResponse, Error> {
 	println!("here");
-	profile::image::create(req, parts).await?;
-	Ok(HttpResponse::Created().finish())
+	let image = profile::image::create(req, parts).await?;
+	Ok(HttpResponse::Created().json(image))
 }
 
 #[delete("/profile/image/{id}")]

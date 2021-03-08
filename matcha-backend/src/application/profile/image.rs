@@ -5,12 +5,12 @@ use crate::models::image::Image;
 use crate::models::user::User;
 use actix_web::HttpRequest;
 
-pub async fn create(req: HttpRequest, mut parts: awmp::Parts) -> Result<(), AppError> {
+pub async fn create(req: HttpRequest, mut parts: awmp::Parts) -> Result<Image, AppError> {
 	let user_key = jwt::decode_from_header(req)?;
 	let user = User::get(&user_key).await?;
 	if let Some(image_file) = parts.files.take("image").pop() {
 		let mut profile = user.get_profile().await?;
-		if profile.images.len() > 5 {
+		if profile.images.len() > 4 {
 			return Err(AppError::bad_request("Only five images allowerd"));
 		}
 		let mut image = Image::new();
@@ -19,12 +19,12 @@ pub async fn create(req: HttpRequest, mut parts: awmp::Parts) -> Result<(), AppE
 		}
 		image.create().await?;
 		image_accessor::save_image(image_file, &image.key)?;
-		profile.images.push(image.key);
+		profile.images.push(image.key.to_owned());
 		profile.update().await?;
+		Ok(image)
 	} else {
 		return Err(AppError::bad_request("No image found in input data"));
 	}
-	Ok(())
 }
 
 pub async fn set_main(req: HttpRequest, id: &str) -> Result<(), AppError> {
