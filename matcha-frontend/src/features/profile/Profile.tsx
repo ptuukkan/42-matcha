@@ -9,6 +9,7 @@ import {
 	TextArea,
 	Message,
 	Image,
+	Divider,
 } from 'semantic-ui-react';
 import agent from '../../app/api/agent';
 import { IProfileFormValues } from '../../app/models/user';
@@ -29,7 +30,7 @@ const Profile = () => {
 	const [interests, setInterestSelect] = useState([]);
 	const [biography, setBiography] = useState('');
 	const { register, handleSubmit, reset, setValue, errors } = useForm({});
-	
+
 	useEffect(() => {
 		reset({
 			firstName: '',
@@ -75,15 +76,17 @@ const Profile = () => {
 			<Header as="h1">Settings</Header>
 			<Form onSubmit={handleSubmit(onSubmit)}>
 				<Header>Account Settings</Header>
+				<Divider />
 				<Image
-					src="https://react.semantic-ui.com/images/wireframe/square-image.png"
-					style={{cursor: 'pointer'}}
+					src="/placeholder.png"
+					style={{ cursor: 'pointer' }}
 					centered
 					size="small"
 					circular
 					onClick={() => openProfilePhoto()}
 				/>
-
+				<Divider />
+				<Header>Name</Header>
 				<TextInput
 					type="text"
 					name="firstName"
@@ -155,8 +158,7 @@ const Profile = () => {
 				/>
 				<Button type="submit">Save</Button>
 			</Form>
-			<AddPhoto/>
-
+			<AddPhoto />
 		</div>
 	);
 };
