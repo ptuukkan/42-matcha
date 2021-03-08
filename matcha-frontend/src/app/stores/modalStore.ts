@@ -61,7 +61,6 @@ export default class ModalStore {
 	}
 	
 	openProfilePhoto = () => {
-		console.log('here')
 		this.profilePhotoOpen = true;
 	}
 
