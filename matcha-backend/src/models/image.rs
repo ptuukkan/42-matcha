@@ -1,6 +1,6 @@
 use crate::database::api;
 use crate::errors::AppError;
-use crate::models::base::{CreateResponse};
+use crate::models::base::CreateResponse;
 use serde::{Deserialize, Serialize};
 use std::env;
 
@@ -11,6 +11,13 @@ pub struct Image {
 	pub key: String,
 	url: String,
 	pub is_main: bool,
+}
+
+#[derive(Serialize, Debug)]
+pub struct IdImage {
+	id: String,
+	url: String,
+	is_main: bool,
 }
 
 impl Image {
@@ -28,6 +35,14 @@ impl Image {
 
 	fn key_url(&self) -> Result<String, AppError> {
 		Ok(format!("{}{}", &Self::url()?, self.key))
+	}
+
+	pub fn with_id(&self) -> IdImage {
+		IdImage {
+			id: self.key.to_owned(),
+			url: self.url.to_owned(),
+			is_main: self.is_main,
+		}
 	}
 
 	pub async fn create(&mut self) -> Result<(), AppError> {
