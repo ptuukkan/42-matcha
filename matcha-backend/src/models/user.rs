@@ -1,7 +1,7 @@
 use crate::database::api;
 use crate::database::cursor::CursorRequest;
 use crate::errors::AppError;
-use crate::models::profile::{Profile, ProfileDto};
+use crate::models::profile::{Profile};
 use actix_web_validator::Validate;
 use nanoid::nanoid;
 use serde::{Deserialize, Serialize};
@@ -166,19 +166,6 @@ impl User {
 	pub async fn get_profile(&self) -> Result<Profile, AppError> {
 		let profile = Profile::get(&self.profile).await?;
 		Ok(profile)
-	}
-
-	pub async fn get_profile_dto(&self) -> Result<Vec<ProfileDto>, AppError> {
-		let query = format!(
-			"FOR p IN profiles filter p._key == '{}' RETURN MERGE(p, {{ images: DOCUMENT(\"images\", p.images) }} )",
-			&self.profile
-		);
-		let result = CursorRequest::from(query)
-			.send()
-			.await?
-			.extract_all::<ProfileDto>()
-			.await?;
-		Ok(result)
 	}
 }
 

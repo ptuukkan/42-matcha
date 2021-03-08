@@ -25,6 +25,7 @@ awmp = "0.6.0"
 actix-web-validator = "2.0.3"
 validator = { version = "0.12", features = ["derive"] }
 actix-files = "0.5.0"
+async-trait = "0.1.47"
 
 [dev-dependencies]
 lazy_static = "1.4.0"

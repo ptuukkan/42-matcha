@@ -1,10 +1,11 @@
-use crate::models::image::ImageDto;
 use crate::errors::AppError;
 use crate::infrastructure::image::image_accessor;
 use crate::infrastructure::security::jwt;
 use crate::models::image::Image;
+use crate::models::image::ImageDto;
 use crate::models::user::User;
 use actix_web::HttpRequest;
+use std::convert::TryFrom;
 
 pub async fn create(req: HttpRequest, mut parts: awmp::Parts) -> Result<ImageDto, AppError> {
 	let user_key = jwt::decode_from_header(req)?;
@@ -22,7 +23,7 @@ pub async fn create(req: HttpRequest, mut parts: awmp::Parts) -> Result<ImageDto
 		image_accessor::save_image(image_file, &image.key)?;
 		profile.images.push(image.key.to_owned());
 		profile.update().await?;
-		Ok(ImageDto::from(&image))
+		Ok(ImageDto::try_from(&image)?)
 	} else {
 		return Err(AppError::bad_request("No image found in input data"));
 	}
