@@ -98,7 +98,7 @@ const App = () => {
 							</Route>
 							<Route exact path="/register" component={Register} />
 							<Route exact path="/login" component={Login} />
-							<Route path="/image/:link" component={ImageViewer} />
+							<Route path="/image/:id" component={ImageViewer} />
 							<Route component={NotFound} />
 						</Switch>
 					</Fragment>

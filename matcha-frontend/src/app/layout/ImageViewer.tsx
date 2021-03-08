@@ -1,3 +1,4 @@
+import { Loader } from 'semantic-ui-react';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import agent from '../api/agent';
@@ -16,7 +17,7 @@ const ImageViewer = () => {
 		})
 	}, []);
 
-	if (image === null) return;
+	if (image === null) return <Loader />;
 
 	return (
 		<img src={`data:image/jpeg;base64,${image}`} />
