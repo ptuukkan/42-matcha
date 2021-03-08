@@ -3,6 +3,7 @@ use crate::infrastructure::image::image_accessor;
 use crate::infrastructure::security::jwt;
 use crate::models::image::Image;
 use crate::models::user::User;
+use std::fs;
 use actix_web::HttpRequest;
 
 pub async fn create(req: HttpRequest, mut parts: awmp::Parts) -> Result<(), AppError> {
@@ -14,7 +15,7 @@ pub async fn create(req: HttpRequest, mut parts: awmp::Parts) -> Result<(), AppE
 			return Err(AppError::bad_request("Only five images allowerd"));
 		}
 		let mut image = Image::new();
-		if profile.images.len() == 0 {
+		if profile.images.is_empty() {
 			image.is_main = true;
 		}
 		image.create().await?;
@@ -40,7 +41,7 @@ pub async fn set_main(req: HttpRequest, id: &str) -> Result<(), AppError> {
 	let mut new_main = Image::get(id).await?;
 	new_main.is_main = true;
 	new_main.update().await?;
-	if let Some(mut old_main) = images.into_iter().find(|x| x.is_main == true) {
+	if let Some(mut old_main) = images.into_iter().find(|x| x.is_main) {
 		old_main.is_main = false;
 		old_main.update().await?;
 	}
@@ -64,4 +65,12 @@ pub async fn delete(req: HttpRequest, id: &str) -> Result<(), AppError> {
 	image.delete().await?;
 	image_accessor::delete_image(id)?;
 	Ok(())
+}
+
+pub async fn get(req: HttpRequest, id: &str) -> Result<Vec<u8>, AppError> {
+	let user_key = jwt::decode_from_header(req)?;
+	User::get(&user_key).await?;
+	Image::get(id).await?;
+	let image_data = fs::read(format!("/tmp/{}", id))?;
+	Ok(image_data)
 }

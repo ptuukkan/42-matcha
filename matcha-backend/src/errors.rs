@@ -245,6 +245,12 @@ impl From<actix_web::client::JsonPayloadError> for AppError {
 	}
 }
 
+impl From<std::io::Error> for AppError {
+	fn from(from_error: std::io::Error) -> Self {
+		Self::InternalError(InternalError::from(from_error.to_string()))
+	}
+}
+
 impl From<&str> for UnauthorizedError {
 	fn from(text: &str) -> Self {
 		Self {
