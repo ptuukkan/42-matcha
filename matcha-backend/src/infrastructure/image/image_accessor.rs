@@ -1,7 +1,6 @@
 use crate::errors::AppError;
 use awmp::File;
 use std::fs;
-use base64::encode;
 
 pub fn save_image(image_file: File, image_key: &str) -> Result<(), AppError> {
 	fs::create_dir_all("images")?;
@@ -14,10 +13,4 @@ pub fn delete_image(image_key: &str) -> Result<(), AppError> {
 	let file_path = format!("images/{}", image_key);
 	fs::remove_file(&file_path)?;
 	Ok(())
-}
-
-pub fn read_image(image_key: &str) -> Result<String, AppError> {
-	let file_path = format!("images/{}", image_key);
-	let file_data = fs::read(&file_path)?;
-	Ok(encode(file_data))
 }

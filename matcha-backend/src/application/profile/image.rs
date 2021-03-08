@@ -65,10 +65,3 @@ pub async fn delete(req: HttpRequest, id: &str) -> Result<(), AppError> {
 	image_accessor::delete_image(id)?;
 	Ok(())
 }
-
-pub async fn get(req: HttpRequest, id: &str) -> Result<String, AppError> {
-//	let user_key = jwt::decode_from_header(req)?;
-//	User::get(&user_key).await?;
-	Image::get(id).await?;
-	Ok(image_accessor::read_image(id)?)
-}

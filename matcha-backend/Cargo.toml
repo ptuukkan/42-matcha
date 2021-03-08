@@ -24,7 +24,7 @@ env_logger = "0.8.3"
 awmp = "0.6.0"
 actix-web-validator = "2.0.3"
 validator = { version = "0.12", features = ["derive"] }
-base64 = "0.13.0"
+actix-files = "0.5.0"
 
 [dev-dependencies]
 lazy_static = "1.4.0"

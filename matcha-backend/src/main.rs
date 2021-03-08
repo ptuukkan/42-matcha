@@ -13,6 +13,7 @@ use actix_web::{get, App, HttpResponse, HttpServer, Responder};
 use database::seed_data;
 use dotenv::dotenv;
 use log::info;
+use actix_files::Files;
 
 #[get("/")]
 async fn hello() -> impl Responder {
@@ -35,6 +36,7 @@ async fn main() -> std::io::Result<()> {
 		App::new()
 			.wrap(Logger::new("%a \"%r\" %s"))
 			.wrap(Cors::permissive())
+			.service(Files::new("/img", "./images").show_files_listing())
 			.configure(api::controllers::user::routes)
 			.configure(api::controllers::profile::routes)
 	})
