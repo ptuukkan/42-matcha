@@ -9,6 +9,7 @@ pub struct Image {
 	#[serde(skip_serializing)]
 	#[serde(rename = "_key")]
 	pub key: String,
+	url: String,
 	pub is_main: bool,
 }
 
@@ -16,6 +17,7 @@ impl Image {
 	pub fn new() -> Self {
 		Self {
 			key: String::new(),
+			url: String::new(),
 			is_main: false,
 		}
 	}
@@ -30,7 +32,9 @@ impl Image {
 
 	pub async fn create(&mut self) -> Result<(), AppError> {
 		let res = api::post::<Self, CreateResponse>(&Self::url()?, &self).await?;
+		let img_base_url = env::var("IMG_BASE_URL")?;
 		self.key = res.key;
+		self.url = format!("{}{}", img_base_url, self.key);
 		Ok(())
 	}
 
