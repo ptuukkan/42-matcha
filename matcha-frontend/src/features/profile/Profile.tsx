@@ -201,12 +201,165 @@ const Profile = () => {
 
 export default observer(Profile); */
 
-export interface ProfileProps {
-	
-}
- 
-const Profile: React.FC<ProfileProps> = () => {
-	return ( null );
-}
- 
+import React from 'react';
+import { Form as FinalForm, Field } from 'react-final-form';
+import { combineValidators, isRequired } from 'revalidate';
+import {
+	Form,
+	Message,
+	Button,
+	Modal,
+	Input,
+	Header,
+	Dropdown,
+} from 'semantic-ui-react';
+import agent from '../../app/api/agent';
+import { IProfile, IProfileFormValues } from '../../app/models/profile';
+import TextInput from '../user/TextInput';
+import SelectInput from './SelectInput';
+
+const mockUpInterest = [
+	{ text: 'angular', value: 'angular' },
+	{ text: 'pangular', value: 'pangular' },
+	{ text: 'piercing', value: 'piercing' },
+];
+
+const onSubmit = (data: IProfile) => {
+	console.log(data);
+};
+
+const Profile = () => {
+	return (
+		<>
+			<FinalForm
+				onSubmit={onSubmit}
+				render={({ handleSubmit }) => (
+					<Form onSubmit={handleSubmit}>
+						<Field
+							component={TextInput}
+							name="firstName"
+							placeholder="First name"
+						/>
+						<Field
+							component={TextInput}
+							name="lastName"
+							placeholder="First name"
+						/>
+						<b>
+							<label>Gender</label>
+						</b>
+						<Field component="select" placeholder="Gender" name="gender">
+							<option disabled />
+							<option value="Male">Male</option>
+							<option value="Female">Female</option>
+						</Field>
+						<b>
+							<label>Sexual preference</label>
+						</b>
+						<Field
+							component="select"
+							label="Sexual preference"
+							name="sexualPreference"
+						>
+							<option disabled />
+							<option value="Male">Male</option>
+							<option value="Female">Female</option>
+							<option value="Other">Other</option>
+						</Field>
+						<Field
+							name="interests"
+							options={mockUpInterest}
+							placeholder="Category"
+							value={''}
+							component={SelectInput}
+						/>
+						{/* 	<Field
+							component={DropdownAdapter}
+							label="Interests"
+							fluid
+							multiple
+							search
+							name="interests"
+							selection
+							options={mockUpInterest}
+							value={[]}
+							allowAdditions
+							additionLabel={<i style={{ color: 'red' }}>New interest: </i>}
+						/> */}
+						<Field
+							component="textarea"
+							label="Biography"
+							placeholder="Tell us more"
+							name="biography"
+						/>
+						<Button type="submit">Save</Button>
+					</Form>
+				)}
+			/>
+		</>
+	);
+};
+
 export default Profile;
+/* render={({ handleSubmit }) =>  {
+	<Form onSubmit={handleSubmit}>
+		<Header>Account Settings</Header>
+		<Form.Group widths="2">
+			<Field type="text" name="firstName" label="First name" />
+			<Field label="Last name" type="text" name="lastName" />
+		</Form.Group>
+		<Form.Group widths="2">
+			{/* <ErrorMessage
+		errors={errors}
+		name="gender"
+		render={({ message }) => <Message negative>{message}</Message>}
+	/> 
+			<Form.Select
+				label="Gender"
+				placeholder="Gender"
+				options={[
+					{ text: 'Male', value: 'Male' },
+					{ text: 'Female', value: 'Female' },
+				]}
+				name="gender"
+				/* 						onChange={(e, { value }: any) => {
+			setGender(value);
+			setValue('gender', value);
+		}}
+			></Form.Select>
+			<Form.Select
+				selection
+				label="Sexual preference"
+				options={[
+					{ text: 'Male', value: 'Male' },
+					{ text: 'Female', value: 'Female' },
+					{ text: 'Other', value: 'Other' },
+				]}
+				name="sexualPreference"
+			></Form.Select>
+			{/* 					<ErrorMessage
+		errors={errors}
+		name="sexualPreference"
+		render={({ message }) => <Message negative>{message}</Message>}
+	/>
+		</Form.Group>
+		<Form.Select
+			label="Interests"
+			fluid
+			multiple
+			search
+			name="interests"
+			selection
+			options={mockUpInterest}
+			value={[]}
+			allowAdditions
+			additionLabel={<i style={{ color: 'red' }}>New interest: </i>}
+		></Form.Select>
+		<Form.TextArea
+			label="Biography"
+			placeholder="Tell us more"
+			name="biography"
+		/>
+		<Button type="submit">Save</Button>
+	</Form>;
+}} */

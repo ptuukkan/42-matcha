@@ -22,17 +22,6 @@ const Login = () => {
 	const { loginUser, loading } = rootStore.userStore;
 	const history = useHistory();
 
-	const onSubmit = (data: ILoginFormValues) => {
-		loginUser(data)
-			.then(() => {
-				history.push('/');
-			})
-			.catch((error: BackendError) => {
-				/* 				setError('global', { type: 'manual', message: error.message });
-				 */
-			});
-	};
-
 	return (
 		<Fragment>
 			<Modal
@@ -45,7 +34,13 @@ const Login = () => {
 				<Modal.Header>Login to Matcha</Modal.Header>
 				<Modal.Content>
 					<FinalForm
-						onSubmit={onSubmit}
+						onSubmit={(data) =>
+							loginUser(data)
+								.then(() => {
+									history.push('/');
+								})
+								.catch((e) => console.log(e))
+						}
 						validate={validate}
 						render={({ handleSubmit }) => (
 							<Form onSubmit={handleSubmit}>
@@ -53,18 +48,14 @@ const Login = () => {
 									component={TextInput}
 									name="emailAddress"
 									placeholder="Email address"
-									/>
+								/>
 								<Field
 									component={TextInput}
 									type="password"
 									name="password"
 									placeholder="Password"
 								/>
-								<Button
-									primary
-									loading={loading}
-									content="Login"
-								/>
+								<Button primary loading={loading} content="Login" />
 								<Button
 									type="button"
 									floated="right"
