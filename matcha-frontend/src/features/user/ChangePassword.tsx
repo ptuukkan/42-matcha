@@ -2,7 +2,7 @@ import { useForm } from 'react-hook-form';
 import { useParams } from 'react-router-dom';
 import { ErrorMessage } from '@hookform/error-message';
 import { Form, Header, Message, Button, Input } from 'semantic-ui-react';
-import TextInput from './TextInput';
+import TextInput from '../../app/common/form/TextInput';
 import agent from '../../app/api/agent';
 import { BackendError } from '../../app/models/errors';
 import { IResetPassword } from '../../app/models/user';

@@ -1,11 +1,9 @@
 import { action, makeObservable, observable, runInAction } from 'mobx';
 import agent from '../api/agent';
-import {
-	ILoginFormValues,
-	IRegisterFormValues,
-	IUser,
-} from '../models/user';
+import { ILoginFormValues, IRegisterFormValues, IUser } from '../models/user';
 import { RootStore } from './rootStore';
+import { history } from '../..';
+import { FORM_ERROR } from 'final-form';
 
 export default class UserStore {
 	rootStore: RootStore;
@@ -56,18 +54,16 @@ export default class UserStore {
 	};
 
 	loginUser = async (data: ILoginFormValues) => {
-		this.loading = true;
 		try {
 			const user = await agent.User.login(data);
 			runInAction(() => {
 				this.user = user;
 			});
 			this.setToken(user.token);
-			this.stopLoading();
 			this.rootStore.modalStore.closeLogin();
+			history.push('/');
 		} catch (error) {
-			this.stopLoading();
-			throw error;
+			return { [FORM_ERROR]: error.message };
 		}
 	};
 
