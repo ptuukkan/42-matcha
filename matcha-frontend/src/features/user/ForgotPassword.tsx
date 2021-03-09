@@ -36,7 +36,7 @@ const ForgotPassword = () => {
 	);
 
 	const validate = combineValidators({
-		email_address: composeValidators(isRequired, isValidEmail)('email_address'),
+		emailAddress: composeValidators(isRequired, isValidEmail)('emailAddress'),
 	});
 
 	const onSubmit = (data: IForgetPassword) => {
@@ -64,11 +64,15 @@ const ForgotPassword = () => {
 						render={({ handleSubmit }) => (
 							<Form onSubmit={handleSubmit}>
 								<Field
+									component={TextInput}
 									name="emailAddress"
 									placeholder="Email address"
-									component={TextInput}
+									/>
+								<Button
+									primary
+									loading={loading}
+									content="Login"
 								/>
-								<Button primary type="submit" loading={loading} content="Reset password" />
 							</Form>
 						)}
 					/>
