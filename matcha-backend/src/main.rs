@@ -14,6 +14,7 @@ use database::seed_data;
 use dotenv::dotenv;
 use log::info;
 use actix_files::Files;
+use std::fs;
 
 #[get("/")]
 async fn hello() -> impl Responder {
@@ -32,6 +33,7 @@ async fn main() -> std::io::Result<()> {
 	dotenv().ok();
 	env_logger::init();
 	database::setup::arango_setup().await;
+	fs::create_dir_all("images")?;
 	let server = HttpServer::new(|| {
 		App::new()
 			.wrap(Logger::new("%a \"%r\" %s"))

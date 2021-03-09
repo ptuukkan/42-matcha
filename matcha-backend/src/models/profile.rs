@@ -46,18 +46,6 @@ pub struct ProfileFormValues {
 	interests: Option<Vec<String>>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ProfileDto {
-	first_name: String,
-	last_name: String,
-	gender: Option<Gender>,
-	sexual_preference: SexualPreference,
-	biography: Option<String>,
-	interests: Vec<String>,
-	images: Vec<ImageDto>,
-}
-
 impl Profile {
 	fn url() -> Result<String, AppError> {
 		let db_url: String = env::var("DB_URL")?;
@@ -100,12 +88,16 @@ impl Profile {
 			"FOR p IN profiles filter p._key == '{}' return DOCUMENT(\"images\", p.images)",
 			&self.key
 		);
-		let result = CursorRequest::from(query)
+		let mut result = CursorRequest::from(query)
 			.send()
 			.await?
-			.extract_all::<Image>()
+			.extract_all::<Vec<Image>>()
 			.await?;
-		Ok(result)
+		if let Some(images) = result.pop() {
+			Ok(images)
+		} else {
+			Err(AppError::internal("No images found"))
+		}
 	}
 }
 
@@ -119,6 +111,32 @@ impl From<&RegisterFormValues> for Profile {
 			sexual_preference: SexualPreference::Both,
 			biography: None,
 			interests: vec![],
+			images: vec![],
+		}
+	}
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ProfileDto {
+	first_name: String,
+	last_name: String,
+	gender: Option<Gender>,
+	sexual_preference: SexualPreference,
+	biography: Option<String>,
+	interests: Vec<String>,
+	pub images: Vec<ImageDto>,
+}
+
+impl From<Profile> for ProfileDto {
+	fn from(profile: Profile) -> Self {
+		Self {
+			first_name: profile.first_name,
+			last_name: profile.last_name,
+			gender: profile.gender,
+			sexual_preference: profile.sexual_preference,
+			biography: profile.biography,
+			interests: profile.interests,
 			images: vec![],
 		}
 	}
