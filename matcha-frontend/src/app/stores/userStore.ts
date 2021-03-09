@@ -3,6 +3,7 @@ import agent from '../api/agent';
 import { ILoginFormValues, IRegisterFormValues, IUser } from '../models/user';
 import { RootStore } from './rootStore';
 import { history } from '../..';
+import { FORM_ERROR } from 'final-form';
 
 export default class UserStore {
 	rootStore: RootStore;
@@ -62,7 +63,7 @@ export default class UserStore {
 			this.rootStore.modalStore.closeLogin();
 			history.push('/');
 		} catch (error) {
-			throw error;
+			return { [FORM_ERROR]: error.message };
 		}
 	};
 

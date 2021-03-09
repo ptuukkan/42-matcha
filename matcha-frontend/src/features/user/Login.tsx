@@ -26,11 +26,7 @@ const Login = () => {
 				<Modal.Header>Login to Matcha</Modal.Header>
 				<Modal.Content>
 					<FinalForm
-						onSubmit={(data: ILoginFormValues) =>
-							loginUser(data).catch((error) => ({
-								[FORM_ERROR]: error.message,
-							}))
-						}
+						onSubmit={loginUser}
 						validate={validate}
 						render={({
 							handleSubmit,
