@@ -83,17 +83,18 @@ const App = () => {
 					<Fragment>
 						<Navigation logout={logout} />
 						<Switch>
-							<Route exact path="/">
-								<Browse getProfile={getRandomUser} profile={profile} />
-							</Route>
+							<Route exact path="/" component={Profile}>
+
+{/* 								<Browse getProfile={getRandomUser} profile={profile} />
+ */}							</Route>
 							<Route exact path="/chat" component={Chat} />
 							<Route exact path="/profile" component={Profile} />
 							<Route exact path="/pictures" component={AddPhoto} />
 							<Route exact path="/matches">
-								<Matches profiles={Profiles.profiles} />
+{/* 								<Matches profiles={Profiles.profiles} /> */}
 							</Route>
 							<Route exact path="/research">
-								<Research profiles={Profiles.profiles} />
+{/* 								<Research profiles={Profiles.profiles} /> */}
 							</Route>
 							<Route exact path="/register" component={Register} />
 							<Route exact path="/login" component={Login} />

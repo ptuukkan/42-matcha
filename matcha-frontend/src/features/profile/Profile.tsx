@@ -1,21 +1,22 @@
-import { ErrorMessage } from '@hookform/error-message';
+/* import { ErrorMessage } from '@hookform/error-message';
 import React, { useState, useEffect, useContext } from 'react';
 import { useForm } from 'react-hook-form';
 import {
 	Button,
 	Header,
 	Form,
-	Dropdown,
-	TextArea,
 	Message,
-	Image,
 	Divider,
+	Grid,
+	Loader,
 } from 'semantic-ui-react';
 import agent from '../../app/api/agent';
-import { IProfileFormValues } from '../../app/models/user';
-import { RootStoreContext } from '../../app/stores/rootStore';
+import { Gender, IProfileFormValues, SexualPreference } from '../../app/models/profile';
 import AddPhoto from '../user/AddPhoto';
+import ShowPhotos from '../user/ShowPhotos';
 import TextInput from '../user/TextInput';
+import { IProfile } from '../../app/models/profile';
+import { observer } from 'mobx-react-lite';
 
 const mockUpInterest = [
 	{ text: 'angular', value: 'angular' },
@@ -24,25 +25,47 @@ const mockUpInterest = [
 ];
 
 const Profile = () => {
-	const rootStore = useContext(RootStoreContext);
-	const { openProfilePhoto } = rootStore.modalStore;
 	const [interestsList, setInterest] = useState(mockUpInterest);
-	const [interests, setInterestSelect] = useState([]);
-	const [biography, setBiography] = useState('');
-	const { register, handleSubmit, reset, setValue, errors } = useForm({});
+	const [interests, setInterestSelect] = useState<string[]>([]);
+	const [sexPref, setSexPref] = useState<SexualPreference | undefined>();
+	const [gender, setGender] = useState<Gender>();
+	const [biography, setBiography] = useState<string | undefined>('');
+	const [addPhotoMode, setAddPhotoMode] = useState(false);
+	const [profile, setProfile] = useState<IProfile | null>(null)
 
 	useEffect(() => {
-		reset({
-			firstName: '',
-			lastName: '',
-			gender: '',
-			sexualPreference: '',
-		});
-	}, [reset]);
+		if (profile) {
+			return
+		}
+		agent.Profile.current()
+			.then((p) => {
+				setProfile(p)
+				setSexPref(p.sexualPreference);
+				setGender(p.gender);
+				setBiography(p.biography);
+				setInterestSelect(p.interests);
+			})
+			.catch((e) => console.log(e));
+	},[profile]);
+
+	const { register, handleSubmit, setValue, errors } = useForm<IProfile>(
+		{
+			defaultValues: {
+				firstName: profile?.firstName ?? '',
+				lastName: profile?.lastName ?? '',
+				biography: profile?.biography ?? '',
+				gender: profile?.gender ?? undefined,
+				sexualPreference: profile?.sexualPreference ?? SexualPreference.Both,
+				interests: profile?.interests ?? [],
+			},
+		}
+	);
 
 	useEffect(() => {
 		register({ name: 'interests' });
 		register({ name: 'biography' });
+		register({ name: 'gender' });
+		register({ name: 'sexualPreference' });
 	}, [register]);
 
 	const handleMultiChange = (e: any, selectedOption: any) => {
@@ -59,86 +82,84 @@ const Profile = () => {
 		setInterest(newInterests);
 	};
 
-	const handleBiography = (
-		e: React.ChangeEvent<HTMLTextAreaElement>,
-		{ value }: any
-	) => {
-		setBiography(value);
-		setValue('biography', value);
-	};
-
 	const onSubmit = (data: IProfileFormValues) => {
+		console.log(data);
 		agent.Profile.create(data).then();
 	};
+	if (!profile) return (<Loader/>)
 
+	
 	return (
 		<div>
 			<Header as="h1">Settings</Header>
 			<Form onSubmit={handleSubmit(onSubmit)}>
 				<Header>Account Settings</Header>
-				<Divider />
-				<Image
-					src="/placeholder.png"
-					style={{ cursor: 'pointer' }}
-					centered
-					size="small"
-					circular
-					onClick={() => openProfilePhoto()}
-				/>
-				<Divider />
-				<Header>Name</Header>
-				<TextInput
-					type="text"
-					name="firstName"
-					label="First name"
-					errors={errors}
-					register={register({
-						required: 'Firstname is required',
-					})}
-				/>
-				<TextInput
-					label="Last name"
-					type="text"
-					name="lastName"
-					errors={errors}
-					register={register({
-						required: 'Lastname is required',
-					})}
-				/>
-				<Header>Preferences</Header>
-				<label>Your gender</label>
-				<ErrorMessage
-					errors={errors}
-					name="gender"
-					render={({ message }) => <Message negative>{message}</Message>}
-				/>
-				<select
-					name="gender"
-					ref={register({ required: 'This is required field!' })}
-				>
-					<option value="Male">Male</option>
-					<option value="Female">Female</option>
-				</select>
-
-				<br></br>
-				<label>Your sexual preference</label>
-				<ErrorMessage
-					errors={errors}
-					name="sexualPreference"
-					render={({ message }) => <Message negative>{message}</Message>}
-				/>
-				<select
-					name="sexualPreference"
-					ref={register({ required: 'This field is required' })}
-				>
-					<option value="Male">Male</option>
-					<option value="Female">Female</option>
-					<option value="Other">Other</option>
-				</select>
-				<h3>Interests</h3>
-				<Dropdown
-					multiple
+				<Form.Group widths="2">
+					<TextInput
+						type="text"
+						name="firstName"
+						label="First name"
+						defaultValue={profile!.firstName}
+						errors={errors}
+						register={register({
+							required: 'Firstname is required',
+						})}
+					/>
+					<TextInput
+						label="Last name"
+						type="text"
+						name="lastName"
+						errors={errors}
+						register={register({
+							required: 'Lastname is required',
+						})}
+					/>
+				</Form.Group>
+				<Form.Group widths="2">
+					<ErrorMessage
+						errors={errors}
+						name="gender"
+						render={({ message }) => <Message negative>{message}</Message>}
+					/>
+					<Form.Select
+						label="Gender"
+						value={gender}
+						placeholder="Gender"
+						options={[
+							{ text: 'Male', value: 'Male' },
+							{ text: 'Female', value: 'Female' },
+						]}
+						name="gender"
+						onChange={(e, { value }: any) => {
+							setGender(value);
+							setValue('gender', value);
+						}}
+					></Form.Select>
+					<Form.Select
+						selection
+						label="Sexual preference"
+						value={sexPref}
+						options={[
+							{ text: 'Male', value: 'Male' },
+							{ text: 'Female', value: 'Female' },
+							{ text: 'Other', value: 'Other' },
+						]}
+						name="sexualPreference"
+						onChange={(e, { value }: any) => {
+							setSexPref(value);
+							setValue('sexualPreference', value);
+						}}
+					></Form.Select>
+					<ErrorMessage
+						errors={errors}
+						name="sexualPreference"
+						render={({ message }) => <Message negative>{message}</Message>}
+					/>
+				</Form.Group>
+				<Form.Select
+					label="Interests"
 					fluid
+					multiple
 					search
 					name="interests"
 					selection
@@ -148,19 +169,44 @@ const Profile = () => {
 					additionLabel={<i style={{ color: 'red' }}>New interest: </i>}
 					onAddItem={handleAddition}
 					onChange={handleMultiChange}
-				></Dropdown>
-				<h3>Biography</h3>
-				<TextArea
+				></Form.Select>
+				<Form.TextArea
+					label="Biography"
+					value={biography}
 					placeholder="Tell us more"
 					name="biography"
-					value={biography}
-					onChange={handleBiography}
+					onChange={(e, { value }: any) => {
+						setBiography(value);
+						setValue('biography', value);
+					}}
 				/>
 				<Button type="submit">Save</Button>
 			</Form>
-			<AddPhoto />
+			<Divider />
+			<Grid>
+				<Grid.Column width={16} style={{ paddingBottom: 0 }}>
+					<Header floated="left" icon="image" content="Photos" />
+					<Button
+						floated="right"
+						basic
+						content={addPhotoMode ? 'Cancel' : 'Add Photo'}
+						onClick={() => setAddPhotoMode(!addPhotoMode)}
+					/>
+				</Grid.Column>
+				{addPhotoMode ? <AddPhoto /> : <ShowPhotos />}
+			</Grid>
 		</div>
 	);
 };
 
+export default observer(Profile); */
+
+export interface ProfileProps {
+	
+}
+ 
+const Profile: React.FC<ProfileProps> = () => {
+	return ( null );
+}
+ 
 export default Profile;

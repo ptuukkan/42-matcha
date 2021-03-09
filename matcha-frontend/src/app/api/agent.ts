@@ -7,9 +7,9 @@ import {
 	IRegisterFormValues,
 	IResetPassword,
 	IUser,
-	IProfileFormValues,
 } from '../models/user';
 import { history } from '../..';
+import { IImage, IProfile, IProfileFormValues } from '../models/profile';
 
 axios.defaults.baseURL = process.env.REACT_APP_API_URL;
 
@@ -67,7 +67,8 @@ const User = {
 
 const Profile = {
 	create: (data: IProfileFormValues): Promise<void> => requests.put('/profile', data),
-	addImage: (data: FormData): Promise<void> => requests.post('/profile/image', data)
+	addImage: (data: FormData): Promise<IImage> => requests.post('/profile/image', data),
+	current: (): Promise<IProfile> => requests.get('/profile') 
 };
 
 const agent = {

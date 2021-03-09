@@ -1,12 +1,12 @@
 import { useForm } from 'react-hook-form';
 import { useParams } from 'react-router-dom';
 import { ErrorMessage } from '@hookform/error-message';
-import { Form, Header, Message, Button } from 'semantic-ui-react';
+import { Form, Header, Message, Button, Input } from 'semantic-ui-react';
 import TextInput from './TextInput';
 import agent from '../../app/api/agent';
 import { BackendError } from '../../app/models/errors';
 import { IResetPassword } from '../../app/models/user';
-import { useState } from 'react';
+import React, { useState } from 'react';
 
 interface IParams {
 	link: string;
@@ -47,7 +47,7 @@ const ChangePassword = () => {
 		<div>
 			<Header>Reset your password</Header>
 			<Form onSubmit={handleSubmit(onSubmit)}>
-				<TextInput
+				<Input
 					type="password"
 					name="password"
 					label="Password"

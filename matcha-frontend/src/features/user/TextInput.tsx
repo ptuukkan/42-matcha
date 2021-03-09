@@ -1,28 +1,28 @@
-import { ErrorMessage } from '@hookform/error-message';
-import React, { RefObject } from 'react';
-import { DeepMap, FieldError } from 'react-hook-form';
-import { Form, Message } from 'semantic-ui-react';
+import React from 'react';
+import { FieldRenderProps } from 'react-final-form'
+import { Form, FormFieldProps, Label } from 'semantic-ui-react';
 
-interface IProps {
-	type: string;
-	name: string,
-	label: string;
-	errors: DeepMap<Record<string, any>, FieldError>;
-	register: string | ((instance: HTMLInputElement | null) => void) | RefObject<HTMLInputElement> | null | undefined;
-}
+interface IProps 
+	extends FieldRenderProps<string>, FormFieldProps {}
 
-const TextInput: React.FC<IProps> = ({ type, name, label, errors, register }) => {
-	return (
-		<Form.Field>
-			<label>{label}</label>
-			<input type={type} name={name} placeholder={label} ref={register} />
-			<ErrorMessage
-				errors={errors}
-				name={name}
-				render={({ message }) => <Message negative>{message}</Message>}
-			/>
-		</Form.Field>
-	);
-};
-
-export default TextInput;
+	const TextInput: React.FC<IProps> = ({
+		input,
+		width,
+		type,
+		placeholder,
+		meta: {touched, error}
+	}) => {
+		return (
+			<Form.Field error={touched && !!error} type={type} width={width}>
+				<label>{placeholder}</label>
+				<input {...input} placeholder={placeholder} />
+				{touched && error && (
+					<Label basic color='red'>
+						{error}
+					</Label>
+				)}
+			</Form.Field>
+		);
+	};
+	
+	export default TextInput;

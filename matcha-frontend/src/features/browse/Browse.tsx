@@ -12,8 +12,8 @@ const Browse: React.FC<IProps> = ({ getProfile, profile }) => {
 
 	const [location, setLocation] = useState({ lat: 0, lon: 0 })
 
-	const birth = new Date(profile.birthday).getFullYear()
-	const nyt = new Date().getFullYear()
+/* 	const birth = new Date(profile.birthday).getFullYear()
+ */	const nyt = new Date().getFullYear()
 
 	const getLocation = () => {
 		navigator.geolocation.getCurrentPosition((position) => {
@@ -57,8 +57,8 @@ const Browse: React.FC<IProps> = ({ getProfile, profile }) => {
 					<Header as="h1">
 						{profile.firstName} {profile.lastName}
 					</Header>
-					<Icon name={profile.gender === 'male' ? 'mars' : 'venus'} />
-					<Card.Meta>
+					{/* <Icon name={profile.gender === 'male' ? 'mars' : 'venus'} /> */}
+{/* 					<Card.Meta>
 						Distance:{' '}
 						{getDistance(
 							location.lat,
@@ -67,9 +67,9 @@ const Browse: React.FC<IProps> = ({ getProfile, profile }) => {
 							profile.location.longitude
 						)}{' '}
 						km
-					</Card.Meta>
-					Age: {nyt - birth}
-					<Card.Description>{profile.biography}</Card.Description>
+					</Card.Meta> */}
+{/* 					Age: {nyt - birth}
+ */}					<Card.Description>{profile.biography}</Card.Description>
 					<br></br>
 					<Button
 						circular
