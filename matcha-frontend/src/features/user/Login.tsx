@@ -1,15 +1,14 @@
-import React, { Fragment, useContext } from 'react';
+import { Fragment, useContext } from 'react';
 import { Form as FinalForm, Field } from 'react-final-form';
 import { combineValidators, isRequired } from 'revalidate';
-import { Form, Message, Button, Modal, Input } from 'semantic-ui-react';
-import { useForm } from 'react-hook-form';
+import { Form, Button, Modal } from 'semantic-ui-react';
 import { RootStoreContext } from '../../app/stores/rootStore';
 import { observer } from 'mobx-react-lite';
 import { ILoginFormValues } from '../../app/models/user';
-import { BackendError } from '../../app/models/errors';
 import ForgotPassword from './ForgotPassword';
-import { useHistory } from 'react-router-dom';
-import TextInput from './TextInput';
+import TextInput from '../../app/common/form/TextInput';
+import { FORM_ERROR } from 'final-form';
+import ErrorMessage from '../../app/common/form/ErrorMessage';
 
 const validate = combineValidators({
 	emailAddress: isRequired('Email '),
@@ -20,51 +19,41 @@ const Login = () => {
 	const rootStore = useContext(RootStoreContext);
 	const { loginOpen, closeLogin, openForget } = rootStore.modalStore;
 	const { loginUser, loading } = rootStore.userStore;
-	const history = useHistory();
-
-	const onSubmit = (data: ILoginFormValues) => {
-		loginUser(data)
-			.then(() => {
-				history.push('/');
-			})
-			.catch((error: BackendError) => {
-				/* 				setError('global', { type: 'manual', message: error.message });
-				 */
-			});
-	};
 
 	return (
 		<Fragment>
-			<Modal
-				size="tiny"
-				open={loginOpen}
-				onClose={() => {
-					closeLogin();
-				}}
-			>
+			<Modal size="tiny" open={loginOpen} onClose={closeLogin}>
 				<Modal.Header>Login to Matcha</Modal.Header>
 				<Modal.Content>
 					<FinalForm
-						onSubmit={onSubmit}
+						onSubmit={(data: ILoginFormValues) =>
+							loginUser(data).catch((error) => ({
+								[FORM_ERROR]: error.message,
+							}))
+						}
 						validate={validate}
-						render={({ handleSubmit }) => (
-							<Form onSubmit={handleSubmit}>
+						render={({
+							handleSubmit,
+							submitting,
+							submitError,
+							dirtySinceLastSubmit,
+						}) => (
+							<Form onSubmit={handleSubmit} error>
 								<Field
 									component={TextInput}
 									name="emailAddress"
 									placeholder="Email address"
-									/>
+								/>
 								<Field
 									component={TextInput}
 									type="password"
 									name="password"
 									placeholder="Password"
 								/>
-								<Button
-									primary
-									loading={loading}
-									content="Login"
-								/>
+								{submitError && !dirtySinceLastSubmit && (
+									<ErrorMessage message={submitError} />
+								)}
+								<Button primary loading={submitting} content="Login" />
 								<Button
 									type="button"
 									floated="right"

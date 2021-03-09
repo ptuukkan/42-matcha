@@ -13,7 +13,7 @@ import agent from '../../app/api/agent';
 import { BackendError } from '../../app/models/errors';
 import { IForgetPassword } from '../../app/models/user';
 import { RootStoreContext } from '../../app/stores/rootStore';
-import TextInput from './TextInput';
+import TextInput from '../../app/common/form/TextInput';
 
 const ForgotPassword = () => {
 	const rootStore = useContext(RootStoreContext);

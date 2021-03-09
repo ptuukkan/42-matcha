@@ -15,7 +15,7 @@ import { observer } from 'mobx-react-lite';
 import { IRegisterFormValues } from '../../app/models/user';
 import { IValidationError } from '../../app/models/errors';
 import { ErrorMessage } from '@hookform/error-message';
-import TextInput from './TextInput';
+import TextInput from '../../app/common/form/TextInput';
 
 const Register = () => {
 	const rootStore = useContext(RootStoreContext);
@@ -51,25 +51,25 @@ const Register = () => {
 	);
 
 	const validate = combineValidators({
-		first_name: composeValidators(
+		firstName: composeValidators(
 			isRequired,
 			isAlphabetic,
 			hasLengthBetween(2, 50)
-		)('first_name'),
+		)('First name'),
 
-		last_name: composeValidators(
+		lastName: composeValidators(
 			isRequired,
 			isAlphabetic,
 			hasLengthBetween(2, 50)
-		)('first_name'),
+		)('Last name'),
 
-		email_address: composeValidators(isRequired, isValidEmail)('email_address'),
+		emailAddress: composeValidators(isRequired, isValidEmail)('Email address'),
 
 		password: composeValidators(
 			isRequired,
 			hasLengthBetween(6, 100),
 			matchesPattern(/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?!.*\s)(?=.*[!@#$*?_])/)
-		)('password'),
+		)('Password'),
 	});
 
 	return (
