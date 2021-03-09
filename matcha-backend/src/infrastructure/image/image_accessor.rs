@@ -3,7 +3,6 @@ use awmp::File;
 use std::fs;
 
 pub fn save_image(image_file: File, image_key: &str) -> Result<(), AppError> {
-	fs::create_dir_all("images")?;
 	let file_path = format!("images/{}", image_key);
 	image_file.persist_at(&file_path)?;
 	Ok(())

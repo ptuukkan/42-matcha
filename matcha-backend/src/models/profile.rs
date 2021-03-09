@@ -88,13 +88,16 @@ impl Profile {
 			"FOR p IN profiles filter p._key == '{}' return DOCUMENT(\"images\", p.images)",
 			&self.key
 		);
-		let result = CursorRequest::from(query)
+		let mut result = CursorRequest::from(query)
 			.send()
 			.await?
-			.extract_all::<Image>()
+			.extract_all::<Vec<Image>>()
 			.await?;
-		println!("{:?}", result);
-		Ok(result)
+		if let Some(images) = result.pop() {
+			Ok(images)
+		} else {
+			Err(AppError::internal("No images found"))
+		}
 	}
 }
 

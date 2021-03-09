@@ -1338,7 +1338,6 @@ dependencies = [
  "actix-web",
  "actix-web-validator",
  "async-mutex",
- "async-trait",
  "awmp",
  "derive_more",
  "dotenv",
