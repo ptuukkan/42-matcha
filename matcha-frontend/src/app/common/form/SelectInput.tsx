@@ -1,6 +1,6 @@
 import React from 'react';
 import { FieldRenderProps } from 'react-final-form';
-import { FormFieldProps, Form, Label, Select } from 'semantic-ui-react';
+import { FormFieldProps, Form, Label, Dropdown } from 'semantic-ui-react';
 
 interface IProps
 	extends FieldRenderProps<string, HTMLElement>,
@@ -15,12 +15,14 @@ const SelectInput: React.FC<IProps> = ({
 }) => {
 	return (
 		<Form.Field error={touched && !!error} width={width}>
-			<Select
+			<label>{placeholder}</label>
+			<Dropdown
 				value={input.value}
 				onChange={(e, data) => input.onChange(data.value)}
 				placeholder={placeholder}
 				options={options}
-			/>
+				selection
+			/> 
 			{touched && error && (
 				<Label basic color="red">
 					{error}
