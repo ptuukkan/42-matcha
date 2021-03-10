@@ -1,17 +1,19 @@
 export interface IValidationError {
-	field: string,
-	message: string
+	field: string;
+	message: string;
 }
 
 export interface IBackendError {
-	error_type: string,
-	message: string
+	error_type: string;
+	message: string;
 }
 
 export class BackendError {
-	message: string
+	error_type: string;
+	message: string;
 
 	constructor(message: string) {
-		this.message = message
+		this.error_type = 'BackendError';
+		this.message = message;
 	}
 }

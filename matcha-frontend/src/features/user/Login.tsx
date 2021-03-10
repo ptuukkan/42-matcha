@@ -1,19 +1,28 @@
 import { Fragment, useContext } from 'react';
 import { Form as FinalForm, Field } from 'react-final-form';
-import { combineValidators, isRequired } from 'revalidate';
 import { Form, Button, Modal } from 'semantic-ui-react';
 import { RootStoreContext } from '../../app/stores/rootStore';
 import { observer } from 'mobx-react-lite';
-import { ILoginFormValues } from '../../app/models/user';
 import ForgotPassword from './ForgotPassword';
 import TextInput from '../../app/common/form/TextInput';
-import { FORM_ERROR } from 'final-form';
 import ErrorMessage from '../../app/common/form/ErrorMessage';
+import { Validators } from '@lemoncode/fonk';
+import { createFinalFormValidation } from '@lemoncode/fonk-final-form';
+import { passwordComplexity } from '../../app/common/form/validators/passwordComplexity';
 
-const validate = combineValidators({
-	emailAddress: isRequired('Email '),
-	password: isRequired('Password '),
-});
+const validationSchema = {
+	field: {
+		emailAddress: [Validators.required.validator, Validators.email.validator],
+		password: [
+			Validators.required.validator,
+			{
+				validator: passwordComplexity,
+			},
+		],
+	},
+};
+
+const formValidation = createFinalFormValidation(validationSchema);
 
 const Login = () => {
 	const rootStore = useContext(RootStoreContext);
@@ -22,12 +31,12 @@ const Login = () => {
 
 	return (
 		<Fragment>
-			<Modal size="tiny" open={loginOpen} onClose={closeLogin}>
+			<Modal size="mini" open={loginOpen} onClose={closeLogin}>
 				<Modal.Header>Login to Matcha</Modal.Header>
 				<Modal.Content>
 					<FinalForm
 						onSubmit={loginUser}
-						validate={validate}
+						validate={formValidation.validateForm}
 						render={({
 							handleSubmit,
 							submitting,
@@ -49,12 +58,12 @@ const Login = () => {
 								{submitError && !dirtySinceLastSubmit && (
 									<ErrorMessage message={submitError} />
 								)}
-								<Button primary loading={submitting} content="Login" />
+								<Button type="submit" primary loading={submitting} content="Login" />
 								<Button
 									type="button"
 									floated="right"
 									disabled={loading}
-									onClick={() => openForget()}
+									onClick={openForget}
 									content="Forgot password?"
 								/>
 							</Form>
