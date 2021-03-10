@@ -1,11 +1,9 @@
 import { action, makeObservable, observable, runInAction } from 'mobx';
 import agent from '../api/agent';
-import {
-	IProfile
-} from '../models/profile';
+import { IProfile } from '../models/profile';
 import { RootStore } from './rootStore';
 
-export default class UserStore {
+export default class ProfileStore {
 	rootStore: RootStore;
 	loading = false;
 	profile: IProfile | null = null;
@@ -25,6 +23,7 @@ export default class UserStore {
 	};
 
 	getProfile = async () => {
+		this.loading = true;
 		try {
 			const profile = await agent.Profile.current();
 			runInAction(() => {
@@ -32,6 +31,8 @@ export default class UserStore {
 			});
 		} catch (error) {
 			console.log(error);
+		} finally {
+			this.stopLoading();
 		}
 	};
 }

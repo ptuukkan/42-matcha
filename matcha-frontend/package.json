@@ -56,6 +56,7 @@
   },
   "devDependencies": {
     "@types/react-router-dom": "^5.1.7",
+    "@types/react-select": "^4.0.13",
     "@types/revalidate": "^1.1.2"
   }
 }

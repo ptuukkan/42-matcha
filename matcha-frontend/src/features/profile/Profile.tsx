@@ -1,22 +1,17 @@
-/* import { ErrorMessage } from '@hookform/error-message';
-import React, { useState, useEffect, useContext } from 'react';
-import { useForm } from 'react-hook-form';
-import {
-	Button,
-	Header,
-	Form,
-	Message,
-	Divider,
-	Grid,
-	Loader,
-} from 'semantic-ui-react';
+import { Form as FinalForm, Field } from 'react-final-form';
+import { combineValidators, composeValidators, isRequired } from 'revalidate';
+import { Form, Button, Grid, Divider, Header } from 'semantic-ui-react';
 import agent from '../../app/api/agent';
-import { Gender, IProfileFormValues, SexualPreference } from '../../app/models/profile';
+import { IProfile, IProfileFormValues } from '../../app/models/profile';
+import TextInput from '../../app/common/form/TextInput';
+import React, { useContext, useEffect, useState } from 'react';
 import AddPhoto from '../user/AddPhoto';
 import ShowPhotos from '../user/ShowPhotos';
-import TextInput from '../user/TextInput';
-import { IProfile } from '../../app/models/profile';
+import SelectInput from '../../app/common/form/SelectInput';
+import MultiSelectInput from '../../app/common/form/MultiSelectInput';
+import { RootStoreContext } from '../../app/stores/rootStore';
 import { observer } from 'mobx-react-lite';
+
 
 const mockUpInterest = [
 	{ text: 'angular', value: 'angular' },
@@ -24,189 +19,112 @@ const mockUpInterest = [
 	{ text: 'piercing', value: 'piercing' },
 ];
 
+const gender = [
+	{ key: 'female',value: 'Female' , text: 'Female'},
+	{ key: 'male', value: 'Male', text: 'Male' },
+];
+
+const sexualPreference = [
+	{ key: 'female', text: 'Female', value: 'Female' },
+	{ key: 'male', text: 'Male', value: 'Male' },
+	{ key: 'other', text: 'Other', value: 'Other' },
+];
+
+
+const validate = combineValidators({
+	firstName:	composeValidators(isRequired)('First Name'),
+	lastName:	composeValidators(isRequired)('Last Name'),
+	gender:		composeValidators(isRequired)('Gender'),
+	biography:	composeValidators(isRequired)('Biography'),
+	interests:	composeValidators(isRequired)('Interests'),
+});
+
+const onSubmit = (data: IProfileFormValues) => {
+	console.log(data);
+	agent.Profile.create(data).then();
+};
+
 const Profile = () => {
-	const [interestsList, setInterest] = useState(mockUpInterest);
-	const [interests, setInterestSelect] = useState<string[]>([]);
-	const [sexPref, setSexPref] = useState<SexualPreference | undefined>();
-	const [gender, setGender] = useState<Gender>();
-	const [biography, setBiography] = useState<string | undefined>('');
-	const [addPhotoMode, setAddPhotoMode] = useState(false);
-	const [profile, setProfile] = useState<IProfile | null>(null)
+	const [addPhotoMode, setaddPhotoMode] = useState(false);
+	const rootStore = useContext(RootStoreContext);
+	const { profile, loading, getProfile} = rootStore.profileStore;
 
 	useEffect(() => {
 		if (profile) {
 			return
 		}
-		agent.Profile.current()
-			.then((p) => {
-				setProfile(p)
-				setSexPref(p.sexualPreference);
-				setGender(p.gender);
-				setBiography(p.biography);
-				setInterestSelect(p.interests);
-			})
-			.catch((e) => console.log(e));
-	},[profile]);
+		getProfile().then().catch((e) => console.log(e))
+		
+	}, [getProfile])
 
-	const { register, handleSubmit, setValue, errors } = useForm<IProfile>(
-		{
-			defaultValues: {
-				firstName: profile?.firstName ?? '',
-				lastName: profile?.lastName ?? '',
-				biography: profile?.biography ?? '',
-				gender: profile?.gender ?? undefined,
-				sexualPreference: profile?.sexualPreference ?? SexualPreference.Both,
-				interests: profile?.interests ?? [],
-			},
-		}
-	);
+	return loading ? <div>Loading...</div> : <>
 
-	useEffect(() => {
-		register({ name: 'interests' });
-		register({ name: 'biography' });
-		register({ name: 'gender' });
-		register({ name: 'sexualPreference' });
-	}, [register]);
 
-	const handleMultiChange = (e: any, selectedOption: any) => {
-		let interests = selectedOption.value;
-		setValue('interests', interests);
-		setInterestSelect(interests);
-	};
-
-	const handleAddition = (
-		e: React.KeyboardEvent<HTMLElement>,
-		{ value }: any
-	) => {
-		let newInterests = interestsList.concat({ text: value, value });
-		setInterest(newInterests);
-	};
-
-	const onSubmit = (data: IProfileFormValues) => {
-		console.log(data);
-		agent.Profile.create(data).then();
-	};
-	if (!profile) return (<Loader/>)
-
-	
-	return (
-		<div>
-			<Header as="h1">Settings</Header>
-			<Form onSubmit={handleSubmit(onSubmit)}>
-				<Header>Account Settings</Header>
-				<Form.Group widths="2">
-					<TextInput
-						type="text"
+	<FinalForm
+		onSubmit={onSubmit}
+		initialValues={profile}
+		validate={validate}
+		render={({ handleSubmit }) => (
+			<Form onSubmit={handleSubmit}>
+				<Form.Group widths={2}>
+					<Field
+						component={TextInput}
 						name="firstName"
-						label="First name"
-						defaultValue={profile!.firstName}
-						errors={errors}
-						register={register({
-							required: 'Firstname is required',
-						})}
+						placeholder="First name"
 					/>
-					<TextInput
-						label="Last name"
-						type="text"
+					<Field
+						component={TextInput}
 						name="lastName"
-						errors={errors}
-						register={register({
-							required: 'Lastname is required',
-						})}
+						placeholder="First name"
 					/>
 				</Form.Group>
-				<Form.Group widths="2">
-					<ErrorMessage
-						errors={errors}
+				<Form.Group widths={2}>
+					<Field
 						name="gender"
-						render={({ message }) => <Message negative>{message}</Message>}
-					/>
-					<Form.Select
-						label="Gender"
-						value={gender}
+						options={gender}
 						placeholder="Gender"
-						options={[
-							{ text: 'Male', value: 'Male' },
-							{ text: 'Female', value: 'Female' },
-						]}
-						name="gender"
-						onChange={(e, { value }: any) => {
-							setGender(value);
-							setValue('gender', value);
-						}}
-					></Form.Select>
-					<Form.Select
-						selection
-						label="Sexual preference"
-						value={sexPref}
-						options={[
-							{ text: 'Male', value: 'Male' },
-							{ text: 'Female', value: 'Female' },
-							{ text: 'Other', value: 'Other' },
-						]}
+						component={SelectInput}
+					/>
+					<Field
 						name="sexualPreference"
-						onChange={(e, { value }: any) => {
-							setSexPref(value);
-							setValue('sexualPreference', value);
-						}}
-					></Form.Select>
-					<ErrorMessage
-						errors={errors}
-						name="sexualPreference"
-						render={({ message }) => <Message negative>{message}</Message>}
+						options={sexualPreference}
+						placeholder="Sexual Preference"
+						component={SelectInput}
 					/>
 				</Form.Group>
-				<Form.Select
-					label="Interests"
-					fluid
-					multiple
-					search
-					name="interests"
-					selection
-					options={interestsList}
-					value={interests}
-					allowAdditions
-					additionLabel={<i style={{ color: 'red' }}>New interest: </i>}
-					onAddItem={handleAddition}
-					onChange={handleMultiChange}
-				></Form.Select>
-				<Form.TextArea
-					label="Biography"
-					value={biography}
-					placeholder="Tell us more"
-					name="biography"
-					onChange={(e, { value }: any) => {
-						setBiography(value);
-						setValue('biography', value);
-					}}
-				/>
+				<Form.Group widths='equal'>
+					<Field
+						component={MultiSelectInput}
+						placeholder="interests"
+						name="interests"
+						options={mockUpInterest}
+					/>
+					<Field
+						component={TextInput}
+						placeholder="Biography"
+						name="biography"
+					/>
+				</Form.Group>
 				<Button type="submit">Save</Button>
 			</Form>
-			<Divider />
-			<Grid>
-				<Grid.Column width={16} style={{ paddingBottom: 0 }}>
-					<Header floated="left" icon="image" content="Photos" />
-					<Button
-						floated="right"
-						basic
-						content={addPhotoMode ? 'Cancel' : 'Add Photo'}
-						onClick={() => setAddPhotoMode(!addPhotoMode)}
-					/>
-				</Grid.Column>
-				{addPhotoMode ? <AddPhoto /> : <ShowPhotos />}
-			</Grid>
-		</div>
-	);
+		)}
+	/>
+	<Divider />
+	<Grid>
+		<Grid.Column width={16} style={{ paddingBottom: 0 }}>
+			<Header floated="left" icon="image" content="Photos" />
+			<Button
+				floated="right"
+				basic
+				content={addPhotoMode ? 'Cancel' : 'Add Photo'}
+				onClick={() => setaddPhotoMode(!addPhotoMode)}
+			/>
+		</Grid.Column>
+		{addPhotoMode ? <AddPhoto /> : <ShowPhotos />}
+	</Grid>
+</>
+
+
 };
 
-export default observer(Profile); */
-
-export interface ProfileProps {
-	
-}
- 
-const Profile: React.FC<ProfileProps> = () => {
-	return ( null );
-}
- 
-export default Profile;
+export default observer(Profile);
