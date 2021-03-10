@@ -1,17 +1,16 @@
 import { Form as FinalForm, Field } from 'react-final-form';
-import { combineValidators, composeValidators, isRequired } from 'revalidate';
 import { Form, Button, Grid, Divider, Header } from 'semantic-ui-react';
 import agent from '../../app/api/agent';
-import { IProfile, IProfileFormValues } from '../../app/models/profile';
+import { IProfileFormValues } from '../../app/models/profile';
 import TextInput from '../../app/common/form/TextInput';
-import React, { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import AddPhoto from '../user/AddPhoto';
 import ShowPhotos from '../user/ShowPhotos';
 import SelectInput from '../../app/common/form/SelectInput';
 import MultiSelectInput from '../../app/common/form/MultiSelectInput';
 import { RootStoreContext } from '../../app/stores/rootStore';
 import { observer } from 'mobx-react-lite';
-
+import { formValidation } from './ProfileValidation';
 
 const mockUpInterest = [
 	{ text: 'angular', value: 'angular' },
@@ -20,7 +19,7 @@ const mockUpInterest = [
 ];
 
 const gender = [
-	{ key: 'female',value: 'Female' , text: 'Female'},
+	{ key: 'female', value: 'Female', text: 'Female' },
 	{ key: 'male', value: 'Male', text: 'Male' },
 ];
 
@@ -30,15 +29,6 @@ const sexualPreference = [
 	{ key: 'other', text: 'Other', value: 'Other' },
 ];
 
-
-const validate = combineValidators({
-	firstName:	composeValidators(isRequired)('First Name'),
-	lastName:	composeValidators(isRequired)('Last Name'),
-	gender:		composeValidators(isRequired)('Gender'),
-	biography:	composeValidators(isRequired)('Biography'),
-	interests:	composeValidators(isRequired)('Interests'),
-});
-
 const onSubmit = (data: IProfileFormValues) => {
 	console.log(data);
 	agent.Profile.create(data).then();
@@ -47,84 +37,85 @@ const onSubmit = (data: IProfileFormValues) => {
 const Profile = () => {
 	const [addPhotoMode, setaddPhotoMode] = useState(false);
 	const rootStore = useContext(RootStoreContext);
-	const { profile, loading, getProfile} = rootStore.profileStore;
+	const { profile, loading, getProfile } = rootStore.profileStore;
 
 	useEffect(() => {
 		if (profile) {
-			return
+			return;
 		}
-		getProfile().then().catch((e) => console.log(e))
-		
-	}, [getProfile])
+		getProfile()
+			.then()
+			.catch((e) => console.log(e));
+	}, [getProfile]);
 
-	return loading ? <div>Loading...</div> : <>
-
-
-	<FinalForm
-		onSubmit={onSubmit}
-		initialValues={profile}
-		validate={validate}
-		render={({ handleSubmit }) => (
-			<Form onSubmit={handleSubmit}>
-				<Form.Group widths={2}>
-					<Field
-						component={TextInput}
-						name="firstName"
-						placeholder="First name"
-					/>
-					<Field
-						component={TextInput}
-						name="lastName"
-						placeholder="First name"
-					/>
-				</Form.Group>
-				<Form.Group widths={2}>
-					<Field
-						name="gender"
-						options={gender}
-						placeholder="Gender"
-						component={SelectInput}
-					/>
-					<Field
-						name="sexualPreference"
-						options={sexualPreference}
-						placeholder="Sexual Preference"
-						component={SelectInput}
-					/>
-				</Form.Group>
-				<Form.Group widths='equal'>
-					<Field
-						component={MultiSelectInput}
-						placeholder="interests"
-						name="interests"
-						options={mockUpInterest}
-					/>
-					<Field
-						component={TextInput}
-						placeholder="Biography"
-						name="biography"
-					/>
-				</Form.Group>
-				<Button type="submit">Save</Button>
-			</Form>
-		)}
-	/>
-	<Divider />
-	<Grid>
-		<Grid.Column width={16} style={{ paddingBottom: 0 }}>
-			<Header floated="left" icon="image" content="Photos" />
-			<Button
-				floated="right"
-				basic
-				content={addPhotoMode ? 'Cancel' : 'Add Photo'}
-				onClick={() => setaddPhotoMode(!addPhotoMode)}
+	return loading ? (
+		<div>Loading...</div>
+	) : (
+		<>
+			<FinalForm
+				onSubmit={onSubmit}
+				initialValues={profile}
+				validate={formValidation.validateForm}
+				render={({ handleSubmit }) => (
+					<Form onSubmit={handleSubmit} error>
+						<Form.Group widths={2}>
+							<Field
+								component={TextInput}
+								name="firstName"
+								placeholder="First name"
+							/>
+							<Field
+								component={TextInput}
+								name="lastName"
+								placeholder="First name"
+							/>
+						</Form.Group>
+						<Form.Group widths={2}>
+							<Field
+								name="gender"
+								options={gender}
+								placeholder="Gender"
+								component={SelectInput}
+							/>
+							<Field
+								name="sexualPreference"
+								options={sexualPreference}
+								placeholder="Sexual Preference"
+								component={SelectInput}
+							/>
+						</Form.Group>
+						<Form.Group widths="equal">
+							<Field
+								component={MultiSelectInput}
+								placeholder="interests"
+								name="interests"
+								options={mockUpInterest}
+							/>
+							<Field
+								component={TextInput}
+								placeholder="Biography"
+								name="biography"
+							/>
+						</Form.Group>
+						<Button type="submit">Save</Button>
+					</Form>
+				)}
 			/>
-		</Grid.Column>
-		{addPhotoMode ? <AddPhoto /> : <ShowPhotos />}
-	</Grid>
-</>
-
-
+			<Divider />
+			<Grid>
+				<Grid.Column width={16} style={{ paddingBottom: 0 }}>
+					<Header floated="left" icon="image" content="Photos" />
+					<Button
+						floated="right"
+						basic
+						content={addPhotoMode ? 'Cancel' : 'Add Photo'}
+						onClick={() => setaddPhotoMode(!addPhotoMode)}
+					/>
+				</Grid.Column>
+				{addPhotoMode ? <AddPhoto /> : <ShowPhotos />}
+			</Grid>
+		</>
+	);
 };
 
 export default observer(Profile);
