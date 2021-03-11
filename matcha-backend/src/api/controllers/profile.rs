@@ -49,5 +49,6 @@ pub fn routes(config: &mut web::ServiceConfig) {
 		.service(edit_profile)
 		.service(create_image)
 		.service(set_main)
-		.service(delete_image);
+		.service(delete_image)
+		.service(get_interests);
 }

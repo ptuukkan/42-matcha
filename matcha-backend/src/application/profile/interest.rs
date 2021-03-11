@@ -10,4 +10,3 @@ pub async fn get(req: HttpRequest) -> Result<Vec<Interest>, AppError> {
 	let interests = Interest::get_all().await?;
 	Ok(interests)
 }
-
