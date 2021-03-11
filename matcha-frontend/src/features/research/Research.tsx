@@ -85,7 +85,7 @@ const Research: React.FC<IProps> = ({ profiles }) => {
 			</Grid>
 
 			<Divider />
-			<Card.Group itemsPerRow={3}>
+{/* 			<Card.Group itemsPerRow={3}>
 				{profiles.map((profile) => (
 					<Card
 						key={profile.location.latitude - Date.now()}
@@ -109,7 +109,7 @@ const Research: React.FC<IProps> = ({ profiles }) => {
 						</Card.Content>
 					</Card>
 				))}
-			</Card.Group>
+			</Card.Group> */}
 		</Container>
 	);
 };

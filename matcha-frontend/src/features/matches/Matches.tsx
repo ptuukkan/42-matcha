@@ -16,7 +16,7 @@ interface IProps {
 const Matches: React.FC<IProps> = ({ profiles }) => {
 	return (
 		<Container>
-			<Card.Group itemsPerRow={1}>
+			{/* <Card.Group itemsPerRow={1}>
 				{profiles.map((profile) => (
 					<Card key={profile.location.latitude - Date.now()}>
 						<Label
@@ -46,7 +46,7 @@ const Matches: React.FC<IProps> = ({ profiles }) => {
 						<Button color="red" icon="heart" content="Start Chat" as={Link} to={'/chat'}/>
 					</Card>
 				))}
-			</Card.Group>
+			</Card.Group> */}
 		</Container>
 	);
 };

@@ -7,9 +7,9 @@ import {
 	IRegisterFormValues,
 	IResetPassword,
 	IUser,
-	IProfileFormValues,
 } from '../models/user';
 import { history } from '../..';
+import { IImage, IProfile, IProfileFormValues } from '../models/profile';
 
 axios.defaults.baseURL = process.env.REACT_APP_API_URL;
 
@@ -48,6 +48,7 @@ const responseBody = (response: AxiosResponse) => response.data;
 
 const requests = {
 	get: (url: string) => axios.get(url).then(responseBody),
+	delete: (url: string) => axios.delete(url).then(responseBody),
 	post: (url: string, body: {}) => axios.post(url, body).then(responseBody),
 	put: (url: string, body: {}) => axios.put(url, body).then(responseBody),
 };
@@ -66,8 +67,15 @@ const User = {
 };
 
 const Profile = {
-	create: (data: IProfileFormValues): Promise<void> => requests.put('/profile', data),
-	addImage: (data: FormData): Promise<void> => requests.post('/profile/image', data)
+	create: (data: IProfileFormValues): Promise<void> =>
+		requests.put('/profile', data),
+	addImage: (data: FormData): Promise<IImage> =>
+		requests.post('/profile/image', data),
+	current: (): Promise<IProfile> => requests.get('/profile'),
+	removeImage: (id: string): Promise<void> =>
+		requests.delete(`/profile/image/${id}`),
+	imageToMain: (id: string): Promise<void> =>
+		requests.put(`/profile/image/${id}`, {}),
 };
 
 const agent = {

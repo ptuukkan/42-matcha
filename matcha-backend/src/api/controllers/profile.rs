@@ -21,7 +21,6 @@ async fn edit_profile(
 
 #[post("/profile/image")]
 async fn create_image(req: HttpRequest, parts: awmp::Parts) -> Result<HttpResponse, Error> {
-	println!("here");
 	let image = profile::image::create(req, parts).await?;
 	Ok(HttpResponse::Created().json(image))
 }
@@ -38,10 +37,17 @@ async fn set_main(req: HttpRequest, Path(id): Path<String>) -> Result<HttpRespon
 	Ok(HttpResponse::Ok().finish())
 }
 
+#[get("/profile/interests")]
+async fn get_interests(req: HttpRequest) -> Result<HttpResponse, Error> {
+	let interests = profile::interest::get(req).await?;
+	Ok(HttpResponse::Ok().json(interests))
+}
+
 pub fn routes(config: &mut web::ServiceConfig) {
 	config
 		.service(get_my_profile)
 		.service(edit_profile)
 		.service(create_image)
+		.service(set_main)
 		.service(delete_image);
 }

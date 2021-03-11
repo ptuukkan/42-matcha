@@ -1,21 +1,16 @@
-import { ErrorMessage } from '@hookform/error-message';
-import React, { useState, useEffect, useContext } from 'react';
-import { useForm } from 'react-hook-form';
-import {
-	Button,
-	Header,
-	Form,
-	Dropdown,
-	TextArea,
-	Message,
-	Image,
-	Divider,
-} from 'semantic-ui-react';
+import { Form as FinalForm, Field } from 'react-final-form';
+import { Form, Button, Grid, Divider, Header } from 'semantic-ui-react';
 import agent from '../../app/api/agent';
-import { IProfileFormValues } from '../../app/models/user';
+import { IProfileFormValues } from '../../app/models/profile';
+import TextInput from '../../app/common/form/TextInput';
+import { useContext, useEffect, useState } from 'react';
+import ShowPhotos from '../user/ShowPhotos';
+import SelectInput from '../../app/common/form/SelectInput';
+import MultiSelectInput from '../../app/common/form/MultiSelectInput';
 import { RootStoreContext } from '../../app/stores/rootStore';
-import AddPhoto from '../user/AddPhoto';
-import TextInput from '../user/TextInput';
+import { observer } from 'mobx-react-lite';
+import ProfilePhotos from '../user/ProfilePhotos';
+import { formValidation } from './ProfileValidation';
 
 const mockUpInterest = [
 	{ text: 'angular', value: 'angular' },
@@ -23,144 +18,102 @@ const mockUpInterest = [
 	{ text: 'piercing', value: 'piercing' },
 ];
 
+const gender = [
+	{ key: 'female', value: 'Female', text: 'Female' },
+	{ key: 'male', value: 'Male', text: 'Male' },
+];
+
+const sexualPreference = [
+	{ key: 'female', text: 'Female', value: 'Female' },
+	{ key: 'male', text: 'Male', value: 'Male' },
+	{ key: 'other', text: 'Other', value: 'Other' },
+];
+
+const onSubmit = (data: IProfileFormValues) => {
+	agent.Profile.create(data).then();
+};
+
 const Profile = () => {
+	const [addPhotoMode, setaddPhotoMode] = useState(false);
 	const rootStore = useContext(RootStoreContext);
-	const { openProfilePhoto } = rootStore.modalStore;
-	const [interestsList, setInterest] = useState(mockUpInterest);
-	const [interests, setInterestSelect] = useState([]);
-	const [biography, setBiography] = useState('');
-	const { register, handleSubmit, reset, setValue, errors } = useForm({});
+	const { profile, loading, getProfile } = rootStore.profileStore;
 
 	useEffect(() => {
-		reset({
-			firstName: '',
-			lastName: '',
-			gender: '',
-			sexualPreference: '',
-		});
-	}, [reset]);
+		if (profile) {
+			return;
+		}
+		getProfile()
+			.then()
+			.catch((e) => console.log(e));
+	}, [getProfile]);
 
-	useEffect(() => {
-		register({ name: 'interests' });
-		register({ name: 'biography' });
-	}, [register]);
-
-	const handleMultiChange = (e: any, selectedOption: any) => {
-		let interests = selectedOption.value;
-		setValue('interests', interests);
-		setInterestSelect(interests);
-	};
-
-	const handleAddition = (
-		e: React.KeyboardEvent<HTMLElement>,
-		{ value }: any
-	) => {
-		let newInterests = interestsList.concat({ text: value, value });
-		setInterest(newInterests);
-	};
-
-	const handleBiography = (
-		e: React.ChangeEvent<HTMLTextAreaElement>,
-		{ value }: any
-	) => {
-		setBiography(value);
-		setValue('biography', value);
-	};
-
-	const onSubmit = (data: IProfileFormValues) => {
-		agent.Profile.create(data).then();
-	};
-
-	return (
-		<div>
-			<Header as="h1">Settings</Header>
-			<Form onSubmit={handleSubmit(onSubmit)}>
-				<Header>Account Settings</Header>
-				<Divider />
-				<Image
-					src="/placeholder.png"
-					style={{ cursor: 'pointer' }}
-					centered
-					size="small"
-					circular
-					onClick={() => openProfilePhoto()}
+	return loading ? (
+		<div>Loading...</div>
+	) : (
+		<>
+			<FinalForm
+				onSubmit={onSubmit}
+				initialValues={profile}
+				validate={formValidation.validateForm}
+				render={({ handleSubmit }) => (
+					<Form onSubmit={handleSubmit} error>
+						<Form.Group widths={2}>
+							<Field
+								component={TextInput}
+								name="firstName"
+								placeholder="First name"
+							/>
+							<Field
+								component={TextInput}
+								name="lastName"
+								placeholder="First name"
+							/>
+						</Form.Group>
+						<Form.Group widths={2}>
+							<Field
+								name="gender"
+								options={gender}
+								placeholder="Gender"
+								component={SelectInput}
+							/>
+							<Field
+								name="sexualPreference"
+								options={sexualPreference}
+								placeholder="Sexual Preference"
+								component={SelectInput}
+							/>
+						</Form.Group>
+						<Form.Group widths="equal">
+							<Field
+								component={MultiSelectInput}
+								placeholder="interests"
+								name="interests"
+								options={mockUpInterest}
+							/>
+							<Field
+								component={TextInput}
+								placeholder="Biography"
+								name="biography"
+							/>
+						</Form.Group>
+						<Button type="submit">Save</Button>
+					</Form>
+				)}
+			/>
+			<Divider />
+				<Button
+					floated="right"
+					basic
+					content={addPhotoMode ? 'Cancel' : 'Add Photo'}
+					onClick={() => setaddPhotoMode(!addPhotoMode)}
 				/>
-				<Divider />
-				<Header>Name</Header>
-				<TextInput
-					type="text"
-					name="firstName"
-					label="First name"
-					errors={errors}
-					register={register({
-						required: 'Firstname is required',
-					})}
-				/>
-				<TextInput
-					label="Last name"
-					type="text"
-					name="lastName"
-					errors={errors}
-					register={register({
-						required: 'Lastname is required',
-					})}
-				/>
-				<Header>Preferences</Header>
-				<label>Your gender</label>
-				<ErrorMessage
-					errors={errors}
-					name="gender"
-					render={({ message }) => <Message negative>{message}</Message>}
-				/>
-				<select
-					name="gender"
-					ref={register({ required: 'This is required field!' })}
-				>
-					<option value="Male">Male</option>
-					<option value="Female">Female</option>
-				</select>
-
-				<br></br>
-				<label>Your sexual preference</label>
-				<ErrorMessage
-					errors={errors}
-					name="sexualPreference"
-					render={({ message }) => <Message negative>{message}</Message>}
-				/>
-				<select
-					name="sexualPreference"
-					ref={register({ required: 'This field is required' })}
-				>
-					<option value="Male">Male</option>
-					<option value="Female">Female</option>
-					<option value="Other">Other</option>
-				</select>
-				<h3>Interests</h3>
-				<Dropdown
-					multiple
-					fluid
-					search
-					name="interests"
-					selection
-					options={interestsList}
-					value={interests}
-					allowAdditions
-					additionLabel={<i style={{ color: 'red' }}>New interest: </i>}
-					onAddItem={handleAddition}
-					onChange={handleMultiChange}
-				></Dropdown>
-				<h3>Biography</h3>
-				<TextArea
-					placeholder="Tell us more"
-					name="biography"
-					value={biography}
-					onChange={handleBiography}
-				/>
-				<Button type="submit">Save</Button>
-			</Form>
-			<AddPhoto />
-		</div>
+			{addPhotoMode && profile ? (
+				<ProfilePhotos photoMode={setaddPhotoMode} loading={loading} />
+			) : (
+				<ShowPhotos  profile={profile} />
+			)}
+		</>
 	);
 };
 
-export default Profile;
+export default observer(Profile);

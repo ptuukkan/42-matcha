@@ -1,44 +1,44 @@
-import { useForm } from 'react-hook-form';
 import { useParams } from 'react-router-dom';
-import { ErrorMessage } from '@hookform/error-message';
-import { Form, Header, Message, Button } from 'semantic-ui-react';
-import TextInput from './TextInput';
+import { Form, Header, Button } from 'semantic-ui-react';
+import TextInput from '../../app/common/form/TextInput';
+import { Form as FinalForm, Field } from 'react-final-form';
 import agent from '../../app/api/agent';
-import { BackendError } from '../../app/models/errors';
 import { IResetPassword } from '../../app/models/user';
 import { useState } from 'react';
+import { Validators } from '@lemoncode/fonk';
+import ErrorMessage from '../../app/common/form/ErrorMessage';
+import { createFinalFormValidation } from '@lemoncode/fonk-final-form';
+import { passwordComplexity } from '../../app/common/form/validators/passwordComplexity';
+import { FORM_ERROR } from 'final-form';
 
 interface IParams {
 	link: string;
 }
 
-const validatePassword = (value: string) => {
-	if (value.length < 6) {
-		return 'Password should be at-least 6 characters.';
-	} else if (
-		!/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?!.*\s)(?=.*[!@#$*?_])/.test(value)
-	) {
-		return 'Password should contain at least one uppercase letter, lowercase letter, digit, and special symbol.';
-	}
-	return true;
+const validationSchema = {
+	field: {
+		password: [
+			Validators.required.validator,
+			{
+				validator: passwordComplexity,
+			},
+		],
+	},
 };
 
+const formValidation = createFinalFormValidation(validationSchema);
+
 const ChangePassword = () => {
-	const { register, handleSubmit, errors, setError, clearErrors } = useForm();
-	const [loading, setLoading] = useState(false);
 	const [finish, setFinish] = useState(false);
 	const { link } = useParams<IParams>();
 
-	const onSubmit = (data: IResetPassword) => {
-		setLoading(true);
-		agent.User.reset(link, data)
-			.catch((error: BackendError) => {
-				setError('global', { type: 'manual', message: error.message });
-			})
-			.finally(() => {
-				setLoading(false);
-				setFinish(true);
-			});
+	const onSubmit = async (data: IResetPassword) => {
+		try {
+			await agent.User.reset(link, data);
+			setFinish(true);
+		} catch (error) {
+			return { [FORM_ERROR]: error.message };
+		}
 	};
 
 	if (finish) return <Header>Password successfully changed!</Header>;
@@ -46,30 +46,29 @@ const ChangePassword = () => {
 	return (
 		<div>
 			<Header>Reset your password</Header>
-			<Form onSubmit={handleSubmit(onSubmit)}>
-				<TextInput
-					type="password"
-					name="password"
-					label="Password"
-					errors={errors}
-					register={register({
-						required: 'Password is required',
-						validate: validatePassword,
-					})}
-				/>
-				<ErrorMessage
-					errors={errors}
-					name="global"
-					render={({ message }) => <Message negative>{message}</Message>}
-				/>
-				<Button
-					primary
-					type="submit"
-					loading={loading}
-					content="Reset password"
-					onClick={() => clearErrors()}
-				/>
-			</Form>
+			<FinalForm
+				onSubmit={onSubmit}
+				validate={formValidation.validateForm}
+				render={({
+					handleSubmit,
+					submitError,
+					dirtySinceLastSubmit,
+					submitting,
+				}) => (
+					<Form onSubmit={handleSubmit} error>
+						<Field
+							type="password"
+							name="password"
+							placeholder="Password"
+							component={TextInput}
+						/>
+						{submitError && !dirtySinceLastSubmit && (
+							<ErrorMessage message={submitError} />
+						)}
+						<Button primary loading={submitting} content="Reset password" />
+					</Form>
+				)}
+			/>
 		</div>
 	);
 };

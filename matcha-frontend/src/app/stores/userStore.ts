@@ -1,11 +1,10 @@
 import { action, makeObservable, observable, runInAction } from 'mobx';
 import agent from '../api/agent';
-import {
-	ILoginFormValues,
-	IRegisterFormValues,
-	IUser,
-} from '../models/user';
+import { ILoginFormValues, IRegisterFormValues, IUser } from '../models/user';
 import { RootStore } from './rootStore';
+import { history } from '../..';
+import { FORM_ERROR } from 'final-form';
+import { IValidationError } from '../models/errors';
 
 export default class UserStore {
 	rootStore: RootStore;
@@ -44,30 +43,31 @@ export default class UserStore {
 	};
 
 	registerUser = async (data: IRegisterFormValues) => {
-		this.loading = true;
 		try {
 			await agent.User.register(data);
-			this.stopLoading();
 			this.rootStore.modalStore.openRegisterFinish();
 		} catch (error) {
-			this.stopLoading();
-			throw error;
+			if (error.error_type === 'ValidationError') {
+				return error.errors.reduce((obj: any, item: IValidationError) => {
+					obj[item.field] = item.message;
+					return obj;
+				}, {});
+			}
+			return { [FORM_ERROR]: error.message };
 		}
 	};
 
 	loginUser = async (data: ILoginFormValues) => {
-		this.loading = true;
 		try {
 			const user = await agent.User.login(data);
 			runInAction(() => {
 				this.user = user;
 			});
 			this.setToken(user.token);
-			this.stopLoading();
 			this.rootStore.modalStore.closeLogin();
+			history.push('/');
 		} catch (error) {
-			this.stopLoading();
-			throw error;
+			return { [FORM_ERROR]: error.message };
 		}
 	};
 

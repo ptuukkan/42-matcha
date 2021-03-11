@@ -1,19 +1,27 @@
 export interface IProfile {
 	firstName: string;
 	lastName: string;
-	emailAddress: string;
-	birthday: string;
+/* 	emailAddress: string; */
+/* 	birthday: string; */
 	/* birthday: Date; */
-	sexualPreference: string;
-	gender: string;
+	sexualPreference: SexualPreference;
+	gender: Gender;
 	/* gender: Gender; */
 	/* sexualPreference: SexualPreference; */
-	fameRating: number;
-	biography: string;
-	location: ILocation;
+/* 	fameRating: number;
+ */	biography: string;
+/* 	location: ILocation; */
 	interests: string[];
-/* 	pictures: string[]; */
-	pictures: IPicture[];
+	images: IImage[];
+}
+
+export interface IProfileFormValues {
+	firstName: String;
+	lastName: String;
+	gender: String;
+	biography: String,
+	sexualPreference: String;
+	interests: String[];
 }
 
 export interface ILocation {
@@ -22,15 +30,16 @@ export interface ILocation {
 	longitude: number;
 }
 
-export interface IPicture {
+export interface IImage {
 	id: string;
 	url: string;
 	isMain: boolean;
 }
 
-enum SexualPreference {
-	Hetero,
-	Bi,
+export enum SexualPreference {
+	Male,
+	Female,
+	Both,
 }
 
 export enum Gender {
