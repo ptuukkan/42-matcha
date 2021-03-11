@@ -48,6 +48,7 @@ const responseBody = (response: AxiosResponse) => response.data;
 
 const requests = {
 	get: (url: string) => axios.get(url).then(responseBody),
+	delete: (url: string) => axios.delete(url).then(responseBody),
 	post: (url: string, body: {}) => axios.post(url, body).then(responseBody),
 	put: (url: string, body: {}) => axios.put(url, body).then(responseBody),
 };
@@ -68,6 +69,8 @@ const User = {
 const Profile = {
 	create: (data: IProfileFormValues): Promise<void> => requests.put('/profile', data),
 	addImage: (data: FormData): Promise<IImage> => requests.post('/profile/image', data),
+	removeImage: (id: string): Promise<void> => requests.delete(`/profile/image/${id}`),
+	imageToMain: (id: string): Promise<void> => requests.put(`/profile/image/${id}`, {}),
 	current: (): Promise<IProfile> => requests.get('/profile') 
 };
 

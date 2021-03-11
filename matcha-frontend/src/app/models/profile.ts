@@ -12,7 +12,7 @@ export interface IProfile {
  */	biography: string;
 /* 	location: ILocation; */
 	interests: string[];
-	pictures: IImage[];
+	images: IImage[];
 }
 
 export interface IProfileFormValues {

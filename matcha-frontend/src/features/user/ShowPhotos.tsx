@@ -1,33 +1,52 @@
-import { Image, Button, Card } from 'semantic-ui-react';
+import { observer } from 'mobx-react-lite';
+import agent from '../../app/api/agent';
 
-const ShowPhotos = () => {
+import {
+	Image,
+	Button,
+	Card,
+	Grid,
+	CardContent,
+} from 'semantic-ui-react';
+import { IProfile } from '../../app/models/profile';
+
+interface IProps {
+	profile: IProfile | null;
+}
+
+const ShowPhotos: React.FC<IProps> = (profile) => {
 	return (
-		<Image.Group>
-			<Card>
-				<Image src="http://localhost:8080/img/1240219" wrapped ui={true} />
-				<Button.Group fluid widths={2}>
-					<Button
-						onClick={() => console.log('To main photo')}
-						//disabled={photo.isMain}
-						//loading={loading && target === photo.id}
-						basic
-						positive
-						content="Main"
-					/>
-					<Button
-						//name={photo.id}
-						onClick={() => console.log('delete')}
-						//disabled={photo.isMain}
-						//loading={loading && deleteTarget === photo.id}
-						basic
-						negative
-						icon="trash"
-					/>
-				</Button.Group>
-				)
-			</Card>
-		</Image.Group>
-	);
+		<Grid.Column width={16}>
+			<Grid.Row columns={6}>
+				<Card.Group itemsPerRow={5}>
+					{profile.profile?.images.map((image) => (
+						<Card key={image.id}>
+								<Image size="tiny" verticalAlign="middle" src={image.url} wrapped ui={false} />
+							<CardContent/>
+
+								<Button.Group fluid widths={2} >
+									<Button
+										onClick={() => agent.Profile.imageToMain(image.id)}
+										disabled={image.isMain}
+										basic
+										positive
+										content="Main"
+									/>
+									<Button
+										onClick={() => agent.Profile.removeImage(image.id)}
+										disabled={image.isMain}
+										basic
+										negative
+										icon="trash"
+									/>
+								</Button.Group>
+
+						</Card>
+					))}
+				</Card.Group>
+			</Grid.Row>
+		</Grid.Column>
+	)
 };
 
-export default ShowPhotos;
+export default observer(ShowPhotos);

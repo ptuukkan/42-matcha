@@ -34,6 +34,7 @@ async fn delete_image(req: HttpRequest, Path(id): Path<String>) -> Result<HttpRe
 
 #[put("/profile/image/{id}")]
 async fn set_main(req: HttpRequest, Path(id): Path<String>) -> Result<HttpResponse, Error> {
+	println!("here");
 	profile::image::set_main(req, &id).await?;
 	Ok(HttpResponse::Ok().finish())
 }
@@ -43,5 +44,6 @@ pub fn routes(config: &mut web::ServiceConfig) {
 		.service(get_my_profile)
 		.service(edit_profile)
 		.service(create_image)
+		.service(set_main)
 		.service(delete_image);
 }
