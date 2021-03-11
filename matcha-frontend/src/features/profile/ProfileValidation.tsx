@@ -33,22 +33,6 @@ const validationSchema = {
 			},
 			alphabetic,
 		],
-		username: [
-			Validators.required.validator,
-			{
-				validator: Validators.minLength,
-				customArgs: { length: 2 },
-				message: 'Must be at least 2 characters.',
-			},
-			{
-				validator: Validators.maxLength,
-				customArgs: { length: 33 },
-				message: 'Must be less than 33 characters.',
-			},
-			alphabetic,
-		],
-		emailAddress: [Validators.required.validator, Validators.email.validator],
-		password: [Validators.required.validator, passwordComplexity],
 	},
 };
 

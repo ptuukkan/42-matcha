@@ -46,6 +46,9 @@ pub async fn arango_setup() {
 		create_arango_collection("images", "2", &db_url)
 			.await
 			.expect("Collection creation failed");
+		create_arango_collection("interests", "2", &db_url)
+			.await
+			.expect("Collection creation failed");
 	}
 }
 

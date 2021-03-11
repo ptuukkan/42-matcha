@@ -7,19 +7,14 @@ use actix_web::HttpRequest;
 use std::convert::TryFrom;
 
 pub mod image;
+pub mod interest;
 
 pub async fn get_my(req: HttpRequest) -> Result<ProfileDto, AppError> {
-	println!("start");
 	let user_key = jwt::decode_from_header(req)?;
-	println!("user_key");
 	let user = User::get(&user_key).await?;
-	println!("user");
 	let profile = user.get_profile().await?;
-	println!("profile");
 	let images = profile.get_images().await?;
-	println!("images");
 	let mut profile_dto = ProfileDto::from(profile);
-	println!("profiledto");
 	profile_dto.images = images
 		.into_iter()
 		.filter_map(|x| ImageDto::try_from(&x).ok())
