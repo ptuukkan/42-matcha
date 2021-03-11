@@ -67,11 +67,15 @@ const User = {
 };
 
 const Profile = {
-	create: (data: IProfileFormValues): Promise<void> => requests.put('/profile', data),
-	addImage: (data: FormData): Promise<IImage> => requests.post('/profile/image', data),
-	removeImage: (id: string): Promise<void> => requests.delete(`/profile/image/${id}`),
-	imageToMain: (id: string): Promise<void> => requests.put(`/profile/image/${id}`, {}),
-	current: (): Promise<IProfile> => requests.get('/profile') 
+	create: (data: IProfileFormValues): Promise<void> =>
+		requests.put('/profile', data),
+	addImage: (data: FormData): Promise<IImage> =>
+		requests.post('/profile/image', data),
+	current: (): Promise<IProfile> => requests.get('/profile'),
+	removeImage: (id: string): Promise<void> =>
+		requests.delete(`/profile/image/${id}`),
+	imageToMain: (id: string): Promise<void> =>
+		requests.put(`/profile/image/${id}`, {}),
 };
 
 const agent = {

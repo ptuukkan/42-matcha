@@ -1,12 +1,11 @@
-use crate::models::user::RegisterFormValues;
 use crate::database::cursor::CursorRequest;
 use crate::errors::{AppError, ValidationError};
 use crate::models::profile::Profile;
+use crate::models::user::RegisterFormValues;
 use crate::models::user::User;
 use lettre::{SendableEmail, SendmailTransport, Transport};
 use lettre_email::EmailBuilder;
 use std::env;
-
 
 pub async fn register(values: RegisterFormValues) -> Result<(), AppError> {
 	let mut user = User::from(&values);

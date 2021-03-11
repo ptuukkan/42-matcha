@@ -1,16 +1,16 @@
 import { Form as FinalForm, Field } from 'react-final-form';
-import { combineValidators, composeValidators, isRequired } from 'revalidate';
-import { Form, Button, Divider } from 'semantic-ui-react';
+import { Form, Button, Grid, Divider, Header } from 'semantic-ui-react';
 import agent from '../../app/api/agent';
 import { IProfileFormValues } from '../../app/models/profile';
 import TextInput from '../../app/common/form/TextInput';
-import React, { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import ShowPhotos from '../user/ShowPhotos';
 import SelectInput from '../../app/common/form/SelectInput';
 import MultiSelectInput from '../../app/common/form/MultiSelectInput';
 import { RootStoreContext } from '../../app/stores/rootStore';
 import { observer } from 'mobx-react-lite';
 import ProfilePhotos from '../user/ProfilePhotos';
+import { formValidation } from './ProfileValidation';
 
 const mockUpInterest = [
 	{ text: 'angular', value: 'angular' },
@@ -29,14 +29,6 @@ const sexualPreference = [
 	{ key: 'other', text: 'Other', value: 'Other' },
 ];
 
-const validate = combineValidators({
-	firstName: composeValidators(isRequired)('First Name'),
-	lastName: composeValidators(isRequired)('Last Name'),
-	gender: composeValidators(isRequired)('Gender'),
-	biography: composeValidators(isRequired)('Biography'),
-	interests: composeValidators(isRequired)('Interests'),
-});
-
 const onSubmit = (data: IProfileFormValues) => {
 	agent.Profile.create(data).then();
 };
@@ -53,7 +45,7 @@ const Profile = () => {
 		getProfile()
 			.then()
 			.catch((e) => console.log(e));
-	}, [getProfile, profile]);
+	}, [getProfile]);
 
 	return loading ? (
 		<div>Loading...</div>
@@ -62,9 +54,9 @@ const Profile = () => {
 			<FinalForm
 				onSubmit={onSubmit}
 				initialValues={profile}
-				validate={validate}
+				validate={formValidation.validateForm}
 				render={({ handleSubmit }) => (
-					<Form onSubmit={handleSubmit}>
+					<Form onSubmit={handleSubmit} error>
 						<Form.Group widths={2}>
 							<Field
 								component={TextInput}
