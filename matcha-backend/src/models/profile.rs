@@ -43,7 +43,7 @@ pub struct ProfileFormValues {
 	gender: Option<Gender>,
 	sexual_preference: Option<SexualPreference>,
 	biography: Option<String>,
-	interests: Option<Vec<String>>,
+	pub interests: Option<Vec<String>>,
 }
 
 impl Profile {

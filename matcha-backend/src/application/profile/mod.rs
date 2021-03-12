@@ -1,6 +1,6 @@
-use crate::models::image::ImageDto;
 use crate::errors::AppError;
 use crate::infrastructure::security::jwt;
+use crate::models::image::ImageDto;
 use crate::models::profile::{ProfileDto, ProfileFormValues};
 use crate::models::user::User;
 use actix_web::HttpRequest;
@@ -22,10 +22,13 @@ pub async fn get_my(req: HttpRequest) -> Result<ProfileDto, AppError> {
 	Ok(profile_dto)
 }
 
-pub async fn edit(req: HttpRequest, values: ProfileFormValues) -> Result<(), AppError> {
+pub async fn update(req: HttpRequest, mut values: ProfileFormValues) -> Result<(), AppError> {
 	let user_key = jwt::decode_from_header(req)?;
 	let user = User::get(&user_key).await?;
 	let profile = user.get_profile().await?;
+	if let Some(interests) = values.interests {
+		values.interests = interest::create(interests).await?;
+	}
 	profile.update_from_form(&values).await?;
 	Ok(())
 }

@@ -10,6 +10,21 @@ struct Jwt {
 	token: String,
 }
 
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct ArangoResponseError {
+    error: bool,
+    error_message: String,
+    error_num: i32
+}
+
+#[derive(Deserialize)]
+#[serde(untagged)]
+enum ArangoResponse<T> {
+	Success(T),
+	Error(ArangoResponseError)
+}
+
 pub async fn get_arango_jwt() -> Result<String, AppError> {
 	let jwt: String;
 
@@ -24,14 +39,8 @@ pub async fn get_arango_jwt() -> Result<String, AppError> {
 async fn arango_login() -> Result<String, AppError> {
 	let db_base_url: String = env::var("DB_BASE_URL")?;
 	let mut map = HashMap::new();
-	map.insert(
-		"username",
-		env::var("DB_USER")?,
-	);
-	map.insert(
-		"password",
-		env::var("DB_PASSWORD")?,
-	);
+	map.insert("username", env::var("DB_USER")?);
+	map.insert("password", env::var("DB_PASSWORD")?);
 	let url = db_base_url.to_owned() + "_open/auth";
 
 	let client = Client::default();
@@ -44,7 +53,10 @@ async fn arango_login() -> Result<String, AppError> {
 	Ok(response.token)
 }
 
-pub async fn post<I: Serialize, O: de::DeserializeOwned>(url: &str, data: &I) -> Result<O, AppError> {
+pub async fn post<I: Serialize, O: de::DeserializeOwned>(
+	url: &str,
+	data: &I,
+) -> Result<O, AppError> {
 	let jwt = get_arango_jwt().await?;
 	let client = Client::default();
 	let response = client
@@ -90,4 +102,23 @@ pub async fn delete(url: &str) -> Result<(), AppError> {
 		.send()
 		.await?;
 	Ok(())
+}
+
+pub async fn put<I: Serialize, O: de::DeserializeOwned>(url: &str, data: &I) -> Result<Vec<Option<O>>, AppError> {
+	let jwt = get_arango_jwt().await?;
+	let client = Client::default();
+	let response = client
+		.put(url)
+		.set_header("Authorization", "bearer ".to_owned() + &jwt)
+		.send_json(data)
+		.await?
+		.json::<Vec<ArangoResponse<O>>>()
+		.await?;
+	let result: Vec<Option<O>> = response.into_iter().map(|x| {
+		match x {
+			ArangoResponse::Success(a) => Some(a),
+			ArangoResponse::Error(_) => None
+		}
+	}).collect();
+	Ok(result)
 }
