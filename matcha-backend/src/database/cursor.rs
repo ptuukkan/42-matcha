@@ -8,28 +8,27 @@ use std::convert::From;
 use std::env;
 
 #[derive(Serialize, Debug)]
+#[serde(rename_all = "camelCase")]
 pub struct CursorRequest {
 	query: String,
 	count: bool,
-	#[serde(rename = "batchSize")]
 	batch_size: i32,
 }
 
 #[derive(Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
 pub struct CursorResponse {
 	pub code: i32,
 	pub error: bool,
-	#[serde(rename = "errorMessage")]
 	pub error_message: Option<String>,
-	#[serde(rename = "errorNum")]
 	pub error_num: Option<i32>,
 	#[serde(skip)]
 	bytes: Bytes,
 }
 
 #[derive(Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
 pub struct Cursor<T> {
-	#[serde(rename = "hasMore")]
 	pub has_more: bool,
 	pub id: Option<String>,
 	pub count: i32,

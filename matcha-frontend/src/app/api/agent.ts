@@ -10,6 +10,7 @@ import {
 } from '../models/user';
 import { history } from '../..';
 import { IImage, IProfile, IProfileFormValues } from '../models/profile';
+import { IInterestOption } from '../models/interest';
 
 axios.defaults.baseURL = process.env.REACT_APP_API_URL;
 
@@ -31,17 +32,20 @@ axios.interceptors.response.use(undefined, (error) => {
 		const e = new BackendError('Network Error');
 		throw e;
 	}
-	const { status, data } = error.response;
-	if (status === 401 && data.message === 'Token expired') {
-		console.log(error.response);
-		window.localStorage.removeItem('jwt');
-		history.push('/');
-		toast.error('Your session has expired, please login again');
+	if (error.response) {
+		const { status, data } = error.response;
+		if (status === 401 && data.message === 'Token expired') {
+			console.log(error.response);
+			window.localStorage.removeItem('jwt');
+			history.push('/');
+			toast.error('Your session has expired, please login again');
+		}
+		if (error.response.data) {
+			throw error.response.data;
+		}
+		throw error.response;
 	}
-	if (error.response && error.response.data) {
-		throw error.response.data;
-	}
-	throw error.response;
+	throw error;
 });
 
 const responseBody = (response: AxiosResponse) => response.data;
@@ -78,9 +82,14 @@ const Profile = {
 		requests.put(`/profile/image/${id}`, {}),
 };
 
+const Interests = {
+	get: (): Promise<IInterestOption[]> => requests.get('/profile/interests'),
+};
+
 const agent = {
 	User,
 	Profile,
+	Interests,
 };
 
 export default agent;
