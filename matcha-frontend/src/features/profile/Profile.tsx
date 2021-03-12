@@ -30,13 +30,13 @@ const sexualPreference = [
 ];
 
 const onSubmit = (data: IProfileFormValues) => {
-	agent.Profile.create(data).then();
+	agent.Profile.update(data).then();
 };
 
 const Profile = () => {
 	const [addPhotoMode, setaddPhotoMode] = useState(false);
 	const rootStore = useContext(RootStoreContext);
-	const { profile, loading, getProfile } = rootStore.profileStore;
+	const { profile, loading, getProfile, removeImage, addImage, setMain } = rootStore.profileStore;
 
 	useEffect(() => {
 		if (profile) {
@@ -44,8 +44,8 @@ const Profile = () => {
 		}
 		getProfile()
 			.then()
-			.catch((e) => console.log(e));
-	}, [getProfile]);
+			.catch((e) => console.log(e))
+	}, [getProfile, profile]);
 
 	return loading ? (
 		<div>Loading...</div>
@@ -108,9 +108,9 @@ const Profile = () => {
 					onClick={() => setaddPhotoMode(!addPhotoMode)}
 				/>
 			{addPhotoMode && profile ? (
-				<ProfilePhotos photoMode={setaddPhotoMode} loading={loading} />
+				<ProfilePhotos photoMode={setaddPhotoMode} addImage={addImage} loading={loading} />
 			) : (
-				<ShowPhotos  profile={profile} />
+				<ShowPhotos removeImage={removeImage} setMain={setMain} profile={profile} />
 			)}
 		</>
 	);

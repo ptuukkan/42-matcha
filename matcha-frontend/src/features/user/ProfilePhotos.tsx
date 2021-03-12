@@ -7,9 +7,11 @@ import AddPhoto from './AddPhoto';
 export interface ProfilePhotosProps {
 	loading: boolean;
 	photoMode: (value: boolean) => void;
+	addImage: (data: FormData) => void;
+
 }
 
-const ProfilePhotos: React.FC<ProfilePhotosProps> = ({ loading, photoMode }) => {
+const ProfilePhotos: React.FC<ProfilePhotosProps> = ({ loading, photoMode, addImage }) => {
 	const [files, setFiles] = useState<any[]>([]);
 	const [image, setImage] = useState<Blob | null>(null);
 
@@ -50,9 +52,8 @@ const ProfilePhotos: React.FC<ProfilePhotosProps> = ({ loading, photoMode }) => 
 									onClick={() => {
 										let fd = new FormData()
 										fd.append('image', image!)
-										agent.Profile.addImage(fd)
-											.catch((e) => console.log(e))
-											photoMode(false)
+										addImage(fd)
+										photoMode(false)
 									}
 									}
 								/>
