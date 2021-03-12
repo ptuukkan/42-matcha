@@ -1,11 +1,13 @@
 import { action, makeObservable, observable, runInAction } from 'mobx';
 import agent from '../api/agent';
+import { IInterestOption } from '../models/interest';
 import { IProfile, IProfileFormValues } from '../models/profile';
 import { RootStore } from './rootStore';
 
 export default class ProfileStore {
 	rootStore: RootStore;
 	loading = false;
+	interests: IInterestOption[] = [];
 	profile: IProfile | null = null;
 
 	constructor(rootStore: RootStore) {
@@ -13,9 +15,11 @@ export default class ProfileStore {
 		makeObservable(this, {
 			loading: observable,
 			profile: observable,
+			interests: observable,
 			getProfile: action,
 			removeImage: action,
 			stopLoading: action,
+			getInterests: action,
 		});
 	}
 
@@ -27,14 +31,23 @@ export default class ProfileStore {
 		this.loading = true;
 		try {
 			const profile = await agent.Profile.current();
+			await this.getInterests();
 			runInAction(() => {
 				this.profile = profile;
-				console.log(this.profile.images.map((im) => im.url));
 			});
 		} catch (error) {
 			console.log(error);
 		} finally {
 			this.stopLoading();
+		}
+	};
+
+	getInterests = async () => {
+		try {
+			const interests = await agent.Interests.get();
+			runInAction(() => (this.interests = interests));
+		} catch (error) {
+			console.log(error);
 		}
 	};
 
@@ -79,9 +92,10 @@ export default class ProfileStore {
 
 	updateProfile = async (data: IProfileFormValues) => {
 		try {
-			agent.Profile.update(data)
-		} catch (e){
-			() => console.log(e)
+			await agent.Profile.update(data);
+			await this.getInterests();
+		} catch (error) {
+			console.log(error);
 		}
-	}
+	};
 }

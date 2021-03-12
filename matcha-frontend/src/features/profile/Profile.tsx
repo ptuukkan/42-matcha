@@ -22,18 +22,12 @@ const sexualPreference = [
 	{ key: 'female', text: 'Female', value: 'Female' },
 	{ key: 'male', text: 'Male', value: 'Male' },
 	{ key: 'other', text: 'Other', value: 'Other' },
-];
-
-const onSubmit = (data: IProfileFormValues) => {
-	agent.Profile.update(data).then();
-};
+];	
 
 const Profile = () => {
 	const [addPhotoMode, setaddPhotoMode] = useState(false);
-	const [optionsLoading, setOptionsLoading] = useState(true);
-	const [interests, setInterests] = useState<IInterestOption[]>([]);
 	const rootStore = useContext(RootStoreContext);
-	const { profile, loading, getProfile, removeImage, addImage, setMain } = rootStore.profileStore;
+	const { profile, loading, getProfile, removeImage, addImage, setMain, updateProfile, interests } = rootStore.profileStore;
 
 	useEffect(() => {
 		if (!profile) {
@@ -41,19 +35,14 @@ const Profile = () => {
 				.then()
 				.catch((e) => console.log(e));
 		}
-		agent.Interests.get()
-			.then((interestOptions) => {
-				setInterests(interestOptions);
-			})
-			.finally(() => setOptionsLoading(false));
 	}, [profile, getProfile]);
 
-	if (loading || optionsLoading) return <Loader active />;
+	if (loading ) return <Loader active />;
 
 	return (
 		<>
 			<FinalForm
-				onSubmit={onSubmit}
+				onSubmit={updateProfile}
 				initialValues={profile}
 				validate={formValidation.validateForm}
 				render={({ handleSubmit }) => (
