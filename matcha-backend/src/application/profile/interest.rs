@@ -36,3 +36,4 @@ pub async fn create(interests: Vec<String>) -> Result<Option<Vec<String>>, AppEr
 	existing_keys.append(&mut created_keys);
 	Ok(Some(existing_keys))
 }
+
