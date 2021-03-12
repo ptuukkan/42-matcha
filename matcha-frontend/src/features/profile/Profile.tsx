@@ -1,9 +1,8 @@
 import { Form as FinalForm, Field } from 'react-final-form';
-import { Form, Button, Divider, Dimmer, Loader } from 'semantic-ui-react';
+import { Form, Button, Divider, Loader } from 'semantic-ui-react';
 import agent from '../../app/api/agent';
-import { IProfileFormValues } from '../../app/models/profile';
 import TextInput from '../../app/common/form/TextInput';
-import React, { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import ShowPhotos from '../user/ShowPhotos';
 import SelectInput from '../../app/common/form/SelectInput';
 import MultiSelectInput from '../../app/common/form/MultiSelectInput';
@@ -22,22 +21,34 @@ const sexualPreference = [
 	{ key: 'female', text: 'Female', value: 'Female' },
 	{ key: 'male', text: 'Male', value: 'Male' },
 	{ key: 'other', text: 'Other', value: 'Other' },
-];	
+];
 
 const Profile = () => {
 	const [addPhotoMode, setaddPhotoMode] = useState(false);
+	const [interests, setInterests] = useState<IInterestOption[]>([]);
+	const [interestsLoading, setInterestsLoading] = useState(true);
 	const rootStore = useContext(RootStoreContext);
-	const { profile, loading, getProfile, removeImage, addImage, setMain, updateProfile, interests } = rootStore.profileStore;
+	const {
+		profile,
+		loading,
+		getProfile,
+		removeImage,
+		addImage,
+		setMain,
+		updateProfile,
+	} = rootStore.profileStore;
 
 	useEffect(() => {
 		if (!profile) {
-			getProfile()
-				.then()
-				.catch((e) => console.log(e));
+			getProfile().catch((e) => console.log(e));
 		}
+		agent.Interests.get()
+			.then((interests) => setInterests(interests))
+			.catch((error) => console.log(error))
+			.finally(() => setInterestsLoading(false));
 	}, [profile, getProfile]);
 
-	if (loading ) return <Loader active />;
+	if (!profile || interestsLoading) return <Loader active />;
 
 	return (
 		<>
@@ -45,7 +56,7 @@ const Profile = () => {
 				onSubmit={updateProfile}
 				initialValues={profile}
 				validate={formValidation.validateForm}
-				render={({ handleSubmit }) => (
+				render={({ handleSubmit, submitting }) => (
 					<Form onSubmit={handleSubmit} error>
 						<Form.Group widths={2}>
 							<Field
@@ -56,7 +67,7 @@ const Profile = () => {
 							<Field
 								component={TextInput}
 								name="lastName"
-								placeholder="First name"
+								placeholder="Last name"
 							/>
 						</Form.Group>
 						<Form.Group widths={2}>
@@ -86,7 +97,7 @@ const Profile = () => {
 								name="biography"
 							/>
 						</Form.Group>
-						<Button type="submit">Save</Button>
+						<Button content="save" loading={submitting} />
 					</Form>
 				)}
 			/>
@@ -98,9 +109,17 @@ const Profile = () => {
 				onClick={() => setaddPhotoMode(!addPhotoMode)}
 			/>
 			{addPhotoMode && profile ? (
-				<ProfilePhotos photoMode={setaddPhotoMode} addImage={addImage} loading={loading} />
+				<ProfilePhotos
+					photoMode={setaddPhotoMode}
+					addImage={addImage}
+					loading={loading}
+				/>
 			) : (
-				<ShowPhotos removeImage={removeImage} setMain={setMain} profile={profile} />
+				<ShowPhotos
+					removeImage={removeImage}
+					setMain={setMain}
+					profile={profile}
+				/>
 			)}
 		</>
 	);

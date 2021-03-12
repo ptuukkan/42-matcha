@@ -32,7 +32,7 @@ pub fn create_token(user: &User) -> Result<String, AppError> {
 	Ok(token)
 }
 
-pub fn decode_from_header(req: HttpRequest) -> Result<String, AppError> {
+pub fn decode_from_header(req: &HttpRequest) -> Result<String, AppError> {
 	if let Some(auth) = req.headers().get("Authorization") {
 		let key: String = env::var("SECRET")?;
 		if let Some(encoded_token) = auth.to_str()?.strip_prefix("Bearer ") {

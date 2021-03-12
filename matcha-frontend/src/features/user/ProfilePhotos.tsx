@@ -1,6 +1,5 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import { Button, Grid, Header } from 'semantic-ui-react';
-import agent from '../../app/api/agent';
 import PhotoCropper from '../../app/common/photoUpload/PhotoCropper';
 import AddPhoto from './AddPhoto';
 

@@ -1,7 +1,6 @@
 import { Validators } from "@lemoncode/fonk";
 import { createFinalFormValidation } from "@lemoncode/fonk-final-form";
 import { alphabetic } from "../../app/common/form/validators/alphabetic";
-import { passwordComplexity } from "../../app/common/form/validators/passwordComplexity";
 
 const validationSchema = {
 	field: {

@@ -1,13 +1,11 @@
 import { action, makeObservable, observable, runInAction } from 'mobx';
 import agent from '../api/agent';
-import { IInterestOption } from '../models/interest';
 import { IProfile, IProfileFormValues } from '../models/profile';
 import { RootStore } from './rootStore';
 
 export default class ProfileStore {
 	rootStore: RootStore;
 	loading = false;
-	interests: IInterestOption[] = [];
 	profile: IProfile | null = null;
 
 	constructor(rootStore: RootStore) {
@@ -15,11 +13,10 @@ export default class ProfileStore {
 		makeObservable(this, {
 			loading: observable,
 			profile: observable,
-			interests: observable,
 			getProfile: action,
 			removeImage: action,
 			stopLoading: action,
-			getInterests: action,
+			updateProfile: action,
 		});
 	}
 
@@ -31,7 +28,6 @@ export default class ProfileStore {
 		this.loading = true;
 		try {
 			const profile = await agent.Profile.current();
-			await this.getInterests();
 			runInAction(() => {
 				this.profile = profile;
 			});
@@ -42,10 +38,11 @@ export default class ProfileStore {
 		}
 	};
 
-	getInterests = async () => {
+	updateProfile = async (data: IProfileFormValues) => {
 		try {
-			const interests = await agent.Interests.get();
-			runInAction(() => (this.interests = interests));
+			console.log(data);
+			const profile = await agent.Profile.update(data);
+			runInAction(() => (this.profile = profile));
 		} catch (error) {
 			console.log(error);
 		}
@@ -57,7 +54,7 @@ export default class ProfileStore {
 				runInAction(
 					() =>
 						(this.profile!.images = this.profile!.images.filter(
-							(i) => i.id != id
+							(i) => i.id !== id
 						))
 				);
 			});
@@ -85,15 +82,6 @@ export default class ProfileStore {
 			agent.Profile.addImage(data).then((image) => {
 				runInAction(() => this.profile?.images.push(image));
 			});
-		} catch (error) {
-			console.log(error);
-		}
-	};
-
-	updateProfile = async (data: IProfileFormValues) => {
-		try {
-			await agent.Profile.update(data);
-			await this.getInterests();
 		} catch (error) {
 			console.log(error);
 		}

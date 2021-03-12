@@ -1,13 +1,10 @@
-import React, { Fragment, useContext, useEffect, useState } from 'react';
+import { Fragment, useContext, useEffect, useState } from 'react';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import Navigation from '../../features/nav/Navigation';
 import { Container, Dimmer, Loader } from 'semantic-ui-react';
 import Profiles from '../../testProfiles1.json';
 import Chat from '../../features/chat/Chat';
 import Profile from '../../features/profile/Profile';
-import Browse from '../../features/browse/Browse';
-import Research from '../../features/research/Research';
-import Matches from '../../features/matches/Matches';
 import Footer from '../../features/nav/Footer';
 import Login from '../../features/user/Login';
 import Register from '../../features/user/Register';
@@ -22,15 +19,15 @@ import { ToastContainer } from 'react-toastify';
 import AddPhoto from '../../features/user/AddPhoto';
 
 const App = () => {
-	const [profile, setProfile] = useState(Profiles.profiles[0]);
+	// const [profile, setProfile] = useState(Profiles.profiles[0]);
 	const [appLoaded, setAppLoaded] = useState(false);
 	const rootStore = useContext(RootStoreContext);
 	const { token, getUser, logoutUser, user } = rootStore.userStore;
 
-	const getRandomUser = () => {
-		let i = Math.floor(Math.random() * Profiles.profiles.length);
-		setProfile(Profiles.profiles[i]);
-	};
+	// const getRandomUser = () => {
+	// 	let i = Math.floor(Math.random() * Profiles.profiles.length);
+	// 	setProfile(Profiles.profiles[i]);
+	// };
 
 	useEffect(() => {
 		if (token) {

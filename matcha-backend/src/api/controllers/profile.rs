@@ -15,8 +15,8 @@ async fn update_profile(
 	req: HttpRequest,
 	values: Json<ProfileFormValues>,
 ) -> Result<HttpResponse, Error> {
-	profile::update(req, values.into_inner()).await?;
-	Ok(HttpResponse::Created().finish())
+	let profile = profile::update(req, values.into_inner()).await?;
+	Ok(HttpResponse::Ok().json(profile))
 }
 
 #[post("/profile/image")]

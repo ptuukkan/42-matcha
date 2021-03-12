@@ -8,7 +8,7 @@ use actix_web::HttpRequest;
 use std::convert::TryFrom;
 
 pub async fn create(req: HttpRequest, mut parts: awmp::Parts) -> Result<ImageDto, AppError> {
-	let user_key = jwt::decode_from_header(req)?;
+	let user_key = jwt::decode_from_header(&req)?;
 	let user = User::get(&user_key).await?;
 	if let Some(image_file) = parts.files.take("image").pop() {
 		let mut profile = user.get_profile().await?;
@@ -30,7 +30,7 @@ pub async fn create(req: HttpRequest, mut parts: awmp::Parts) -> Result<ImageDto
 }
 
 pub async fn set_main(req: HttpRequest, id: &str) -> Result<(), AppError> {
-	let user_key = jwt::decode_from_header(req)?;
+	let user_key = jwt::decode_from_header(&req)?;
 	let user = User::get(&user_key).await?;
 	let profile = user.get_profile().await?;
 	if !profile.images.contains(&id.to_owned()) {
@@ -49,7 +49,7 @@ pub async fn set_main(req: HttpRequest, id: &str) -> Result<(), AppError> {
 	Ok(())
 }
 pub async fn delete(req: HttpRequest, id: &str) -> Result<(), AppError> {
-	let user_key = jwt::decode_from_header(req)?;
+	let user_key = jwt::decode_from_header(&req)?;
 	let user = User::get(&user_key).await?;
 	let mut profile = user.get_profile().await?;
 	if !profile.images.contains(&id.to_owned()) {

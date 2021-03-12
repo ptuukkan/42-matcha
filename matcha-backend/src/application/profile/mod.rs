@@ -10,7 +10,7 @@ pub mod image;
 pub mod interest;
 
 pub async fn get_my(req: HttpRequest) -> Result<ProfileDto, AppError> {
-	let user_key = jwt::decode_from_header(req)?;
+	let user_key = jwt::decode_from_header(&req)?;
 	let user = User::get(&user_key).await?;
 	let profile = user.get_profile().await?;
 	let images = profile.get_images().await?;
@@ -22,13 +22,13 @@ pub async fn get_my(req: HttpRequest) -> Result<ProfileDto, AppError> {
 	Ok(profile_dto)
 }
 
-pub async fn update(req: HttpRequest, mut values: ProfileFormValues) -> Result<(), AppError> {
-	let user_key = jwt::decode_from_header(req)?;
+pub async fn update(req: HttpRequest, mut values: ProfileFormValues) -> Result<ProfileDto, AppError> {
+	let user_key = jwt::decode_from_header(&req)?;
 	let user = User::get(&user_key).await?;
 	let profile = user.get_profile().await?;
 	if let Some(interests) = values.interests {
 		values.interests = interest::create(interests).await?;
 	}
 	profile.update_from_form(&values).await?;
-	Ok(())
+	Ok(get_my(req).await?)
 }
