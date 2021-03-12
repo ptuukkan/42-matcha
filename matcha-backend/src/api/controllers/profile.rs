@@ -11,11 +11,11 @@ async fn get_my_profile(req: HttpRequest) -> Result<HttpResponse, Error> {
 }
 
 #[put("/profile")]
-async fn edit_profile(
+async fn update_profile(
 	req: HttpRequest,
 	values: Json<ProfileFormValues>,
 ) -> Result<HttpResponse, Error> {
-	profile::edit(req, values.into_inner()).await?;
+	profile::update(req, values.into_inner()).await?;
 	Ok(HttpResponse::Created().finish())
 }
 
@@ -46,7 +46,7 @@ async fn get_interests(req: HttpRequest) -> Result<HttpResponse, Error> {
 pub fn routes(config: &mut web::ServiceConfig) {
 	config
 		.service(get_my_profile)
-		.service(edit_profile)
+		.service(update_profile)
 		.service(create_image)
 		.service(set_main)
 		.service(delete_image)
