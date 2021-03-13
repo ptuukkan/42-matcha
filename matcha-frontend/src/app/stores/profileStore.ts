@@ -1,3 +1,4 @@
+import { FORM_ERROR } from 'final-form';
 import { action, makeObservable, observable, runInAction } from 'mobx';
 import agent from '../api/agent';
 import { IProfile, IProfileFormValues } from '../models/profile';
@@ -42,7 +43,7 @@ export default class ProfileStore {
 		try {
 			await agent.Profile.update(data);
 		} catch (error) {
-			console.log(error);
+			return { [FORM_ERROR]: error.message };
 		}
 	};
 

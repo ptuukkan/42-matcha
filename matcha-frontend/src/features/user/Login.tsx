@@ -58,7 +58,13 @@ const Login = () => {
 								{submitError && !dirtySinceLastSubmit && (
 									<ErrorMessage message={submitError} />
 								)}
-								<Button type="submit" primary loading={submitting} content="Login" />
+								<Button
+									type="submit"
+									primary
+									loading={submitting}
+									content="Login"
+									disabled={submitting}
+								/>
 								<Button
 									type="button"
 									floated="right"

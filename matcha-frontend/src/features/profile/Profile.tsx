@@ -2,7 +2,7 @@ import { Form as FinalForm, Field } from 'react-final-form';
 import { Form, Button, Divider, Loader } from 'semantic-ui-react';
 import agent from '../../app/api/agent';
 import TextInput from '../../app/common/form/TextInput';
-import { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import ShowPhotos from '../user/ShowPhotos';
 import SelectInput from '../../app/common/form/SelectInput';
 import MultiSelectInput from '../../app/common/form/MultiSelectInput';
@@ -11,6 +11,7 @@ import { observer } from 'mobx-react-lite';
 import ProfilePhotos from '../user/ProfilePhotos';
 import { formValidation } from './ProfileValidation';
 import { IInterestOption } from '../../app/models/interest';
+import ErrorMessage from '../../app/common/form/ErrorMessage';
 
 const gender = [
 	{ key: 'female', value: 'Female', text: 'Female' },
@@ -61,6 +62,8 @@ const Profile = () => {
 					handleSubmit,
 					submitting,
 					invalid,
+					submitError,
+					dirtySinceLastSubmit
 				}) => (
 					<Form onSubmit={handleSubmit} error>
 						<Form.Group widths={2}>
@@ -102,10 +105,13 @@ const Profile = () => {
 								name="biography"
 							/>
 						</Form.Group>
+						{submitError && !dirtySinceLastSubmit && (
+								<ErrorMessage message={submitError} />
+							)}
 						<Button
 							content="Save"
 							loading={submitting}
-							disabled={invalid || submitting}
+							disabled={submitting}
 						/>
 					</Form>
 				)}

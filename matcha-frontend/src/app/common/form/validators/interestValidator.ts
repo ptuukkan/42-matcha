@@ -14,7 +14,7 @@ export const interestValidator = (fieldValidatorArgs: FieldValidatorArgs) => {
 		message: '',
 	};
 
-	const regexp = new RegExp('^[a-z0-9\-_:\.]+$');
+	const regexp = new RegExp('^[a-z0-9-_:.]+$');
 
 	value.forEach((x) => {
 		if (!regexp.test(x)) {

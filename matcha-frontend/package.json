@@ -3,7 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@hookform/error-message": "0.0.5",
     "@lemoncode/fonk": "^1.5.1",
     "@lemoncode/fonk-final-form": "^2.3.4",
     "@testing-library/jest-dom": "^5.11.9",
