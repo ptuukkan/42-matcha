@@ -87,7 +87,7 @@ const Profile = () => {
 						<Form.Group widths="equal">
 							<Field
 								component={MultiSelectInput}
-								placeholder="interests"
+								placeholder="Interests"
 								name="interests"
 								options={interests}
 							/>
