@@ -67,7 +67,7 @@ export default class ProfileStore {
 			agent.Profile.imageToMain(id).then(() => {
 				runInAction(() => {
 					this.profile?.images.forEach((image) => {
-						image.id === id ? (image.isMain = true) : (image.isMain = false);
+						image.id === id ? (image.is_main = true) : (image.is_main = false);
 					});
 				});
 			});

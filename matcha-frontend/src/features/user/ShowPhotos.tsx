@@ -28,14 +28,14 @@ const ShowPhotos: React.FC<IProps> = ({ profile, removeImage, setMain }) => {
 							<Button.Group fluid widths={2}>
 								<Button
 									onClick={() => setMain(image.id)}
-									disabled={image.isMain}
+									disabled={image.is_main}
 									basic
 									positive
 									content="Main"
 								/>
 								<Button
 									onClick={() => removeImage(image.id)}
-									disabled={image.isMain}
+									disabled={image.is_main}
 									basic
 									negative
 									icon="trash"
