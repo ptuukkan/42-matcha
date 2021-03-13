@@ -22,7 +22,7 @@ pub async fn get_my(req: HttpRequest) -> Result<ProfileDto, AppError> {
 	Ok(profile_dto)
 }
 
-pub async fn update(req: HttpRequest, mut values: ProfileFormValues) -> Result<ProfileDto, AppError> {
+pub async fn update(req: HttpRequest, mut values: ProfileFormValues) -> Result<(), AppError> {
 	let user_key = jwt::decode_from_header(&req)?;
 	let user = User::get(&user_key).await?;
 	let profile = user.get_profile().await?;
@@ -30,5 +30,5 @@ pub async fn update(req: HttpRequest, mut values: ProfileFormValues) -> Result<P
 		values.interests = interest::create(interests).await?;
 	}
 	profile.update_from_form(&values).await?;
-	Ok(get_my(req).await?)
+	Ok(())
 }

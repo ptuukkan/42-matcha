@@ -40,9 +40,7 @@ export default class ProfileStore {
 
 	updateProfile = async (data: IProfileFormValues) => {
 		try {
-			console.log(data);
-			const profile = await agent.Profile.update(data);
-			runInAction(() => (this.profile = profile));
+			await agent.Profile.update(data);
 		} catch (error) {
 			console.log(error);
 		}

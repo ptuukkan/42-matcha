@@ -8,10 +8,8 @@ use std::env;
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct Interest {
-	#[serde(skip_serializing)]
 	#[serde(rename = "_key")]
 	pub key: String,
-	pub name: String,
 }
 
 impl Interest {
@@ -76,8 +74,7 @@ impl Interest {
 impl From<&String> for Interest {
 	fn from(name: &String) -> Self {
 		Self {
-			key: String::new(),
-			name: name.to_owned(),
+			key: name.to_owned(),
 		}
 	}
 }
@@ -91,8 +88,8 @@ pub struct InterestDto {
 impl From<Interest> for InterestDto {
 	fn from(interest: Interest) -> Self {
 		Self {
-			value: interest.key,
-			text: interest.name,
+			value: interest.key.to_owned(),
+			text: interest.key,
 		}
 	}
 }

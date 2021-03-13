@@ -71,7 +71,7 @@ const User = {
 };
 
 const Profile = {
-	update: (data: IProfileFormValues): Promise<IProfile> =>
+	update: (data: IProfileFormValues): Promise<void> =>
 		requests.put('/profile', data),
 	addImage: (data: FormData): Promise<IImage> =>
 		requests.post('/profile/image', data),

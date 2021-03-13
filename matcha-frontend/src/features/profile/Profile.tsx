@@ -26,7 +26,7 @@ const sexualPreference = [
 const Profile = () => {
 	const [addPhotoMode, setaddPhotoMode] = useState(false);
 	const [interests, setInterests] = useState<IInterestOption[]>([]);
-	const [interestsLoading, setInterestsLoading] = useState(true);
+	const [interestsLoading, setInterestsLoading] = useState(false);
 	const rootStore = useContext(RootStoreContext);
 	const {
 		profile,
@@ -42,6 +42,7 @@ const Profile = () => {
 		if (!profile) {
 			getProfile().catch((e) => console.log(e));
 		}
+		setInterestsLoading(true);
 		agent.Interests.get()
 			.then((interests) => setInterests(interests))
 			.catch((error) => console.log(error))
@@ -56,7 +57,11 @@ const Profile = () => {
 				onSubmit={updateProfile}
 				initialValues={profile}
 				validate={formValidation.validateForm}
-				render={({ handleSubmit, submitting }) => (
+				render={({
+					handleSubmit,
+					submitting,
+					invalid,
+				}) => (
 					<Form onSubmit={handleSubmit} error>
 						<Form.Group widths={2}>
 							<Field
@@ -97,7 +102,11 @@ const Profile = () => {
 								name="biography"
 							/>
 						</Form.Group>
-						<Button content="save" loading={submitting} />
+						<Button
+							content="Save"
+							loading={submitting}
+							disabled={invalid || submitting}
+						/>
 					</Form>
 				)}
 			/>

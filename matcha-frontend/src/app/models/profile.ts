@@ -16,12 +16,12 @@ export interface IProfile {
 }
 
 export interface IProfileFormValues {
-	firstName: String;
-	lastName: String;
-	gender: String;
-	biography: String,
-	sexualPreference: String;
-	interests: String[];
+	firstName: string;
+	lastName: string;
+	gender: string;
+	biography: string,
+	sexualPreference: string;
+	interests: string[];
 }
 
 export interface ILocation {

@@ -1,6 +1,7 @@
 import { Validators } from "@lemoncode/fonk";
 import { createFinalFormValidation } from "@lemoncode/fonk-final-form";
 import { alphabetic } from "../../app/common/form/validators/alphabetic";
+import { interestValidator } from "../../app/common/form/validators/interestValidator";
 
 const validationSchema = {
 	field: {
@@ -32,6 +33,9 @@ const validationSchema = {
 			},
 			alphabetic,
 		],
+		interests :[
+			interestValidator
+		]
 	},
 };
 
