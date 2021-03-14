@@ -26,14 +26,14 @@ const ProfileImagesDisplay: React.FC<IProps> = ({ profile, removeImage, setMain 
 							<Button.Group fluid widths={2}>
 								<Button
 									onClick={() => setMain(image.id)}
-									disabled={image.is_main}
+									disabled={image.isMain}
 									basic
 									positive
 									content="Main"
 								/>
 								<Button
 									onClick={() => removeImage(image.id)}
-									disabled={image.is_main}
+									disabled={image.isMain}
 									basic
 									negative
 									icon="trash"

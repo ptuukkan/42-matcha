@@ -16,6 +16,7 @@ import EmailVerification from '../../features/user/EmailVerification';
 import LandingNavigation from '../../features/home/LandingNavigation';
 import ChangePassword from '../../features/user/ChangePassword';
 import { ToastContainer } from 'react-toastify';
+import ProfilePage from '../../features/profile/ProfilePage';
 
 const App = () => {
 	// const [profile, setProfile] = useState(Profiles.profiles[0]);
@@ -79,12 +80,10 @@ const App = () => {
 					<Fragment>
 						<Navigation logout={logout} />
 						<Switch>
-							<Route exact path="/" component={Profile}>
-
-{/* 								<Browse getProfile={getRandomUser} profile={profile} />
- */}							</Route>
+							<Route exact path="/" component={ProfilePage}/>
+							<Route exact path="/profile" component={ProfilePage} />
 							<Route exact path="/chat" component={Chat} />
-							<Route exact path="/profile" component={Profile} />
+							<Route exact path="/profileForm" component={Profile} />
 							<Route exact path="/matches">
 {/* 								<Matches profiles={Profiles.profiles} /> */}
 							</Route>

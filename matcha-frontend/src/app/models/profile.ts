@@ -33,7 +33,7 @@ export interface ILocation {
 export interface IImage {
 	id: string;
 	url: string;
-	is_main: boolean;
+	isMain: boolean;
 }
 
 export enum SexualPreference {
