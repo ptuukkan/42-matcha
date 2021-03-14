@@ -54,6 +54,7 @@ impl Image {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
 pub struct ImageDto {
 	id: String,
 	url: String,

@@ -11,11 +11,11 @@ const MultiSelectInput: React.FC<IProps> = ({
 	width,
 	options,
 	placeholder,
-	meta: { touched, error },
+	meta: { modified, error },
 }) => {
 	const [interests, setInterests] = useState(options);
 	return (
-		<Form.Field error={touched && !!error} width={width}>
+		<Form.Field error={modified && !!error} width={width}>
 			<label>{placeholder}</label>
 			<Dropdown
 				value={input.value || []}
@@ -32,7 +32,7 @@ const MultiSelectInput: React.FC<IProps> = ({
 					setInterests(interests.concat({ text: value, value }))
 				}
 			/>
-			{touched && error && (
+			{modified && error && (
 				<Label basic color="red">
 					{error}
 				</Label>

@@ -22,7 +22,7 @@ const SelectInput: React.FC<IProps> = ({
 				placeholder={placeholder}
 				options={options}
 				selection
-			/> 
+			/>
 			{touched && error && (
 				<Label basic color="red">
 					{error}

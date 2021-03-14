@@ -43,12 +43,14 @@ const Profile = () => {
 		if (!profile) {
 			getProfile().catch((e) => console.log(e));
 		}
-		setInterestsLoading(true);
-		agent.Interests.get()
-			.then((interests) => setInterests(interests))
-			.catch((error) => console.log(error))
-			.finally(() => setInterestsLoading(false));
-	}, [profile, getProfile]);
+		if (interests.length === 0) {
+			setInterestsLoading(true);
+			agent.Interests.get()
+				.then((interests) => setInterests(interests))
+				.catch((error) => console.log(error))
+				.finally(() => setInterestsLoading(false));
+		}
+	}, [profile, getProfile, interests.length]);
 
 	if (!profile || interestsLoading) return <Loader active />;
 
@@ -61,9 +63,8 @@ const Profile = () => {
 				render={({
 					handleSubmit,
 					submitting,
-					invalid,
 					submitError,
-					dirtySinceLastSubmit
+					dirtySinceLastSubmit,
 				}) => (
 					<Form onSubmit={handleSubmit} error>
 						<Form.Group widths={2}>
@@ -106,13 +107,9 @@ const Profile = () => {
 							/>
 						</Form.Group>
 						{submitError && !dirtySinceLastSubmit && (
-								<ErrorMessage message={submitError} />
-							)}
-						<Button
-							content="Save"
-							loading={submitting}
-							disabled={submitting}
-						/>
+							<ErrorMessage message={submitError} />
+						)}
+						<Button content="Save" loading={submitting} disabled={submitting} />
 					</Form>
 				)}
 			/>
