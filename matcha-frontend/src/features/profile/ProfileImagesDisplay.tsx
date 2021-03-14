@@ -9,7 +9,7 @@ interface IProps {
 	setMain: (id: string) => void;
 }
 
-const ShowPhotos: React.FC<IProps> = ({ profile, removeImage, setMain }) => {
+const ProfileImagesDisplay: React.FC<IProps> = ({ profile, removeImage, setMain }) => {
 	return (
 		<Grid.Column width={16}>
 			<Grid.Row columns={6}>
@@ -23,8 +23,6 @@ const ShowPhotos: React.FC<IProps> = ({ profile, removeImage, setMain }) => {
 								wrapped
 								ui={false}
 							/>
-							<CardContent />
-
 							<Button.Group fluid widths={2}>
 								<Button
 									onClick={() => setMain(image.id)}
@@ -49,4 +47,4 @@ const ShowPhotos: React.FC<IProps> = ({ profile, removeImage, setMain }) => {
 	);
 };
 
-export default observer(ShowPhotos);
+export default observer(ProfileImagesDisplay);

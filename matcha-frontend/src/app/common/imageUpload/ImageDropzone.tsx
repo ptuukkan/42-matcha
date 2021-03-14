@@ -19,7 +19,7 @@ const dropzoneActive = {
 	borderColor: 'green',
 };
 
-const AddPhoto: React.FC<IProps> = ({ setFiles }) => {
+const ImageDropzone: React.FC<IProps> = ({ setFiles }) => {
 	const onDrop = useCallback(
 		(acceptedFiles) => {
 			setFiles(
@@ -51,4 +51,4 @@ const AddPhoto: React.FC<IProps> = ({ setFiles }) => {
 	);
 };
 
-export default AddPhoto;
+export default ImageDropzone;

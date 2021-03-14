@@ -1,16 +1,16 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import { Button, Grid, Header } from 'semantic-ui-react';
-import PhotoCropper from '../../app/common/photoUpload/PhotoCropper';
-import AddPhoto from './AddPhoto';
+import ImageCropper from './ImageCropper';
+import ImageDropzone from './ImageDropzone';
 
-export interface ProfilePhotosProps {
+export interface IProps {
 	loading: boolean;
-	photoMode: (value: boolean) => void;
+	setAddImageMode: (value: boolean) => void;
 	addImage: (data: FormData) => void;
 
 }
 
-const ProfilePhotos: React.FC<ProfilePhotosProps> = ({ loading, photoMode, addImage }) => {
+const ImageUpload: React.FC<IProps> = ({ loading, setAddImageMode, addImage }) => {
 	const [files, setFiles] = useState<any[]>([]);
 	const [image, setImage] = useState<Blob | null>(null);
 
@@ -21,17 +21,17 @@ const ProfilePhotos: React.FC<ProfilePhotosProps> = ({ loading, photoMode, addIm
 	});
 
 	return (
-		<div>
+		<Fragment>
 			<Grid>
 				<Grid.Column width={4}>
 					<Header sub color="pink" content="Step 1 - Add image" />
-					<AddPhoto setFiles={setFiles} />
+					<ImageDropzone setFiles={setFiles} />
 				</Grid.Column>
 				<Grid.Column width={1} />
 				<Grid.Column width={4}>
 					<Header sub color="pink" content="Step 2 - Resize image" />
 					{files.length > 0 && (
-						<PhotoCropper setImage={setImage} imagePreview={files[0].preview} />
+						<ImageCropper setImage={setImage} imagePreview={files[0].preview} />
 					)}
 				</Grid.Column>
 				<Grid.Column width={1} />
@@ -43,7 +43,7 @@ const ProfilePhotos: React.FC<ProfilePhotosProps> = ({ loading, photoMode, addIm
 								className="img-preview"
 								style={{ minHeight: '200px', overflow: 'hidden' }}
 							/>
-							<Button.Group widths={2}>
+							<Button.Group widths={4} style={{width: "200px"}}>
 								<Button
 									positive
 									icon="check"
@@ -52,7 +52,7 @@ const ProfilePhotos: React.FC<ProfilePhotosProps> = ({ loading, photoMode, addIm
 										let fd = new FormData()
 										fd.append('image', image!)
 										addImage(fd)
-										photoMode(false)
+										setAddImageMode(false)
 									}
 									}
 								/>
@@ -66,8 +66,8 @@ const ProfilePhotos: React.FC<ProfilePhotosProps> = ({ loading, photoMode, addIm
 					)}
 				</Grid.Column>
 			</Grid>
-		</div>
+		</Fragment>
 	);
 };
 
-export default ProfilePhotos;
+export default ImageUpload;

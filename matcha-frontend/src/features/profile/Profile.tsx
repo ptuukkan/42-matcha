@@ -2,16 +2,15 @@ import { Form as FinalForm, Field } from 'react-final-form';
 import { Form, Button, Divider, Loader } from 'semantic-ui-react';
 import agent from '../../app/api/agent';
 import TextInput from '../../app/common/form/TextInput';
-import React, { useContext, useEffect, useState } from 'react';
-import ShowPhotos from '../user/ShowPhotos';
+import { useContext, useEffect, useState } from 'react';
 import SelectInput from '../../app/common/form/SelectInput';
 import MultiSelectInput from '../../app/common/form/MultiSelectInput';
 import { RootStoreContext } from '../../app/stores/rootStore';
 import { observer } from 'mobx-react-lite';
-import ProfilePhotos from '../user/ProfilePhotos';
 import { formValidation } from './ProfileValidation';
 import { IInterestOption } from '../../app/models/interest';
 import ErrorMessage from '../../app/common/form/ErrorMessage';
+import ProfileImages from './ProfileImages';
 
 const gender = [
 	{ key: 'female', value: 'Female', text: 'Female' },
@@ -25,19 +24,10 @@ const sexualPreference = [
 ];
 
 const Profile = () => {
-	const [addPhotoMode, setaddPhotoMode] = useState(false);
 	const [interests, setInterests] = useState<IInterestOption[]>([]);
 	const [interestsLoading, setInterestsLoading] = useState(false);
 	const rootStore = useContext(RootStoreContext);
-	const {
-		profile,
-		loading,
-		getProfile,
-		removeImage,
-		addImage,
-		setMain,
-		updateProfile,
-	} = rootStore.profileStore;
+	const { profile, getProfile, updateProfile } = rootStore.profileStore;
 
 	useEffect(() => {
 		if (!profile) {
@@ -114,25 +104,7 @@ const Profile = () => {
 				)}
 			/>
 			<Divider />
-			<Button
-				floated="right"
-				basic
-				content={addPhotoMode ? 'Cancel' : 'Add Photo'}
-				onClick={() => setaddPhotoMode(!addPhotoMode)}
-			/>
-			{addPhotoMode && profile ? (
-				<ProfilePhotos
-					photoMode={setaddPhotoMode}
-					addImage={addImage}
-					loading={loading}
-				/>
-			) : (
-				<ShowPhotos
-					removeImage={removeImage}
-					setMain={setMain}
-					profile={profile}
-				/>
-			)}
+			<ProfileImages />
 		</>
 	);
 };
