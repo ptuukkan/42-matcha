@@ -1,7 +1,8 @@
-import { Validators } from "@lemoncode/fonk";
-import { createFinalFormValidation } from "@lemoncode/fonk-final-form";
-import { alphabetic } from "../../app/common/form/validators/alphabetic";
-import { interestValidator } from "../../app/common/form/validators/interestValidator";
+import { Validators } from '@lemoncode/fonk';
+import { createFinalFormValidation } from '@lemoncode/fonk-final-form';
+import { alphabetic } from '../../app/common/form/validators/alphabetic';
+import { interestValidator } from '../../app/common/form/validators/interestValidator';
+import { arrayRequired } from '@lemoncode/fonk-array-required-validator';
 
 const validationSchema = {
 	field: {
@@ -33,9 +34,10 @@ const validationSchema = {
 			},
 			alphabetic,
 		],
-		interests :[
-			interestValidator
-		]
+		interests: [interestValidator, arrayRequired.validator],
+		biography: [Validators.required.validator],
+		gender: [Validators.required.validator],
+		sexualPreference: [Validators.required.validator],
 	},
 };
 

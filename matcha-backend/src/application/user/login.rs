@@ -14,7 +14,7 @@ pub async fn login(values: LoginFormValues) -> Result<LoginResponse, AppError> {
 			return Err(AppError::unauthorized("Please verify your account!"));
 		}
 		let token = jwt::create_token(&user)?;
-		Ok(user.login_response(&token))
+		Ok(user.login_response(&token).await?)
 	} else {
 		return Err(AppError::unauthorized("Login failed"));
 	}

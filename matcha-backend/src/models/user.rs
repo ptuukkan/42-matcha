@@ -67,7 +67,7 @@ pub struct ResetPasswordValues {
 pub struct LoginResponse {
 	email_address: String,
 	pub token: String,
-	has_profile: bool,
+	profile_complete: bool,
 }
 
 impl User {
@@ -89,12 +89,13 @@ impl User {
 		Ok(())
 	}
 
-	pub fn login_response(&self, token: &str) -> LoginResponse {
-		LoginResponse {
+	pub async fn login_response(&self, token: &str) -> Result<LoginResponse, AppError> {
+		let profile = self.get_profile().await?;
+		Ok(LoginResponse {
 			email_address: self.email_address.to_owned(),
 			token: token.to_owned(),
-			has_profile: false,
-		}
+			profile_complete: profile.is_complete(),
+		})
 	}
 
 	fn url() -> Result<String, AppError> {

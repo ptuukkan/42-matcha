@@ -99,6 +99,13 @@ impl Profile {
 			Err(AppError::internal("No images found"))
 		}
 	}
+
+	pub fn is_complete(&self) -> bool {
+		self.gender.is_some()
+			&& self.biography.is_some()
+			&& !self.images.is_empty()
+			&& !self.interests.is_empty()
+	}
 }
 
 impl From<&RegisterFormValues> for Profile {

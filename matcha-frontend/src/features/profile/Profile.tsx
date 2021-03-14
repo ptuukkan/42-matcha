@@ -21,7 +21,7 @@ const gender = [
 const sexualPreference = [
 	{ key: 'female', text: 'Female', value: 'Female' },
 	{ key: 'male', text: 'Male', value: 'Male' },
-	{ key: 'other', text: 'Other', value: 'Other' },
+	{ key: 'both', text: 'Both', value: 'Both' },
 ];
 
 const Profile = () => {

@@ -1,10 +1,7 @@
 export interface IUser {
-	firstName: string;
-	lastName: string;
 	emailAddress: string;
-	username: string;
 	token: string;
-	hasProfile: boolean
+	profileComplete: boolean
 }
 
 
