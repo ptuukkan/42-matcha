@@ -10,6 +10,7 @@ struct Jwt {
 	token: String,
 }
 
+#[allow(dead_code)]
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct ArangoResponseError {

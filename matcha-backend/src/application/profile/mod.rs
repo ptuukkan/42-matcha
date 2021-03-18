@@ -1,3 +1,4 @@
+use crate::models::profile::Profile;
 use crate::errors::AppError;
 use crate::infrastructure::security::jwt;
 use crate::models::image::ImageDto;
@@ -31,4 +32,14 @@ pub async fn update(req: HttpRequest, mut values: ProfileFormValues) -> Result<(
 	}
 	profile.update_from_form(&values).await?;
 	Ok(())
+}
+
+pub async fn get(user: User, id: &str) -> Result<ProfileDto, AppError> {
+	let profile = Profile::get(id).await?;
+	if !profile.is_complete() {
+		return Err(AppError::not_found("Profile not found"));
+	}
+	println!("{:?}", user);
+
+	Ok(ProfileDto::from(profile))
 }

@@ -1,5 +1,6 @@
 use crate::application::profile;
 use crate::models::profile::ProfileFormValues;
+use crate::models::user::User;
 use actix_web::web::{Json, Path};
 use actix_web::{delete, get, post, put, web, HttpResponse};
 use actix_web::{error::Error, HttpRequest};
@@ -7,6 +8,12 @@ use actix_web::{error::Error, HttpRequest};
 #[get("/profile")]
 async fn get_my_profile(req: HttpRequest) -> Result<HttpResponse, Error> {
 	let profile = profile::get_my(req).await?;
+	Ok(HttpResponse::Ok().json(profile))
+}
+
+#[get("/profile/{id}")]
+async fn get_profile(user: User, Path(id): Path<String>) -> Result<HttpResponse, Error> {
+	let profile = profile::get(user, &id).await?;
 	Ok(HttpResponse::Ok().json(profile))
 }
 
@@ -46,6 +53,7 @@ async fn get_interests(req: HttpRequest) -> Result<HttpResponse, Error> {
 pub fn routes(config: &mut web::ServiceConfig) {
 	config
 		.service(get_my_profile)
+		.service(get_profile)
 		.service(update_profile)
 		.service(create_image)
 		.service(set_main)

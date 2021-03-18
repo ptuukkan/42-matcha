@@ -18,7 +18,7 @@ pub async fn init() {
 		database::api::delete("http://localhost:8529/_api/database/matcha_test")
 			.await
 			.expect("Failed to delete test db");
-		database::setup::arango_setup().await;
+		database::setup::arango_setup().await.expect("DB setup failed");
 		let bob = models::user::User::new(
 			"bob.matthews@email.com",
 			"Password123!",

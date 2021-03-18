@@ -1,12 +1,17 @@
 use crate::database::api;
 use crate::database::cursor::CursorRequest;
 use crate::errors::AppError;
-use crate::models::profile::{Profile};
+use crate::infrastructure::security::jwt;
+use crate::models::base::CreateResponse;
+use crate::models::profile::Profile;
+use actix_web::{dev, FromRequest, HttpRequest};
 use actix_web_validator::Validate;
+use core::future::Future;
 use nanoid::nanoid;
 use serde::{Deserialize, Serialize};
 use sodiumoxide::crypto::pwhash::argon2id13;
 use std::env;
+use std::pin::Pin;
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -19,13 +24,6 @@ pub struct User {
 	password: String,
 	pub link: Option<String>,
 	pub profile: String,
-}
-
-#[derive(Deserialize, Debug)]
-struct CreateUserResponse {
-	_id: String,
-	_key: String,
-	_rev: String,
 }
 
 #[derive(Deserialize, Debug, Validate)]
@@ -108,7 +106,7 @@ impl User {
 	}
 
 	pub async fn create(&self) -> Result<(), AppError> {
-		api::post::<Self, CreateUserResponse>(&Self::url()?, &self).await?;
+		api::post::<Self, CreateResponse>(&Self::url()?, &self).await?;
 		Ok(())
 	}
 
@@ -180,5 +178,27 @@ impl From<&RegisterFormValues> for User {
 			link: Some(nanoid!(10, &nanoid::alphabet::SAFE)),
 			profile: String::new(),
 		}
+	}
+}
+
+impl FromRequest for User {
+	type Error = AppError;
+	type Future = Pin<Box<dyn Future<Output = Result<Self, Self::Error>>>>;
+	type Config = ();
+
+	fn from_request(req: &HttpRequest, _payload: &mut dev::Payload) -> Self::Future {
+		let key = jwt::decode_from_header(req);
+		if key.is_err() {
+			return Box::pin(async { Err(AppError::bad_request("invalid token")) });
+		}
+		let key = key.unwrap();
+		Box::pin(async move {
+			let user = User::get(&key).await;
+			if user.is_err() {
+				return Err(AppError::unauthorized("user not found"));
+			}
+			let user = user.unwrap();
+			Ok(user)
+		})
 	}
 }

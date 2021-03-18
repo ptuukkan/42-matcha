@@ -20,6 +20,9 @@ pub enum AppError {
 
 	#[display(fmt = "bad request error")]
 	BadRequestError(BadRequestError),
+
+	#[display(fmt = "not found error")]
+	NotFoundError(NotFoundError),
 }
 
 #[derive(Serialize, Debug)]
@@ -28,6 +31,7 @@ pub enum AppErrorType {
 	InternalError,
 	UnauthorizedError,
 	BadRequestError,
+	NotFoundError,
 }
 
 #[derive(Serialize, Debug)]
@@ -56,6 +60,12 @@ pub struct BadRequestError {
 
 #[derive(Serialize, Debug)]
 pub struct UnauthorizedError {
+	error_type: AppErrorType,
+	message: String,
+}
+
+#[derive(Serialize, Debug)]
+pub struct NotFoundError {
 	error_type: AppErrorType,
 	message: String,
 }
@@ -104,6 +114,10 @@ impl AppError {
 	pub fn bad_request(text: &str) -> AppError {
 		AppError::BadRequestError(BadRequestError::from(text))
 	}
+
+	pub fn not_found(text: &str) -> AppError {
+		AppError::NotFoundError(NotFoundError::from(text))
+	}
 }
 
 impl ResponseError for AppError {
@@ -113,6 +127,7 @@ impl ResponseError for AppError {
 			AppError::InternalError(_) => StatusCode::INTERNAL_SERVER_ERROR,
 			AppError::UnauthorizedError(_) => StatusCode::UNAUTHORIZED,
 			AppError::BadRequestError(_) => StatusCode::BAD_REQUEST,
+			AppError::NotFoundError(_) => StatusCode::NOT_FOUND,
 		}
 	}
 
@@ -128,6 +143,9 @@ impl ResponseError for AppError {
 				.set_header(header::CONTENT_TYPE, "application/json")
 				.json(e),
 			AppError::BadRequestError(e) => HttpResponseBuilder::new(self.status_code())
+				.set_header(header::CONTENT_TYPE, "application/json")
+				.json(e),
+			AppError::NotFoundError(e) => HttpResponseBuilder::new(self.status_code())
 				.set_header(header::CONTENT_TYPE, "application/json")
 				.json(e),
 		}
@@ -156,6 +174,24 @@ impl From<&str> for BadRequestError {
 	fn from(text: &str) -> Self {
 		Self {
 			error_type: AppErrorType::BadRequestError,
+			message: text.to_owned(),
+		}
+	}
+}
+
+impl From<&str> for NotFoundError {
+	fn from(text: &str) -> Self {
+		Self {
+			error_type: AppErrorType::NotFoundError,
+			message: text.to_owned(),
+		}
+	}
+}
+
+impl From<&str> for UnauthorizedError {
+	fn from(text: &str) -> Self {
+		Self {
+			error_type: AppErrorType::UnauthorizedError,
 			message: text.to_owned(),
 		}
 	}
@@ -215,8 +251,10 @@ impl From<lettre::sendmail::error::Error> for AppError {
 impl From<jsonwebtoken::errors::Error> for AppError {
 	fn from(from_error: jsonwebtoken::errors::Error) -> Self {
 		match from_error.kind() {
-			jsonwebtoken::errors::ErrorKind::ExpiredSignature => Self::unauthorized("Token expired"),
-			_ => Self::InternalError(InternalError::from(from_error.to_string()))
+			jsonwebtoken::errors::ErrorKind::ExpiredSignature => {
+				Self::unauthorized("Token expired")
+			}
+			_ => Self::InternalError(InternalError::from(from_error.to_string())),
 		}
 	}
 }
@@ -250,13 +288,3 @@ impl From<std::io::Error> for AppError {
 		Self::InternalError(InternalError::from(from_error.to_string()))
 	}
 }
-
-impl From<&str> for UnauthorizedError {
-	fn from(text: &str) -> Self {
-		Self {
-			error_type: AppErrorType::UnauthorizedError,
-			message: text.to_owned(),
-		}
-	}
-}
-

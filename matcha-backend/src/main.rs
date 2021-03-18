@@ -32,7 +32,7 @@ async fn seed() -> impl Responder {
 async fn main() -> std::io::Result<()> {
 	dotenv().ok();
 	env_logger::init();
-	database::setup::arango_setup().await;
+	database::setup::arango_setup().await.expect("DB setup failed");
 	fs::create_dir_all("images")?;
 	let server = HttpServer::new(|| {
 		App::new()
