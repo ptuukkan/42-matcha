@@ -45,7 +45,6 @@ export default class UserStore {
 	registerUser = async (data: IRegisterFormValues) => {
 		try {
 			await agent.User.register(data);
-			this.rootStore.modalStore.openRegisterFinish();
 		} catch (error) {
 			if (error.error_type === 'ValidationError') {
 				return error.errors.reduce((obj: any, item: IValidationError) => {
@@ -64,7 +63,7 @@ export default class UserStore {
 				this.user = user;
 			});
 			this.setToken(user.token);
-			this.rootStore.modalStore.closeLogin();
+			this.rootStore.modalStore.closeModal();
 			history.push('/');
 		} catch (error) {
 			return { [FORM_ERROR]: error.message };

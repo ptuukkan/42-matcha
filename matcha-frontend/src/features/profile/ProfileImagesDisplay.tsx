@@ -1,20 +1,32 @@
 import { observer } from 'mobx-react-lite';
+import React from 'react';
 
-import { Image, Button, Card, Grid, CardContent } from 'semantic-ui-react';
+import {
+	Image,
+	Button,
+	Card,
+	Grid,
+	CardContent,
+	Icon,
+} from 'semantic-ui-react';
 import { IProfile } from '../../app/models/profile';
 
 interface IProps {
-	profile: IProfile | null;
+	profile: IProfile;
 	removeImage: (id: string) => void;
 	setMain: (id: string) => void;
 }
 
-const ProfileImagesDisplay: React.FC<IProps> = ({ profile, removeImage, setMain }) => {
+const ProfileImagesDisplay: React.FC<IProps> = ({
+	profile,
+	removeImage,
+	setMain,
+}) => {
 	return (
 		<Grid.Column width={16}>
 			<Grid.Row columns={6}>
 				<Card.Group itemsPerRow={5}>
-					{profile?.images.map((image) => (
+					{profile.images.map((image) => (
 						<Card key={image.id}>
 							<Image
 								size="tiny"

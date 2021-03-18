@@ -1,5 +1,5 @@
-import { Fragment, useContext, useState } from 'react';
-import { Button } from 'semantic-ui-react';
+import React, { Fragment, useContext, useState } from 'react';
+import { Button, Grid, Header } from 'semantic-ui-react';
 import { RootStoreContext } from '../../app/stores/rootStore';
 import ProfileImagesDisplay from './ProfileImagesDisplay';
 import ImageUpload from '../../app/common/imageUpload/ImageUpload';
@@ -17,12 +17,21 @@ const ProfileImages = () => {
 
 	return (
 		<Fragment>
-			<Button
-				floated="right"
-				basic
-				content={addImageMode ? 'Cancel' : 'Add Photo'}
-				onClick={() => setAddImageMode(!addImageMode)}
-			/>
+			<Grid columns="equal">
+				<Grid.Column>
+					<Header size="large" color="pink" content="Your images" />
+				</Grid.Column>
+				<Grid.Column>
+					<Button
+						floated="right"
+						type="button"
+						primary
+						content={addImageMode ? 'Cancel' : 'Add Photo'}
+						onClick={() => setAddImageMode(!addImageMode)}
+					/>
+				</Grid.Column>
+			</Grid>
+
 			{addImageMode && profile ? (
 				<ImageUpload
 					setAddImageMode={setAddImageMode}
@@ -33,7 +42,7 @@ const ProfileImages = () => {
 				<ProfileImagesDisplay
 					removeImage={removeImage}
 					setMain={setMain}
-					profile={profile}
+					profile={profile!}
 				/>
 			)}
 		</Fragment>

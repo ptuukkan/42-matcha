@@ -1,16 +1,16 @@
 import { Form as FinalForm, Field } from 'react-final-form';
-import { Form, Button, Divider, Loader } from 'semantic-ui-react';
+import { Form, Button, Divider, Loader, Header } from 'semantic-ui-react';
 import agent from '../../app/api/agent';
 import TextInput from '../../app/common/form/TextInput';
-import { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import SelectInput from '../../app/common/form/SelectInput';
 import MultiSelectInput from '../../app/common/form/MultiSelectInput';
-import { RootStoreContext } from '../../app/stores/rootStore';
 import { observer } from 'mobx-react-lite';
 import { formValidation } from './ProfileValidation';
 import { IInterestOption } from '../../app/models/interest';
 import ErrorMessage from '../../app/common/form/ErrorMessage';
 import ProfileImages from './ProfileImages';
+import { IProfile, IProfileFormValues } from '../../app/models/profile';
 
 const gender = [
 	{ key: 'female', value: 'Female', text: 'Female' },
@@ -23,16 +23,16 @@ const sexualPreference = [
 	{ key: 'both', text: 'Both', value: 'Both' },
 ];
 
-const Profile = () => {
+interface IProps {
+	profile: IProfile;
+	updateProfile: (data: IProfileFormValues) => Promise<void | any>;
+}
+
+const ProfileForm: React.FC<IProps> = ({ profile, updateProfile }) => {
 	const [interests, setInterests] = useState<IInterestOption[]>([]);
 	const [interestsLoading, setInterestsLoading] = useState(false);
-	const rootStore = useContext(RootStoreContext);
-	const { profile, getProfile, updateProfile } = rootStore.profileStore;
 
 	useEffect(() => {
-		if (!profile) {
-			getProfile().catch((e) => console.log(e));
-		}
 		if (interests.length === 0) {
 			setInterestsLoading(true);
 			agent.Interests.get()
@@ -40,9 +40,7 @@ const Profile = () => {
 				.catch((error) => console.log(error))
 				.finally(() => setInterestsLoading(false));
 		}
-	}, [profile, getProfile, interests.length]);
-
-	if (!profile || interestsLoading) return <Loader active />;
+	}, [interests.length]);
 
 	return (
 		<>
@@ -56,7 +54,8 @@ const Profile = () => {
 					submitError,
 					dirtySinceLastSubmit,
 				}) => (
-					<Form onSubmit={handleSubmit} error>
+					<Form onSubmit={handleSubmit} error loading={interestsLoading}>
+						<Header size="large" color="pink" content="Personal information" />
 						<Form.Group widths={2}>
 							<Field
 								component={TextInput}
@@ -96,17 +95,33 @@ const Profile = () => {
 								name="biography"
 							/>
 						</Form.Group>
+						<Divider />
+						<ProfileImages />
+						<Divider />
 						{submitError && !dirtySinceLastSubmit && (
 							<ErrorMessage message={submitError} />
 						)}
-						<Button content="Save" loading={submitting} disabled={submitting} />
+
+						<Button
+							primary
+							floated="right"
+							content="Save"
+							loading={submitting}
+							disabled={submitting}
+							style={{ marginBottom: '10px' }}
+						/>
+						<Button
+							type="button"
+							floated="right"
+							content="Cancel"
+							disabled={submitting}
+							style={{ marginBottom: '10px' }}
+						/>
 					</Form>
 				)}
 			/>
-			<Divider />
-			<ProfileImages />
 		</>
 	);
 };
 
-export default observer(Profile);
+export default observer(ProfileForm);

@@ -83,7 +83,7 @@ const Profile = {
 };
 
 const Interests = {
-	get: (): Promise<IInterestOption[]> => requests.get('/profile/interests'),
+	get: (): Promise<IInterestOption[]> => requests.get('/interests'),
 };
 
 const agent = {

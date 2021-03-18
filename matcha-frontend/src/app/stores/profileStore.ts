@@ -1,7 +1,7 @@
 import { FORM_ERROR } from 'final-form';
 import { action, makeObservable, observable, runInAction } from 'mobx';
 import agent from '../api/agent';
-import { IProfile, IProfileFormValues } from '../models/profile';
+import { IProfile, IProfileFormValues, stringToGender, stringToSexPref } from '../models/profile';
 import { RootStore } from './rootStore';
 
 export default class ProfileStore {
@@ -39,9 +39,17 @@ export default class ProfileStore {
 		}
 	};
 
-	updateProfile = async (data: IProfileFormValues) => {
+	updateProfile = async (data: IProfileFormValues): Promise<void | any>  => {
 		try {
 			await agent.Profile.update(data);
+			runInAction(() => {
+				this.profile!.firstName = data.firstName;
+				this.profile!.biography = data.biography;
+				// this.profile!.gender = stringToGender(data.gender);
+				this.profile!.interests = data.interests;
+				this.profile!.lastName = data.lastName;
+				// this.profile!.sexualPreference = stringToSexPref(data.sexualPreference);
+			})
 		} catch (error) {
 			return { [FORM_ERROR]: error.message };
 		}

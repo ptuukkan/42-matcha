@@ -1,10 +1,11 @@
+use crate::models::user::User;
 use crate::models::user::RegisterFormValues;
 use actix_web_validator::Json;
 use crate::application::user;
 use crate::models::user::{
 	LoginFormValues, ResetFormValues, ResetPasswordValues,
 };
-use actix_web::{error::Error, HttpRequest};
+use actix_web::{error::Error};
 use actix_web::{get, post, web, HttpResponse};
 
 #[post("/user/login")]
@@ -41,9 +42,8 @@ async fn verify(web::Path(link): web::Path<String>) -> Result<HttpResponse, Erro
 }
 
 #[get("/user/current")]
-async fn current_user(req: HttpRequest) -> Result<HttpResponse, Error> {
-	let user = user::current::current_user(req).await?;
-	Ok(HttpResponse::Ok().json(user))
+async fn current_user(user: User) -> Result<HttpResponse, Error> {
+	Ok(HttpResponse::Ok().json(user.login_response("").await?))
 }
 
 pub fn routes(config: &mut web::ServiceConfig) {

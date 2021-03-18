@@ -14,6 +14,7 @@ struct Jwt {
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct ArangoResponseError {
+	code: Option<i32>,
     error: bool,
     error_message: String,
     error_num: i32
@@ -78,9 +79,15 @@ pub async fn get<O: de::DeserializeOwned>(url: &str) -> Result<O, AppError> {
 		.set_header("Authorization", "bearer ".to_owned() + &jwt)
 		.send()
 		.await?
-		.json::<O>()
+		.json::<ArangoResponse<O>>()
 		.await?;
-	Ok(res)
+	match res {
+		ArangoResponse::Success(x) => Ok(x),
+		ArangoResponse::Error(e) => match e.code {
+			Some(404) => Err(AppError::not_found(&e.error_message)),
+			_ => Err(AppError::internal(&e.error_message))
+		}
+	}
 }
 
 pub async fn patch<I: Serialize>(url: &str, data: &I) -> Result<(), AppError> {

@@ -1,4 +1,5 @@
-import React, { useContext, useState } from 'react';
+import { observer } from 'mobx-react-lite';
+import { useContext } from 'react';
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
@@ -10,40 +11,25 @@ import {
 	Rating,
 	Loader,
 } from 'semantic-ui-react';
-import agent from '../../app/api/agent';
-import { IInterestOption } from '../../app/models/interest';
 import { RootStoreContext } from '../../app/stores/rootStore';
+import ProfileForm from './ProfileForm';
 
 const ProfilePage = () => {
-	const [interests, setInterests] = useState<IInterestOption[]>([]);
-	const [interestsLoading, setInterestsLoading] = useState(false);
 	const rootStore = useContext(RootStoreContext);
-	const { profile, getProfile } = rootStore.profileStore;
+	const { profile, getProfile, updateProfile } = rootStore.profileStore;
+	const { openModal } = rootStore.modalStore;
 
 	useEffect(() => {
 		if (!profile) {
 			getProfile().catch((e) => console.log(e));
 		}
-		if (interests.length === 0) {
-			setInterestsLoading(true);
-			agent.Interests.get()
-				.then((interests) => setInterests(interests))
-				.catch((error) => console.log(error))
-				.finally(() => setInterestsLoading(false));
-		}
-	}, [profile, getProfile, interests.length]);
+	}, [profile, getProfile]);
 
-	if (!profile || interestsLoading) return <Loader active />;
+	if (!profile) return <Loader active />;
 
 	return (
 		<>
 			<Item.Group divided>
-				<Button floated="right" size="tiny" as={Link} primary to={'/profileForm'}>
-							Edit profile
-						</Button>
-				<Button floated="right" size="tiny" as={Link} primary to={'#'}>
-							Edit credentials
-						</Button>
 				<Item>
 					<Item.Image
 						size="small"
@@ -91,9 +77,28 @@ const ProfilePage = () => {
 						</Label>
 					</Menu.Item>
 				</Menu>
+				<Button
+					floated="right"
+					size="tiny"
+					primary
+					content="Edit profile"
+					onClick={() =>
+						openModal(
+							<ProfileForm profile={profile} updateProfile={updateProfile} />, "large"
+						)
+					}
+				/>
+				<Button
+					floated="right"
+					size="tiny"
+					as={Link}
+					primary
+					to={'#'}
+					content="Edit credentials"
+				/>
 			</Item.Group>
 		</>
 	);
 };
 
-export default ProfilePage;
+export default observer(ProfilePage);

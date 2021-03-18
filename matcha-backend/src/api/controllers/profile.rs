@@ -11,12 +11,6 @@ async fn get_my_profile(req: HttpRequest) -> Result<HttpResponse, Error> {
 	Ok(HttpResponse::Ok().json(profile))
 }
 
-#[get("/profile/{id}")]
-async fn get_profile(user: User, Path(id): Path<String>) -> Result<HttpResponse, Error> {
-	let profile = profile::get(user, &id).await?;
-	Ok(HttpResponse::Ok().json(profile))
-}
-
 #[put("/profile")]
 async fn update_profile(
 	req: HttpRequest,
@@ -44,10 +38,16 @@ async fn set_main(req: HttpRequest, Path(id): Path<String>) -> Result<HttpRespon
 	Ok(HttpResponse::Ok().finish())
 }
 
-#[get("/profile/interests")]
-async fn get_interests(req: HttpRequest) -> Result<HttpResponse, Error> {
-	let interests = profile::interest::get(req).await?;
+#[get("/interests")]
+async fn get_interests(_user: User) -> Result<HttpResponse, Error> {
+	let interests = profile::interest::get().await?;
 	Ok(HttpResponse::Ok().json(interests))
+}
+
+#[get("/profile/{id}")]
+async fn get_profile(user: User, Path(id): Path<String>) -> Result<HttpResponse, Error> {
+	let profile = profile::get(user, &id).await?;
+	Ok(HttpResponse::Ok().json(profile))
 }
 
 pub fn routes(config: &mut web::ServiceConfig) {

@@ -1,6 +1,6 @@
-import { Fragment, useContext } from 'react';
+import React, { Fragment, useContext } from 'react';
 import { Form as FinalForm, Field } from 'react-final-form';
-import { Form, Button, Modal } from 'semantic-ui-react';
+import { Form, Button, Modal, Header } from 'semantic-ui-react';
 import { RootStoreContext } from '../../app/stores/rootStore';
 import { observer } from 'mobx-react-lite';
 import ForgotPassword from './ForgotPassword';
@@ -26,59 +26,52 @@ const formValidation = createFinalFormValidation(validationSchema);
 
 const Login = () => {
 	const rootStore = useContext(RootStoreContext);
-	const { loginOpen, closeLogin, openForget } = rootStore.modalStore;
+	const { openSubModal } = rootStore.modalStore;
 	const { loginUser, loading } = rootStore.userStore;
 
 	return (
-		<Fragment>
-			<Modal size="mini" open={loginOpen} onClose={closeLogin}>
-				<Modal.Header>Login to Matcha</Modal.Header>
-				<Modal.Content>
-					<FinalForm
-						onSubmit={loginUser}
-						validate={formValidation.validateForm}
-						render={({
-							handleSubmit,
-							submitting,
-							submitError,
-							dirtySinceLastSubmit,
-						}) => (
-							<Form onSubmit={handleSubmit} error>
-								<Field
-									component={TextInput}
-									name="emailAddress"
-									placeholder="Email address"
-								/>
-								<Field
-									component={TextInput}
-									type="password"
-									name="password"
-									placeholder="Password"
-								/>
-								{submitError && !dirtySinceLastSubmit && (
-									<ErrorMessage message={submitError} />
-								)}
-								<Button
-									type="submit"
-									primary
-									loading={submitting}
-									content="Login"
-									disabled={submitting}
-								/>
-								<Button
-									type="button"
-									floated="right"
-									disabled={loading}
-									onClick={openForget}
-									content="Forgot password?"
-								/>
-							</Form>
-						)}
+		<FinalForm
+			onSubmit={loginUser}
+			validate={formValidation.validateForm}
+			render={({
+				handleSubmit,
+				submitting,
+				submitError,
+				dirtySinceLastSubmit,
+			}) => (
+				<Form onSubmit={handleSubmit} error>
+					<Header as="h2" content="Login to Matcha" />
+					<Field
+						component={TextInput}
+						name="emailAddress"
+						placeholder="Email address"
 					/>
-					<ForgotPassword />
-				</Modal.Content>
-			</Modal>
-		</Fragment>
+					<Field
+						component={TextInput}
+						type="password"
+						name="password"
+						placeholder="Password"
+					/>
+					{submitError && !dirtySinceLastSubmit && (
+						<ErrorMessage message={submitError} />
+					)}
+					<Button
+						type="submit"
+						primary
+						loading={submitting}
+						content="Login"
+						disabled={submitting}
+					/>
+					<Button
+						type="button"
+						floated="right"
+						disabled={loading}
+						onClick={() => openSubModal(<ForgotPassword />)}
+						content="Forgot password?"
+					/>
+				</Form>
+			)}
+		/>
 	);
 };
 

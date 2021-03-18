@@ -1,12 +1,7 @@
 use crate::errors::AppError;
-use crate::infrastructure::security::jwt;
 use crate::models::interest::{Interest, InterestDto};
-use crate::models::user::User;
-use actix_web::HttpRequest;
 
-pub async fn get(req: HttpRequest) -> Result<Vec<InterestDto>, AppError> {
-	let user_key = jwt::decode_from_header(&req)?;
-	User::get(&user_key).await?;
+pub async fn get() -> Result<Vec<InterestDto>, AppError> {
 	let interests = Interest::get_all().await?;
 	let interest_dtos: Vec<InterestDto> = interests
 		.into_iter()
