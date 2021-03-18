@@ -12,6 +12,7 @@ import {
 	Loader,
 } from 'semantic-ui-react';
 import { RootStoreContext } from '../../app/stores/rootStore';
+import ChangeCredentials from '../user/ChangeCredentials';
 import ProfileForm from './ProfileForm';
 
 const ProfilePage = () => {
@@ -91,10 +92,12 @@ const ProfilePage = () => {
 				<Button
 					floated="right"
 					size="tiny"
-					as={Link}
-					primary
-					to={'#'}
 					content="Edit credentials"
+					onClick={() =>
+						openModal(
+							<ChangeCredentials />, "large"
+						)
+					}
 				/>
 			</Item.Group>
 		</>

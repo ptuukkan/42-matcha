@@ -19,6 +19,7 @@ import ProfilePage from '../../features/profile/ProfilePage';
 import ModalContainer from '../common/modals/ModalContainer';
 import PrivateRoute from './PrivateRoute';
 import SubModalContainer from '../common/modals/SubModalContainer';
+import ChangeCredentials from '../../features/user/ChangeCredentials';
 
 const App = () => {
 	// const [profile, setProfile] = useState(Profiles.profiles[0]);
@@ -72,6 +73,7 @@ const App = () => {
 											path="/profile"
 											component={ProfilePage}
 										/>
+										<PrivateRoute exact path="/credentials" component={ChangeCredentials}/>
 										<PrivateRoute exact path="/chat" component={Chat} />
 										<PrivateRoute component={NotFound} />
 									</Switch>
