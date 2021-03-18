@@ -37,14 +37,14 @@ export interface IImage {
 }
 
 export enum SexualPreference {
-	Male,
-	Female,
-	Both,
+	Male = 'Male',
+	Female = 'Female',
+	Both = 'Both',
 }
 
 export enum Gender {
-	Male,
-	Female,
+	Male = 'Male',
+	Female = 'Female',
 }
 
 export const stringToGender = (data: string): Gender => {

@@ -45,10 +45,10 @@ export default class ProfileStore {
 			runInAction(() => {
 				this.profile!.firstName = data.firstName;
 				this.profile!.biography = data.biography;
-				// this.profile!.gender = stringToGender(data.gender);
+				this.profile!.gender = stringToGender(data.gender);
 				this.profile!.interests = data.interests;
 				this.profile!.lastName = data.lastName;
-				// this.profile!.sexualPreference = stringToSexPref(data.sexualPreference);
+				this.profile!.sexualPreference = stringToSexPref(data.sexualPreference);
 			})
 		} catch (error) {
 			return { [FORM_ERROR]: error.message };
