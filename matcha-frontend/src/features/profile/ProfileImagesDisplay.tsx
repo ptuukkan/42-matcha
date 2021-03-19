@@ -6,8 +6,6 @@ import {
 	Button,
 	Card,
 	Grid,
-	CardContent,
-	Icon,
 } from 'semantic-ui-react';
 import { IProfile } from '../../app/models/profile';
 

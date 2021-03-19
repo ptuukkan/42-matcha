@@ -1,5 +1,7 @@
+use actix_web::HttpRequest;
 use crate::models::user::User;
 use crate::models::user::RegisterFormValues;
+use crate::models::user::CredentialChangeValues;
 use actix_web_validator::Json;
 use crate::application::user;
 use crate::models::user::{
@@ -17,6 +19,12 @@ async fn login(values: Json<LoginFormValues>) -> Result<HttpResponse, Error> {
 #[post("/user/register")]
 async fn register(values: Json<RegisterFormValues>) -> Result<HttpResponse, Error> {
 	user::register::register(values.into_inner()).await?;
+	Ok(HttpResponse::Created().finish())
+}
+
+#[post("/user/credentials")]
+async fn credentials(req: HttpRequest, values: Json<CredentialChangeValues>) -> Result<HttpResponse, Error> {
+	user::credentials::change(req, values.into_inner()).await?; 
 	Ok(HttpResponse::Created().finish())
 }
 
@@ -53,5 +61,6 @@ pub fn routes(config: &mut web::ServiceConfig) {
 		.service(reset)
 		.service(reset_password)
 		.service(verify)
+		.service(credentials)
 		.service(current_user);
 }
