@@ -37,7 +37,7 @@ const ProfilePage = () => {
 						rounded
 						src={
 							profile?.images.length === 0
-								? '/placeholder.png'
+								? '/placeholder_gradient.png'
 								: profile?.images
 										.filter((image) => image.isMain)
 										.map((im) => im.url)
