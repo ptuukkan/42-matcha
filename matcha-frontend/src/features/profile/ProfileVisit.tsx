@@ -1,40 +1,35 @@
-import { observer } from 'mobx-react-lite';
-import React, { useContext, useState } from 'react';
-import { useEffect } from 'react';
-import { Link, useHistory, useParams } from 'react-router-dom';
-import {
-	Item,
-	Button,
-	Label,
-	Icon,
-	Menu,
-	Rating,
-	Loader,
-	Header,
-	Image,
-	Card,
-} from 'semantic-ui-react';
+import React, { Fragment, useEffect, useState } from 'react';
+import { useHistory, useParams } from 'react-router';
+import { Link } from 'react-router-dom';
+import { Button, Header, Icon, Item, Label, Loader, Menu, Rating } from 'semantic-ui-react';
 import agent from '../../app/api/agent';
 import { IProfile } from '../../app/models/profile';
-import { RootStoreContext } from '../../app/stores/rootStore';
 import ProfileForm from './ProfileForm';
-import ProfileStatistics from './ProfileStatistics';
 
-const ProfilePage = () => {
-	const rootStore = useContext(RootStoreContext);
-	const { profile, getProfile, updateProfile } = rootStore.profileStore;
-	const { openModal } = rootStore.modalStore;
+interface IParams {
+	id: string;
+}
+
+const ProfileVisit = () => {
+	const [profile, setProfile] = useState<null | IProfile>(null);
+	const { id } = useParams<IParams>();
+	const history = useHistory();
 
 	useEffect(() => {
 		if (!profile) {
-			getProfile().catch((e) => console.log(e));
+			agent.Profile.get(id)
+				.then((p) => setProfile(p))
+				.catch((error) => {
+					console.log(error);
+					history.push('/notfound');
+				});
 		}
-	}, [profile, getProfile]);
+	});
 
 	if (!profile) return <Loader active />;
 
 	return (
-		<>
+		<Fragment>
 			<Item.Group divided>
 				<Item>
 					<Item.Image
@@ -81,40 +76,7 @@ const ProfilePage = () => {
 						</Item.Extra>
 					</Item.Content>
 				</Item>
-				<Menu compact size="tiny">
-					<Menu.Item onClick={() => openModal(<ProfileStatistics profileThumbnails={profile.likes!} title="Likes" />)}>
-						<Icon name="heart" /> Likes
-						<Label color="red" floating>
-							{profile.likes!.length}
-						</Label>
-					</Menu.Item>
-					<Menu.Item onClick={() => openModal(<ProfileStatistics profileThumbnails={profile.visits!} title="Visits" />)}>
-						<Icon name="users" /> Visits
-						<Label color="teal" floating>
-							{profile.visits!.length}
-						</Label>
-					</Menu.Item>
-				</Menu>
-				<Button
-					floated="right"
-					size="tiny"
-					primary
-					content="Edit profile"
-					onClick={() =>
-						openModal(
-							<ProfileForm profile={profile!} updateProfile={updateProfile} />,
-							'large'
-						)
-					}
-				/>
-				<Button
-					floated="right"
-					size="tiny"
-					as={Link}
-					primary
-					to={'#'}
-					content="Edit credentials"
-				/>
+				<Button content="Like" />
 				{profile!.images.length > 1 && (
 					<Item>
 						{profile!.images
@@ -125,8 +87,9 @@ const ProfilePage = () => {
 					</Item>
 				)}
 			</Item.Group>
-		</>
+		</Fragment>
 	);
 };
 
-export default observer(ProfilePage);
+
+export default ProfileVisit;

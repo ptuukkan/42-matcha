@@ -1,3 +1,4 @@
+use crate::models::profile::Profile;
 use super::*;
 use init::init;
 use actix_web::{
@@ -31,5 +32,5 @@ async fn profile_exists_after_register() {
 	let maybe_user = users.pop();
 	assert!(maybe_user.is_some(), "User not found");
 	let user = maybe_user.unwrap();
-	assert!(user.get_profile().await.is_ok(), "Could not find profile");
+	assert!(Profile::get(&user.key).await.is_ok(), "Could not find profile");
 }

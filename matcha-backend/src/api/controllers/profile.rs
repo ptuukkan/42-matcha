@@ -6,35 +6,41 @@ use actix_web::{delete, get, post, put, web, HttpResponse};
 use actix_web::{error::Error, HttpRequest};
 
 #[get("/profile")]
-async fn get_my_profile(req: HttpRequest) -> Result<HttpResponse, Error> {
-	let profile = profile::get_my(req).await?;
+async fn get_my_profile(user: User) -> Result<HttpResponse, Error> {
+	let profile = profile::get_my(user).await?;
+	Ok(HttpResponse::Ok().json(profile))
+}
+
+#[get("/profile/{id}")]
+async fn get_profile(user: User, Path(id): Path<String>) -> Result<HttpResponse, Error> {
+	let profile = profile::get(user, &id).await?;
 	Ok(HttpResponse::Ok().json(profile))
 }
 
 #[put("/profile")]
 async fn update_profile(
-	req: HttpRequest,
+	user: User,
 	values: Json<ProfileFormValues>,
 ) -> Result<HttpResponse, Error> {
-	profile::update(req, values.into_inner()).await?;
+	profile::update(user, values.into_inner()).await?;
 	Ok(HttpResponse::Ok().finish())
 }
 
 #[post("/profile/image")]
-async fn create_image(req: HttpRequest, parts: awmp::Parts) -> Result<HttpResponse, Error> {
-	let image = profile::image::create(req, parts).await?;
+async fn create_image(user: User, parts: awmp::Parts) -> Result<HttpResponse, Error> {
+	let image = profile::image::create(user, parts).await?;
 	Ok(HttpResponse::Created().json(image))
 }
 
 #[delete("/profile/image/{id}")]
-async fn delete_image(req: HttpRequest, Path(id): Path<String>) -> Result<HttpResponse, Error> {
-	profile::image::delete(req, &id).await?;
+async fn delete_image(user: User, Path(id): Path<String>) -> Result<HttpResponse, Error> {
+	profile::image::delete(user, &id).await?;
 	Ok(HttpResponse::Ok().finish())
 }
 
 #[put("/profile/image/{id}")]
-async fn set_main(req: HttpRequest, Path(id): Path<String>) -> Result<HttpResponse, Error> {
-	profile::image::set_main(req, &id).await?;
+async fn set_main(user: User, Path(id): Path<String>) -> Result<HttpResponse, Error> {
+	profile::image::set_main(user, &id).await?;
 	Ok(HttpResponse::Ok().finish())
 }
 
@@ -44,11 +50,7 @@ async fn get_interests(_user: User) -> Result<HttpResponse, Error> {
 	Ok(HttpResponse::Ok().json(interests))
 }
 
-#[get("/profile/{id}")]
-async fn get_profile(user: User, Path(id): Path<String>) -> Result<HttpResponse, Error> {
-	let profile = profile::get(user, &id).await?;
-	Ok(HttpResponse::Ok().json(profile))
-}
+
 
 pub fn routes(config: &mut web::ServiceConfig) {
 	config

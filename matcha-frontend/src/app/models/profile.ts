@@ -13,6 +13,14 @@ export interface IProfile {
 	/* 	location: ILocation; */
 	interests: string[];
 	images: IImage[];
+	likes?: IProfileThumbnail[];
+	visits?: IProfileThumbnail[];
+}
+
+export interface IProfileThumbnail {
+	id: string;
+	firstName: string;
+	image: IImage;
 }
 
 export interface IProfileFormValues {

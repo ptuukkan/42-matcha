@@ -29,13 +29,13 @@ pub struct User {
 #[derive(Deserialize, Debug, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct RegisterFormValues {
-	#[validate(length(min = 1))]
+	#[validate(length(min = 2, max = 32))]
 	pub first_name: String,
-	#[validate(length(min = 1))]
+	#[validate(length(min = 2, max = 32))]
 	pub last_name: String,
 	#[validate(email)]
 	email_address: String,
-	#[validate(length(min = 1))]
+	#[validate(length(min = 2, max = 32))]
 	username: String,
 	#[validate(length(min = 6))]
 	password: String,
@@ -88,7 +88,7 @@ impl User {
 	}
 
 	pub async fn login_response(&self, token: &str) -> Result<LoginResponse, AppError> {
-		let profile = self.get_profile().await?;
+		let profile = Profile::get(&self.profile).await?;
 		Ok(LoginResponse {
 			email_address: self.email_address.to_owned(),
 			token: token.to_owned(),
@@ -162,10 +162,10 @@ impl User {
 		}
 	}
 
-	pub async fn get_profile(&self) -> Result<Profile, AppError> {
-		let profile = Profile::get(&self.profile).await?;
-		Ok(profile)
-	}
+	// pub async fn get_profile(&self) -> Result<Profile, AppError> {
+	// 	let profile = Profile::get(&self.profile).await?;
+	// 	Ok(profile)
+	// }
 }
 
 impl From<&RegisterFormValues> for User {

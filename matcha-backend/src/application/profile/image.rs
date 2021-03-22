@@ -1,17 +1,14 @@
+use crate::models::profile::Profile;
 use crate::errors::AppError;
 use crate::infrastructure::image::image_accessor;
-use crate::infrastructure::security::jwt;
 use crate::models::image::Image;
 use crate::models::image::ImageDto;
 use crate::models::user::User;
-use actix_web::HttpRequest;
 use std::convert::TryFrom;
 
-pub async fn create(req: HttpRequest, mut parts: awmp::Parts) -> Result<ImageDto, AppError> {
-	let user_key = jwt::decode_from_header(&req)?;
-	let user = User::get(&user_key).await?;
+pub async fn create(user: User, mut parts: awmp::Parts) -> Result<ImageDto, AppError> {
 	if let Some(image_file) = parts.files.take("image").pop() {
-		let mut profile = user.get_profile().await?;
+		let mut profile = Profile::get(&user.key).await?;
 		if profile.images.len() > 4 {
 			return Err(AppError::bad_request("Only five images allowerd"));
 		}
@@ -29,10 +26,8 @@ pub async fn create(req: HttpRequest, mut parts: awmp::Parts) -> Result<ImageDto
 	}
 }
 
-pub async fn set_main(req: HttpRequest, id: &str) -> Result<(), AppError> {
-	let user_key = jwt::decode_from_header(&req)?;
-	let user = User::get(&user_key).await?;
-	let profile = user.get_profile().await?;
+pub async fn set_main(user: User, id: &str) -> Result<(), AppError> {
+	let profile = Profile::get(&user.key).await?;
 	if !profile.images.contains(&id.to_owned()) {
 		return Err(AppError::unauthorized(
 			"Cannot set main other images than yours",
@@ -48,10 +43,8 @@ pub async fn set_main(req: HttpRequest, id: &str) -> Result<(), AppError> {
 	}
 	Ok(())
 }
-pub async fn delete(req: HttpRequest, id: &str) -> Result<(), AppError> {
-	let user_key = jwt::decode_from_header(&req)?;
-	let user = User::get(&user_key).await?;
-	let mut profile = user.get_profile().await?;
+pub async fn delete(user: User, id: &str) -> Result<(), AppError> {
+	let mut profile = Profile::get(&user.key).await?;
 	if !profile.images.contains(&id.to_owned()) {
 		return Err(AppError::unauthorized(
 			"Cannot delete other images than yours",

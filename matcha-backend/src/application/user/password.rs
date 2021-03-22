@@ -6,7 +6,7 @@ use nanoid::nanoid;
 use std::env;
 
 pub async fn reset(values: ResetFormValues) -> Result<(), AppError> {
-	if let Some(mut user) = User::find("email_address", &values.email_address)
+	if let Some(mut user) = User::find("emailAddress", &values.email_address)
 		.await?
 		.pop()
 	{

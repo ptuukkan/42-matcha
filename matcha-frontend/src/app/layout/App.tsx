@@ -19,6 +19,7 @@ import ProfilePage from '../../features/profile/ProfilePage';
 import ModalContainer from '../common/modals/ModalContainer';
 import PrivateRoute from './PrivateRoute';
 import SubModalContainer from '../common/modals/SubModalContainer';
+import ProfileVisit from '../../features/profile/ProfileVisit';
 
 const App = () => {
 	// const [profile, setProfile] = useState(Profiles.profiles[0]);
@@ -53,10 +54,10 @@ const App = () => {
 			style={{ display: 'flex', minHeight: '100vh', flexDirection: 'column' }}
 		>
 			<Container className="main_container">
-				<ModalContainer />
-				<SubModalContainer />
 				<ToastContainer style={{ marginTop: '5%' }} position="top-right" />
 				<Router>
+					<ModalContainer />
+					<SubModalContainer />
 					<Navigation />
 					<Switch>
 						<Route path="/verify/:link" component={EmailVerification} />
@@ -66,7 +67,10 @@ const App = () => {
 							render={() => (
 								<Fragment>
 									<Switch>
-										<PrivateRoute exact path="/" component={ProfilePage} />
+										<PrivateRoute
+											path="/profile/:id"
+											component={ProfileVisit}
+										/>
 										<PrivateRoute
 											exact
 											path="/profile"

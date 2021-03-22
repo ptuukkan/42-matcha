@@ -5,6 +5,8 @@ use crate::models::base::CreateResponse;
 use crate::models::image::{Image, ImageDto};
 use crate::models::user::RegisterFormValues;
 use serde::{Deserialize, Serialize};
+use serde_json::json;
+use std::convert::TryFrom;
 use std::env;
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -13,8 +15,8 @@ pub struct Profile {
 	#[serde(skip_serializing)]
 	#[serde(rename = "_key")]
 	pub key: String,
-	first_name: String,
-	last_name: String,
+	pub first_name: String,
+	pub last_name: String,
 	gender: Option<Gender>,
 	sexual_preference: SexualPreference,
 	biography: Option<String>,
@@ -46,6 +48,24 @@ pub struct ProfileFormValues {
 	pub interests: Option<Vec<String>>,
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ProfileSlice {
+	#[serde(skip_serializing)]
+	#[serde(rename = "_key")]
+	pub key: String,
+	first_name: String,
+	pub images: Vec<Image>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ProfileThumbnail {
+	id: String,
+	first_name: String,
+	image: ImageDto,
+}
+
 impl Profile {
 	fn url() -> Result<String, AppError> {
 		let db_url: String = env::var("DB_URL")?;
@@ -54,6 +74,14 @@ impl Profile {
 
 	fn key_url(&self) -> Result<String, AppError> {
 		Ok(format!("{}{}", &Self::url()?, self.key))
+	}
+
+	fn graph_url() -> Result<String, AppError> {
+		Ok(format!(
+			"{}{}",
+			env::var("DB_URL")?,
+			"_api/gharial/relations/"
+		))
 	}
 
 	pub async fn create(&mut self) -> Result<(), AppError> {
@@ -106,6 +134,71 @@ impl Profile {
 			&& !self.images.is_empty()
 			&& !self.interests.is_empty()
 	}
+
+	pub async fn visit(&self, profile_key: &str) -> Result<(), AppError> {
+		let url = format!("{}{}", Profile::graph_url()?, "edge/visits");
+		let body = json!({
+			"_from": format!("profiles/{}", profile_key),
+			"_to": format!("profiles/{}", &self.key)
+		});
+
+		let res: api::ArangoEdgeResponse = api::post(&url, &body).await?;
+		if res.error {
+			Err(AppError::internal("Edge creation failed"))
+		} else {
+			Ok(())
+		}
+	}
+
+	pub async fn like(&self, profile_key: &str) -> Result<(), AppError> {
+		let url = format!("{}{}", Profile::graph_url()?, "edge/likes");
+		let body = json!({
+			"_from": format!("profiles/{}", profile_key),
+			"_to": format!("profiles/{}", &self.key)
+		});
+
+		let res: api::ArangoEdgeResponse = api::post(&url, &body).await?;
+		if res.error {
+			Err(AppError::internal("Edge creation failed"))
+		} else {
+			Ok(())
+		}
+	}
+
+	pub async fn get_visits(&self) -> Result<Vec<ProfileThumbnail>, AppError> {
+		let query = format!(
+			"FOR v in 1..1 INBOUND 'profiles/{}' visits RETURN MERGE(v, {{ images: DOCUMENT('images', v.images) }} )",
+			&self.key
+		);
+		let visits = CursorRequest::from(query)
+			.send()
+			.await?
+			.extract_all::<ProfileSlice>()
+			.await?;
+		let visits: Vec<ProfileThumbnail> = visits
+			.iter()
+			.filter_map(|x| ProfileThumbnail::try_from(x).ok())
+			.collect();
+		Ok(visits)
+	}
+
+
+	pub async fn get_likes(&self) -> Result<Vec<ProfileThumbnail>, AppError> {
+		let query = format!(
+			"FOR v in 1..1 INBOUND 'profiles/{}' likes RETURN MERGE(v, {{ images: DOCUMENT('images', v.images) }} )",
+			&self.key
+		);
+		let likes = CursorRequest::from(query)
+			.send()
+			.await?
+			.extract_all::<ProfileSlice>()
+			.await?;
+		let likes: Vec<ProfileThumbnail> = likes
+			.iter()
+			.filter_map(|x| ProfileThumbnail::try_from(x).ok())
+			.collect();
+		Ok(likes)
+	}
 }
 
 impl From<&RegisterFormValues> for Profile {
@@ -133,6 +226,24 @@ pub struct ProfileDto {
 	biography: Option<String>,
 	interests: Vec<String>,
 	pub images: Vec<ImageDto>,
+	pub likes: Option<Vec<ProfileThumbnail>>,
+	pub visits: Option<Vec<ProfileThumbnail>>,
+}
+
+impl TryFrom<&ProfileSlice> for ProfileThumbnail {
+	type Error = AppError;
+
+	fn try_from(pv: &ProfileSlice) -> Result<Self, Self::Error> {
+		if let Some(main_image) = pv.images.iter().find(|x| x.is_main) {
+			Ok(Self {
+				id: pv.key.to_owned(),
+				first_name: pv.first_name.to_owned(),
+				image: ImageDto::try_from(main_image)?,
+			})
+		} else {
+			Err(AppError::internal("Main image not found"))
+		}
+	}
 }
 
 impl From<Profile> for ProfileDto {
@@ -145,6 +256,8 @@ impl From<Profile> for ProfileDto {
 			biography: profile.biography,
 			interests: profile.interests,
 			images: vec![],
+			likes: None,
+			visits: None,
 		}
 	}
 }

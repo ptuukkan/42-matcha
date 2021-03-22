@@ -76,6 +76,7 @@ const Profile = {
 	addImage: (data: FormData): Promise<IImage> =>
 		requests.post('/profile/image', data),
 	current: (): Promise<IProfile> => requests.get('/profile'),
+	get: (id: string): Promise<IProfile> => requests.get(`/profile/${id}`),
 	removeImage: (id: string): Promise<void> =>
 		requests.delete(`/profile/image/${id}`),
 	imageToMain: (id: string): Promise<void> =>

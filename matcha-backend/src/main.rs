@@ -7,6 +7,7 @@ mod api;
 #[cfg(test)]
 mod tests;
 
+use actix_web::Error;
 use actix_cors::Cors;
 use actix_web::middleware::Logger;
 use actix_web::{get, App, HttpResponse, HttpServer, Responder};
@@ -23,9 +24,9 @@ async fn hello() -> impl Responder {
 }
 
 #[get("/seed")]
-async fn seed() -> impl Responder {
-	seed_data::seed_data().await;
-	HttpResponse::Ok().body("Success")
+async fn seed() -> Result<HttpResponse, Error> {
+	seed_data::seed_data().await?;
+	Ok(HttpResponse::Ok().body("Success"))
 }
 
 #[actix_web::main]
@@ -38,6 +39,7 @@ async fn main() -> std::io::Result<()> {
 		App::new()
 			.wrap(Logger::new("%a \"%r\" %s"))
 			.wrap(Cors::permissive())
+			.service(seed)
 			.service(Files::new("/img", "./images").show_files_listing())
 			.configure(api::controllers::user::routes)
 			.configure(api::controllers::profile::routes)

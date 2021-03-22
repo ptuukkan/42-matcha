@@ -14,7 +14,7 @@ const validationSchema = {
 			},
 			{
 				validator: Validators.maxLength,
-				customArgs: { length: 33 },
+				customArgs: { length: 32 },
 				message: 'Must be less than 33 characters.',
 			},
 			alphabetic,
@@ -28,7 +28,7 @@ const validationSchema = {
 			},
 			{
 				validator: Validators.maxLength,
-				customArgs: { length: 33 },
+				customArgs: { length: 32 },
 				message: 'Must be less than 33 characters.',
 			},
 			alphabetic,
@@ -42,7 +42,7 @@ const validationSchema = {
 			},
 			{
 				validator: Validators.maxLength,
-				customArgs: { length: 33 },
+				customArgs: { length: 32 },
 				message: 'Must be less than 33 characters.',
 			},
 			alphabetic,

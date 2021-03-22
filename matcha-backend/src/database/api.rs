@@ -10,21 +10,27 @@ struct Jwt {
 	token: String,
 }
 
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ArangoEdgeResponse {
+	pub error: bool,
+}
+
 #[allow(dead_code)]
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct ArangoResponseError {
 	code: Option<i32>,
-    error: bool,
-    error_message: String,
-    error_num: i32
+	error: bool,
+	error_message: String,
+	error_num: i32,
 }
 
 #[derive(Deserialize)]
 #[serde(untagged)]
 enum ArangoResponse<T> {
 	Success(T),
-	Error(ArangoResponseError)
+	Error(ArangoResponseError),
 }
 
 pub async fn get_arango_jwt() -> Result<String, AppError> {
@@ -85,8 +91,8 @@ pub async fn get<O: de::DeserializeOwned>(url: &str) -> Result<O, AppError> {
 		ArangoResponse::Success(x) => Ok(x),
 		ArangoResponse::Error(e) => match e.code {
 			Some(404) => Err(AppError::not_found(&e.error_message)),
-			_ => Err(AppError::internal(&e.error_message))
-		}
+			_ => Err(AppError::internal(&e.error_message)),
+		},
 	}
 }
 
@@ -112,7 +118,10 @@ pub async fn delete(url: &str) -> Result<(), AppError> {
 	Ok(())
 }
 
-pub async fn put<I: Serialize, O: de::DeserializeOwned>(url: &str, data: &I) -> Result<Vec<Option<O>>, AppError> {
+pub async fn put<I: Serialize, O: de::DeserializeOwned>(
+	url: &str,
+	data: &I,
+) -> Result<Vec<Option<O>>, AppError> {
 	let jwt = get_arango_jwt().await?;
 	let client = Client::default();
 	let response = client
@@ -122,11 +131,12 @@ pub async fn put<I: Serialize, O: de::DeserializeOwned>(url: &str, data: &I) -> 
 		.await?
 		.json::<Vec<ArangoResponse<O>>>()
 		.await?;
-	let result: Vec<Option<O>> = response.into_iter().map(|x| {
-		match x {
+	let result: Vec<Option<O>> = response
+		.into_iter()
+		.map(|x| match x {
 			ArangoResponse::Success(a) => Some(a),
-			ArangoResponse::Error(_) => None
-		}
-	}).collect();
+			ArangoResponse::Error(_) => None,
+		})
+		.collect();
 	Ok(result)
 }

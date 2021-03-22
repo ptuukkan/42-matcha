@@ -23,7 +23,7 @@ async fn register(values: Json<RegisterFormValues>) -> Result<HttpResponse, Erro
 #[post("/user/password/reset")]
 async fn reset(values: Json<ResetFormValues>) -> Result<HttpResponse, Error> {
 	user::password::reset(values.into_inner()).await?;
-	Ok(HttpResponse::Created().finish())
+	Ok(HttpResponse::Ok().finish())
 }
 
 #[post("/user/password/reset/{reset_link}")]
@@ -32,7 +32,7 @@ async fn reset_password(
 	values: Json<ResetPasswordValues>,
 ) -> Result<HttpResponse, Error> {
 	user::password::reset_password(&link, values.into_inner()).await?;
-	Ok(HttpResponse::Created().finish())
+	Ok(HttpResponse::Ok().finish())
 }
 
 #[get("/user/verify/{link}")] // <- define path parameters
