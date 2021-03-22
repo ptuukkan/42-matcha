@@ -43,6 +43,15 @@ pub struct RegisterFormValues {
 
 #[derive(Deserialize, Debug, Validate)]
 #[serde(rename_all = "camelCase")]
+pub struct CredentialChangeValues {
+	#[validate(email)]
+	pub email_address: String,
+	#[validate(length(min = 6))]
+	pub password: String,
+}
+
+#[derive(Deserialize, Debug, Validate)]
+#[serde(rename_all = "camelCase")]
 pub struct LoginFormValues {
 	pub email_address: String,
 	pub password: String,
@@ -83,6 +92,12 @@ impl User {
 	pub async fn change_password(&mut self, password: &str) -> Result<(), AppError> {
 		self.password = User::hash_pw(password);
 		self.link = None;
+		self.update().await?;
+		Ok(())
+	}
+
+	pub async fn change_email(&mut self, email: &str) -> Result<(), AppError> {
+		self.email_address = email.to_owned();
 		self.update().await?;
 		Ok(())
 	}

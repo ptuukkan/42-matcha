@@ -19,6 +19,11 @@ export interface ILoginFormValues {
 	password: string
 }
 
+export interface ICredentialFormValues {
+	username: string,
+	password: string
+}
+
 export interface IResetPassword {
 	password: string
 }

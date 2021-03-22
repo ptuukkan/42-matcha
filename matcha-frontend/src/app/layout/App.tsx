@@ -20,6 +20,8 @@ import ModalContainer from '../common/modals/ModalContainer';
 import PrivateRoute from './PrivateRoute';
 import SubModalContainer from '../common/modals/SubModalContainer';
 import ProfileVisit from '../../features/profile/ProfileVisit';
+import ChangeCredentials from '../../features/user/ChangeCredentials';
+import { getPosition } from '../common/location/locationUtils';
 
 const App = () => {
 	// const [profile, setProfile] = useState(Profiles.profiles[0]);
@@ -37,6 +39,7 @@ const App = () => {
 			getUser()
 				.catch(() => logoutUser())
 				.finally(() => setAppLoaded(true));
+			getPosition().then((location) => console.log(location))
 		} else {
 			setAppLoaded(true);
 		}
@@ -48,6 +51,8 @@ const App = () => {
 				<Loader />
 			</Dimmer>
 		);
+
+
 
 	return (
 		<div
@@ -76,6 +81,7 @@ const App = () => {
 											path="/profile"
 											component={ProfilePage}
 										/>
+										<PrivateRoute exact path="/credentials" component={ChangeCredentials}/>
 										<PrivateRoute exact path="/chat" component={Chat} />
 										<PrivateRoute component={NotFound} />
 									</Switch>

@@ -17,6 +17,7 @@ import {
 import agent from '../../app/api/agent';
 import { IProfile } from '../../app/models/profile';
 import { RootStoreContext } from '../../app/stores/rootStore';
+import ChangeCredentials from '../user/ChangeCredentials';
 import ProfileForm from './ProfileForm';
 import ProfileStatistics from './ProfileStatistics';
 
@@ -41,9 +42,9 @@ const ProfilePage = () => {
 						size="small"
 						rounded
 						src={
-							profile!.images.length === 0
-								? '/placeholder.png'
-								: profile!.images
+							profile?.images.length === 0
+								? '/placeholder_gradient.png'
+								: profile?.images
 										.filter((image) => image.isMain)
 										.map((im) => im.url)
 						}
@@ -110,10 +111,12 @@ const ProfilePage = () => {
 				<Button
 					floated="right"
 					size="tiny"
-					as={Link}
-					primary
-					to={'#'}
 					content="Edit credentials"
+					onClick={() =>
+						openModal(
+							<ChangeCredentials />, "large"
+						)
+					}
 				/>
 				{profile!.images.length > 1 && (
 					<Item>

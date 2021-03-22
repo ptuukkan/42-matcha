@@ -1,6 +1,6 @@
 import { action, makeObservable, observable, runInAction } from 'mobx';
 import agent from '../api/agent';
-import { ILoginFormValues, IRegisterFormValues, IUser } from '../models/user';
+import { ICredentialFormValues, ILoginFormValues, IRegisterFormValues, IUser } from '../models/user';
 import { RootStore } from './rootStore';
 import { history } from '../..';
 import { FORM_ERROR } from 'final-form';
@@ -19,6 +19,7 @@ export default class UserStore {
 			loading: observable,
 			user: observable,
 			registerUser: action,
+			changeCredentials: action,
 			loginUser: action,
 			logoutUser: action,
 			getUser: action,
@@ -45,6 +46,20 @@ export default class UserStore {
 	registerUser = async (data: IRegisterFormValues) => {
 		try {
 			await agent.User.register(data);
+		} catch (error) {
+			if (error.error_type === 'ValidationError') {
+				return error.errors.reduce((obj: any, item: IValidationError) => {
+					obj[item.field] = item.message;
+					return obj;
+				}, {});
+			}
+			return { [FORM_ERROR]: error.message };
+		}
+	};
+
+	changeCredentials = async (data: ICredentialFormValues) => {
+		try {
+			await agent.User.credentials(data);
 		} catch (error) {
 			if (error.error_type === 'ValidationError') {
 				return error.errors.reduce((obj: any, item: IValidationError) => {

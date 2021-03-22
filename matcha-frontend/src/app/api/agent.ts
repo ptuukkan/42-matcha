@@ -6,6 +6,7 @@ import {
 	ILoginFormValues,
 	IRegisterFormValues,
 	IResetPassword,
+	ICredentialFormValues,
 	IUser,
 } from '../models/user';
 import { history } from '../..';
@@ -66,6 +67,8 @@ const User = {
 	verify: (link: string): Promise<void> => requests.get(`/user/verify/${link}`),
 	forget: (data: IForgetPassword): Promise<void> =>
 		requests.post(`/user/password/reset`, data),
+	credentials: (data: ICredentialFormValues): Promise<void> =>
+		requests.post(`/user/credentials`, data),
 	reset: (link: string, data: IResetPassword): Promise<void> =>
 		requests.post(`/user/password/reset/${link}`, data),
 };
