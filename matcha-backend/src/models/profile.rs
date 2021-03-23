@@ -135,21 +135,6 @@ impl Profile {
 			&& !self.interests.is_empty()
 	}
 
-	pub async fn visit(&self, profile_key: &str) -> Result<(), AppError> {
-		let url = format!("{}{}", Profile::graph_url()?, "edge/visits");
-		let body = json!({
-			"_from": format!("profiles/{}", profile_key),
-			"_to": format!("profiles/{}", &self.key)
-		});
-
-		let res: api::ArangoEdgeResponse = api::post(&url, &body).await?;
-		if res.error {
-			Err(AppError::internal("Edge creation failed"))
-		} else {
-			Ok(())
-		}
-	}
-
 	pub async fn like(&self, profile_key: &str) -> Result<(), AppError> {
 		let url = format!("{}{}", Profile::graph_url()?, "edge/likes");
 		let body = json!({

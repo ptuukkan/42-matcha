@@ -1,6 +1,6 @@
 use serde_json::Value;
 use crate::models::base::CreateResponse;
-use crate::application::profile;
+use crate::application::{profile, profile::visit};
 use crate::application::user;
 use crate::database::api;
 use crate::errors::AppError;
@@ -133,63 +133,72 @@ pub async fn seed_data() -> Result<(), AppError> {
 
 	jake.like(&charles.key).await?;
 	jake.like(&amy.key).await?;
-	jake.visit(&charles.key).await?;
-	jake.visit(&amy.key).await?;
-	jake.visit(&terry.key).await?;
-	jake.visit(&holt.key).await?;
+	visit(&jake.key, &rosa.key).await?;
+	visit(&jake.key, &amy.key).await?;
+	visit(&jake.key, &charles.key).await?;
+	visit(&jake.key, &terry.key).await?;
+	visit(&jake.key, &holt.key).await?;
 
 	rosa.like(&hitchcock.key).await?;
 	rosa.like(&scully.key).await?;
 	rosa.like(&jake.key).await?;
 	rosa.like(&gina.key).await?;
-	rosa.visit(&hitchcock.key).await?;
-	rosa.visit(&scully.key).await?;
-	rosa.visit(&jake.key).await?;
-	rosa.visit(&gina.key).await?;
-	rosa.visit(&amy.key).await?;
+	visit(&rosa.key, &amy.key).await?;
+	visit(&rosa.key, &gina.key).await?;
+	visit(&rosa.key, &jake.key).await?;
 
+	visit(&amy.key, &gina.key).await?;
+	visit(&amy.key, &rosa.key).await?;
+	visit(&amy.key, &holt.key).await?;
+	visit(&amy.key, &jake.key).await?;
 	amy.like(&jake.key).await?;
 	amy.like(&holt.key).await?;
 	amy.like(&terry.key).await?;
 	amy.like(&rosa.key).await?;
-	amy.visit(&jake.key).await?;
-	amy.visit(&holt.key).await?;
-	amy.visit(&terry.key).await?;
-	amy.visit(&gina.key).await?;
-	amy.visit(&rosa.key).await?;
 
+
+	visit(&charles.key, &gina.key).await?;
+	visit(&charles.key, &terry.key).await?;
+	visit(&charles.key, &jake.key).await?;
 	charles.like(&jake.key).await?;
 	charles.like(&gina.key).await?;
 	charles.like(&amy.key).await?;
-	charles.visit(&jake.key).await?;
-	charles.visit(&gina.key).await?;
-	charles.visit(&amy.key).await?;
-	charles.visit(&holt.key).await?;
 
+	visit(&terry.key, &jake.key).await?;
+	visit(&terry.key, &holt.key).await?;
+	visit(&terry.key, &amy.key).await?;
+	visit(&terry.key, &scully.key).await?;
 	terry.like(&jake.key).await?;
 	terry.like(&amy.key).await?;
 	terry.like(&holt.key).await?;
-	terry.visit(&jake.key).await?;
-	terry.visit(&holt.key).await?;
-	terry.visit(&gina.key).await?;
-	terry.visit(&amy.key).await?;
 
+	visit(&gina.key, &jake.key).await?;
+	visit(&gina.key, &holt.key).await?;
+	visit(&gina.key, &amy.key).await?;
+	visit(&gina.key, &rosa.key).await?;
+	visit(&gina.key, &terry.key).await?;
+
+	visit(&holt.key, &amy.key).await?;
+	visit(&holt.key, &terry.key).await?;
+	visit(&holt.key, &scully.key).await?;
+	visit(&holt.key, &hitchcock.key).await?;
 	holt.like(&terry.key).await?;
 	holt.like(&amy.key).await?;
 	holt.like(&jake.key).await?;
-	holt.visit(&terry.key).await?;
-	holt.visit(&amy.key).await?;
-	holt.visit(&jake.key).await?;
-	holt.visit(&scully.key).await?;
-	holt.visit(&hitchcock.key).await?;
 
+
+	visit(&scully.key, &terry.key).await?;
+	visit(&scully.key, &jake.key).await?;
+	visit(&scully.key, &holt.key).await?;
+	visit(&scully.key, &amy.key).await?;
+	visit(&scully.key, &hitchcock.key).await?;
 	scully.like(&hitchcock.key).await?;
-	scully.visit(&hitchcock.key).await?;
-	scully.visit(&holt.key).await?;
 
+	visit(&hitchcock.key, &terry.key).await?;
+	visit(&hitchcock.key, &gina.key).await?;
+	visit(&hitchcock.key, &charles.key).await?;
+	visit(&hitchcock.key, &scully.key).await?;
 	hitchcock.like(&scully.key).await?;
-	hitchcock.visit(&scully.key).await?;
-	hitchcock.visit(&holt.key).await?;
 
 	Ok(())
 }

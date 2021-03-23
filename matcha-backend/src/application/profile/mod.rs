@@ -1,8 +1,9 @@
+use crate::errors::AppError;
 use crate::models::image::ImageDto;
 use crate::models::profile::Profile;
-use crate::errors::AppError;
 use crate::models::profile::{ProfileDto, ProfileFormValues};
 use crate::models::user::User;
+use crate::models::visit::Visit;
 use std::convert::TryFrom;
 
 pub mod image;
@@ -41,7 +42,7 @@ pub async fn get(user: User, id: &str) -> Result<ProfileDto, AppError> {
 	// 	return Err(AppError::not_found("Profile not found"));
 	// }
 	if user.profile != profile.key {
-		profile.visit(&user.profile).await?;
+		visit(&user.profile, id).await?;
 	}
 
 	let images: Vec<ImageDto> = profile
@@ -53,4 +54,16 @@ pub async fn get(user: User, id: &str) -> Result<ProfileDto, AppError> {
 	let mut profile_dto = ProfileDto::from(profile);
 	profile_dto.images = images;
 	Ok(profile_dto)
+}
+
+pub async fn visit(from: &str, to: &str) -> Result<(), AppError> {
+	if let Some(mut visit) = Visit::find(from, to).await? {
+		visit.count += 1;
+		visit.update().await?;
+		Ok(())
+	} else {
+		let visit = Visit::new(from, to);
+		visit.create().await?;
+		Ok(())
+	}
 }
