@@ -3,7 +3,7 @@ use crate::models::profile::ProfileFormValues;
 use crate::models::user::User;
 use actix_web::web::{Json, Path};
 use actix_web::{delete, get, post, put, web, HttpResponse};
-use actix_web::{error::Error, HttpRequest};
+use actix_web::{error::Error};
 
 #[get("/profile")]
 async fn get_my_profile(user: User) -> Result<HttpResponse, Error> {
@@ -16,6 +16,19 @@ async fn get_profile(user: User, Path(id): Path<String>) -> Result<HttpResponse,
 	let profile = profile::get(user, &id).await?;
 	Ok(HttpResponse::Ok().json(profile))
 }
+
+#[get("/profile/like/{id}")]
+async fn like_profile(user: User, Path(id): Path<String>) -> Result<HttpResponse, Error> {
+	profile::like(&user, &id).await?;
+	Ok(HttpResponse::Ok().finish())
+}
+
+#[delete("/profile/like/{id}")]
+async fn unlike_profile(user: User, Path(id): Path<String>) -> Result<HttpResponse, Error> {
+	profile::unlike(&user, &id).await?;
+	Ok(HttpResponse::Ok().finish())
+}
+
 
 #[put("/profile")]
 async fn update_profile(
@@ -51,11 +64,12 @@ async fn get_interests(_user: User) -> Result<HttpResponse, Error> {
 }
 
 
-
 pub fn routes(config: &mut web::ServiceConfig) {
 	config
 		.service(get_my_profile)
 		.service(get_profile)
+		.service(like_profile)
+		.service(unlike_profile)
 		.service(update_profile)
 		.service(create_image)
 		.service(set_main)

@@ -8,7 +8,7 @@ use std::convert::TryFrom;
 use std::env;
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct Visit {
+pub struct Like {
 	#[serde(skip_serializing)]
 	#[serde(rename = "_key")]
 	key: String,
@@ -16,13 +16,12 @@ pub struct Visit {
 	from: String,
 	#[serde(rename = "_to")]
 	to: String,
-	pub count: u32,
 }
 
-impl Visit {
+impl Like {
 	fn url() -> Result<String, AppError> {
 		let db_url: String = env::var("DB_URL")?;
-		Ok(db_url + "_api/gharial/relations/edge/visits/")
+		Ok(db_url + "_api/gharial/relations/edge/likes/")
 	}
 
 	fn key_url(&self) -> Result<String, AppError> {
@@ -34,7 +33,6 @@ impl Visit {
 			key: String::new(),
 			from: format!("profiles/{}", from),
 			to: format!("profiles/{}", to),
-			count: 1,
 		}
 	}
 
@@ -49,14 +47,14 @@ impl Visit {
 		}
 	}
 
-	pub async fn update(&self) -> Result<(), AppError> {
-		api::patch(&self.key_url()?, &self).await?;
+	pub async fn delete(&self) -> Result<(), AppError> {
+		api::delete(&self.key_url()?).await?;
 		Ok(())
 	}
 
 	pub async fn find(from: &str, to: &str) -> Result<Option<Self>, AppError> {
 		let query = format!(
-			"FOR v, e IN 1..1 OUTBOUND 'profiles/{}' visits FILTER e._to == 'profiles/{}' RETURN e",
+			"FOR v, e IN 1..1 OUTBOUND 'profiles/{}' likes FILTER e._to == 'profiles/{}' RETURN e",
 			from, to
 		);
 		let mut edges = CursorRequest::from(query)
@@ -73,7 +71,7 @@ impl Visit {
 
 	pub async fn find_inbound(profile_key: &str) -> Result<Vec<ProfileThumbnail>, AppError> {
 		let query = format!(
-			"FOR v in 1..1 INBOUND 'profiles/{}' visits RETURN MERGE(v, {{ images: DOCUMENT('images', v.images) }} )",
+			"FOR v in 1..1 INBOUND 'profiles/{}' likes RETURN MERGE(v, {{ images: DOCUMENT('images', v.images) }} )",
 			profile_key
 		);
 		let vertices = CursorRequest::from(query)

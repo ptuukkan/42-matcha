@@ -12,7 +12,7 @@ use actix_web::{get, post, web, HttpResponse};
 
 #[post("/user/login")]
 async fn login(values: Json<LoginFormValues>) -> Result<HttpResponse, Error> {
-	let user = user::login::login(values.into_inner()).await?;
+	let user = user::login(values.into_inner()).await?;
 	Ok(HttpResponse::Ok().json(user))
 }
 
@@ -24,7 +24,7 @@ async fn register(values: Json<RegisterFormValues>) -> Result<HttpResponse, Erro
 
 #[post("/user/credentials")]
 async fn credentials(req: HttpRequest, values: Json<CredentialChangeValues>) -> Result<HttpResponse, Error> {
-	user::credentials::change(req, values.into_inner()).await?; 
+	user::credentials::change(req, values.into_inner()).await?;
 	Ok(HttpResponse::Created().finish())
 }
 

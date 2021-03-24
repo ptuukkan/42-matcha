@@ -5,7 +5,6 @@ use crate::models::base::CreateResponse;
 use crate::models::image::{Image, ImageDto};
 use crate::models::user::RegisterFormValues;
 use serde::{Deserialize, Serialize};
-use serde_json::json;
 use std::convert::TryFrom;
 use std::env;
 
@@ -48,24 +47,6 @@ pub struct ProfileFormValues {
 	pub interests: Option<Vec<String>>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ProfileSlice {
-	#[serde(skip_serializing)]
-	#[serde(rename = "_key")]
-	pub key: String,
-	first_name: String,
-	pub images: Vec<Image>,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ProfileThumbnail {
-	id: String,
-	first_name: String,
-	image: ImageDto,
-}
-
 impl Profile {
 	fn url() -> Result<String, AppError> {
 		let db_url: String = env::var("DB_URL")?;
@@ -74,14 +55,6 @@ impl Profile {
 
 	fn key_url(&self) -> Result<String, AppError> {
 		Ok(format!("{}{}", &Self::url()?, self.key))
-	}
-
-	fn graph_url() -> Result<String, AppError> {
-		Ok(format!(
-			"{}{}",
-			env::var("DB_URL")?,
-			"_api/gharial/relations/"
-		))
 	}
 
 	pub async fn create(&mut self) -> Result<(), AppError> {
@@ -134,56 +107,6 @@ impl Profile {
 			&& !self.images.is_empty()
 			&& !self.interests.is_empty()
 	}
-
-	pub async fn like(&self, profile_key: &str) -> Result<(), AppError> {
-		let url = format!("{}{}", Profile::graph_url()?, "edge/likes");
-		let body = json!({
-			"_from": format!("profiles/{}", profile_key),
-			"_to": format!("profiles/{}", &self.key)
-		});
-
-		let res: api::ArangoEdgeResponse = api::post(&url, &body).await?;
-		if res.error {
-			Err(AppError::internal("Edge creation failed"))
-		} else {
-			Ok(())
-		}
-	}
-
-	pub async fn get_visits(&self) -> Result<Vec<ProfileThumbnail>, AppError> {
-		let query = format!(
-			"FOR v in 1..1 INBOUND 'profiles/{}' visits RETURN MERGE(v, {{ images: DOCUMENT('images', v.images) }} )",
-			&self.key
-		);
-		let visits = CursorRequest::from(query)
-			.send()
-			.await?
-			.extract_all::<ProfileSlice>()
-			.await?;
-		let visits: Vec<ProfileThumbnail> = visits
-			.iter()
-			.filter_map(|x| ProfileThumbnail::try_from(x).ok())
-			.collect();
-		Ok(visits)
-	}
-
-
-	pub async fn get_likes(&self) -> Result<Vec<ProfileThumbnail>, AppError> {
-		let query = format!(
-			"FOR v in 1..1 INBOUND 'profiles/{}' likes RETURN MERGE(v, {{ images: DOCUMENT('images', v.images) }} )",
-			&self.key
-		);
-		let likes = CursorRequest::from(query)
-			.send()
-			.await?
-			.extract_all::<ProfileSlice>()
-			.await?;
-		let likes: Vec<ProfileThumbnail> = likes
-			.iter()
-			.filter_map(|x| ProfileThumbnail::try_from(x).ok())
-			.collect();
-		Ok(likes)
-	}
 }
 
 impl From<&RegisterFormValues> for Profile {
@@ -199,20 +122,6 @@ impl From<&RegisterFormValues> for Profile {
 			images: vec![],
 		}
 	}
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ProfileDto {
-	first_name: String,
-	last_name: String,
-	gender: Option<Gender>,
-	sexual_preference: SexualPreference,
-	biography: Option<String>,
-	interests: Vec<String>,
-	pub images: Vec<ImageDto>,
-	pub likes: Option<Vec<ProfileThumbnail>>,
-	pub visits: Option<Vec<ProfileThumbnail>>,
 }
 
 impl TryFrom<&ProfileSlice> for ProfileThumbnail {
@@ -231,7 +140,22 @@ impl TryFrom<&ProfileSlice> for ProfileThumbnail {
 	}
 }
 
-impl From<Profile> for ProfileDto {
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct PrivateProfileDto {
+	first_name: String,
+	last_name: String,
+	gender: Option<Gender>,
+	sexual_preference: SexualPreference,
+	biography: Option<String>,
+	interests: Vec<String>,
+	pub fame_rating: usize,
+	pub images: Vec<ImageDto>,
+	pub likes: Vec<ProfileThumbnail>,
+	pub visits: Vec<ProfileThumbnail>,
+}
+
+impl From<Profile> for PrivateProfileDto {
 	fn from(profile: Profile) -> Self {
 		Self {
 			first_name: profile.first_name,
@@ -240,9 +164,58 @@ impl From<Profile> for ProfileDto {
 			sexual_preference: profile.sexual_preference,
 			biography: profile.biography,
 			interests: profile.interests,
+			fame_rating: 0,
 			images: vec![],
-			likes: None,
-			visits: None,
+			likes: vec![],
+			visits: vec![],
 		}
 	}
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct PublicProfileDto {
+	first_name: String,
+	last_name: String,
+	gender: Option<Gender>,
+	sexual_preference: SexualPreference,
+	biography: Option<String>,
+	interests: Vec<String>,
+	pub fame_rating: usize,
+	pub images: Vec<ImageDto>,
+	pub connected: bool,
+}
+
+impl From<Profile> for PublicProfileDto {
+	fn from(profile: Profile) -> Self {
+		Self {
+			first_name: profile.first_name,
+			last_name: profile.last_name,
+			gender: profile.gender,
+			sexual_preference: profile.sexual_preference,
+			biography: profile.biography,
+			interests: profile.interests,
+			fame_rating: 0,
+			images: vec![],
+			connected: false,
+		}
+	}
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ProfileSlice {
+	#[serde(skip_serializing)]
+	#[serde(rename = "_key")]
+	pub key: String,
+	first_name: String,
+	pub images: Vec<Image>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ProfileThumbnail {
+	id: String,
+	first_name: String,
+	image: ImageDto,
 }

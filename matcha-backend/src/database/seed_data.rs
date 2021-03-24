@@ -1,6 +1,6 @@
 use serde_json::Value;
 use crate::models::base::CreateResponse;
-use crate::application::{profile, profile::visit};
+use crate::application::{profile, profile::visit, profile::like};
 use crate::application::user;
 use crate::database::api;
 use crate::errors::AppError;
@@ -14,9 +14,9 @@ use std::env;
 pub async fn seed_data() -> Result<(), AppError> {
 
 
-	let user = create_user("Jake", "Peralta", "jake@test.com").await?;
+	let jake_user = create_user("Jake", "Peralta", "jake@test.com").await?;
 	let profile = update_profile(
-		&user,
+		&jake_user,
 		"Male",
 		"Female",
 		"Ultimate detective / genius",
@@ -27,9 +27,9 @@ pub async fn seed_data() -> Result<(), AppError> {
 	let profile = create_image(profile, "jake2").await?;
 	let jake = create_image(profile, "jake3").await?;
 
-	let user = create_user("Rosa", "Diaz", "rosa@test.com").await?;
+	let rosa_user = create_user("Rosa", "Diaz", "rosa@test.com").await?;
 	let profile = update_profile(
-		&user,
+		&rosa_user,
 		"Female",
 		"Male",
 		"This is dumb",
@@ -40,9 +40,9 @@ pub async fn seed_data() -> Result<(), AppError> {
 	let profile = create_image(profile, "rosa2").await?;
 	let rosa = create_image(profile, "rosa3").await?;
 
-	let user = create_user("Terry", "Jeffords", "terry@test.com").await?;
+	let terry_user = create_user("Terry", "Jeffords", "terry@test.com").await?;
 	let profile = update_profile(
-		&user,
+		&terry_user,
 		"Male",
 		"Female",
 		"I like yogurt and gym",
@@ -53,9 +53,9 @@ pub async fn seed_data() -> Result<(), AppError> {
 	let profile = create_image(profile, "terry2").await?;
 	let terry = create_image(profile, "terry3").await?;
 
-	let user = create_user("Amy", "Santiago", "amy@test.com").await?;
+	let amy_user = create_user("Amy", "Santiago", "amy@test.com").await?;
 	let profile = update_profile(
-		&user,
+		&amy_user,
 		"Female",
 		"Male",
 		"I like to be organized with binders",
@@ -66,9 +66,9 @@ pub async fn seed_data() -> Result<(), AppError> {
 	let profile = create_image(profile, "amy2").await?;
 	let amy = create_image(profile, "amy3").await?;
 
-	let user = create_user("Charles", "Boyle", "charles@test.com").await?;
+	let charles_user = create_user("Charles", "Boyle", "charles@test.com").await?;
 	let profile = update_profile(
-		&user,
+		&charles_user,
 		"Male",
 		"Female",
 		"I like cooking strange stuff",
@@ -79,9 +79,9 @@ pub async fn seed_data() -> Result<(), AppError> {
 	let profile = create_image(profile, "charles2").await?;
 	let charles = create_image(profile, "charles3").await?;
 
-	let user = create_user("Gina", "Linetti", "gina@test.com").await?;
+	let gina_user = create_user("Gina", "Linetti", "gina@test.com").await?;
 	let profile = update_profile(
-		&user,
+		&gina_user,
 		"Female",
 		"Male",
 		"I am the real leader at 99.",
@@ -92,9 +92,9 @@ pub async fn seed_data() -> Result<(), AppError> {
 	let profile = create_image(profile, "gina2").await?;
 	let gina = create_image(profile, "gina3").await?;
 
-	let user = create_user("Raymond", "Holt", "raymond@test.com").await?;
+	let holt_user = create_user("Raymond", "Holt", "raymond@test.com").await?;
 	let profile = update_profile(
-		&user,
+		&holt_user,
 		"Male",
 		"Male",
 		"Captain at 99th precinct",
@@ -105,9 +105,9 @@ pub async fn seed_data() -> Result<(), AppError> {
 	let profile = create_image(profile, "holt2").await?;
 	let holt = create_image(profile, "holt3").await?;
 
-	let user = create_user("Michael", "Hitchcock", "michael@test.com").await?;
+	let hitchcock_user = create_user("Michael", "Hitchcock", "michael@test.com").await?;
 	let profile = update_profile(
-		&user,
+		&hitchcock_user,
 		"Male",
 		"Female",
 		"I work with my pal Scully at 99.",
@@ -118,9 +118,9 @@ pub async fn seed_data() -> Result<(), AppError> {
 	let profile = create_image(profile, "hitchcock2").await?;
 	let hitchcock = create_image(profile, "hitchcock3").await?;
 
-	let user = create_user("Norm", "Scully", "norm@test.com").await?;
+	let scully_user = create_user("Norm", "Scully", "norm@test.com").await?;
 	let profile = update_profile(
-		&user,
+		&scully_user,
 		"Male",
 		"Female",
 		"I work with my pal Hitchcock at 99.",
@@ -131,60 +131,67 @@ pub async fn seed_data() -> Result<(), AppError> {
 	let profile = create_image(profile, "scully2").await?;
 	let scully = create_image(profile, "scully3").await?;
 
-	jake.like(&charles.key).await?;
-	jake.like(&amy.key).await?;
 	visit(&jake.key, &rosa.key).await?;
 	visit(&jake.key, &amy.key).await?;
 	visit(&jake.key, &charles.key).await?;
 	visit(&jake.key, &terry.key).await?;
 	visit(&jake.key, &holt.key).await?;
+	like(&jake_user, &amy.key).await?;
+	like(&jake_user, &holt.key).await?;
+	like(&jake_user, &charles.key).await?;
 
-	rosa.like(&hitchcock.key).await?;
-	rosa.like(&scully.key).await?;
-	rosa.like(&jake.key).await?;
-	rosa.like(&gina.key).await?;
 	visit(&rosa.key, &amy.key).await?;
 	visit(&rosa.key, &gina.key).await?;
 	visit(&rosa.key, &jake.key).await?;
+	like(&rosa_user, &gina.key).await?;
+	like(&rosa_user, &terry.key).await?;
+	like(&rosa_user, &amy.key).await?;
 
 	visit(&amy.key, &gina.key).await?;
 	visit(&amy.key, &rosa.key).await?;
 	visit(&amy.key, &holt.key).await?;
 	visit(&amy.key, &jake.key).await?;
-	amy.like(&jake.key).await?;
-	amy.like(&holt.key).await?;
-	amy.like(&terry.key).await?;
-	amy.like(&rosa.key).await?;
-
+	like(&amy_user, &rosa.key).await?;
+	like(&amy_user, &holt.key).await?;
+	like(&amy_user, &gina.key).await?;
+	like(&amy_user, &jake.key).await?;
 
 	visit(&charles.key, &gina.key).await?;
 	visit(&charles.key, &terry.key).await?;
 	visit(&charles.key, &jake.key).await?;
-	charles.like(&jake.key).await?;
-	charles.like(&gina.key).await?;
-	charles.like(&amy.key).await?;
+	like(&charles_user, &amy.key).await?;
+	like(&charles_user, &jake.key).await?;
+	like(&charles_user, &terry.key).await?;
+	like(&charles_user, &holt.key).await?;
 
 	visit(&terry.key, &jake.key).await?;
 	visit(&terry.key, &holt.key).await?;
 	visit(&terry.key, &amy.key).await?;
 	visit(&terry.key, &scully.key).await?;
-	terry.like(&jake.key).await?;
-	terry.like(&amy.key).await?;
-	terry.like(&holt.key).await?;
+	like(&terry_user, &rosa.key).await?;
+	like(&terry_user, &amy.key).await?;
+	like(&terry_user, &jake.key).await?;
+	like(&terry_user, &scully.key).await?;
+	like(&terry_user, &holt.key).await?;
 
 	visit(&gina.key, &jake.key).await?;
 	visit(&gina.key, &holt.key).await?;
 	visit(&gina.key, &amy.key).await?;
 	visit(&gina.key, &rosa.key).await?;
 	visit(&gina.key, &terry.key).await?;
+	like(&gina_user, &rosa.key).await?;
+	like(&gina_user, &amy.key).await?;
+	like(&gina_user, &terry.key).await?;
 
 	visit(&holt.key, &amy.key).await?;
 	visit(&holt.key, &terry.key).await?;
 	visit(&holt.key, &scully.key).await?;
 	visit(&holt.key, &hitchcock.key).await?;
-	holt.like(&terry.key).await?;
-	holt.like(&amy.key).await?;
-	holt.like(&jake.key).await?;
+	like(&holt_user, &terry.key).await?;
+	like(&holt_user, &jake.key).await?;
+	like(&holt_user, &amy.key).await?;
+	like(&holt_user, &hitchcock.key).await?;
+	like(&holt_user, &scully.key).await?;
 
 
 	visit(&scully.key, &terry.key).await?;
@@ -192,13 +199,17 @@ pub async fn seed_data() -> Result<(), AppError> {
 	visit(&scully.key, &holt.key).await?;
 	visit(&scully.key, &amy.key).await?;
 	visit(&scully.key, &hitchcock.key).await?;
-	scully.like(&hitchcock.key).await?;
+	like(&scully_user, &terry.key).await?;
+	like(&scully_user, &hitchcock.key).await?;
+	like(&scully_user, &jake.key).await?;
 
 	visit(&hitchcock.key, &terry.key).await?;
 	visit(&hitchcock.key, &gina.key).await?;
 	visit(&hitchcock.key, &charles.key).await?;
 	visit(&hitchcock.key, &scully.key).await?;
-	hitchcock.like(&scully.key).await?;
+	like(&hitchcock_user, &scully.key).await?;
+	like(&hitchcock_user, &rosa.key).await?;
+	like(&hitchcock_user, &gina.key).await?;
 
 	Ok(())
 }
