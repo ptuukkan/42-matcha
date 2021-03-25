@@ -4,6 +4,7 @@ use crate::models::like::Like;
 use crate::models::profile::{PrivateProfileDto, Profile, ProfileFormValues, PublicProfileDto};
 use crate::models::user::User;
 use crate::models::visit::Visit;
+use serde_json::{json, Value};
 use std::convert::TryFrom;
 
 pub mod image;
@@ -54,6 +55,13 @@ pub async fn get(user: User, id: &str) -> Result<PublicProfileDto, AppError> {
 		.collect();
 	let mut profile_dto = PublicProfileDto::from(profile);
 	profile_dto.images = images;
+	profile_dto.liked = Like::find(&user.profile, id).await?.is_some();
+	if profile_dto.liked && Like::find(id, &user.profile).await?.is_some() {
+		profile_dto.connected = true;
+	}
+	let visits = Visit::find_inbound(&id).await?;
+	let likes = Like::find_inbound(&id).await?;
+	profile_dto.fame_rating = visits.len() + likes.len();
 	Ok(profile_dto)
 }
 
@@ -69,13 +77,19 @@ pub async fn visit(from: &str, to: &str) -> Result<(), AppError> {
 	}
 }
 
-pub async fn like(user: &User, profile_key: &str) -> Result<(), AppError> {
+pub async fn like(user: &User, profile_key: &str) -> Result<Value, AppError> {
 	if Like::find(&user.profile, profile_key).await?.is_some() {
 		Err(AppError::bad_request("Already liked this profile"))
 	} else {
 		let like = Like::new(&user.profile, profile_key);
 		like.create().await?;
-		Ok(())
+		let res: Value;
+		if Like::find(profile_key, &user.profile).await?.is_some() {
+			res = json!({"connected": true});
+		} else {
+			res = json!({"connected": false});
+		}
+		Ok(res)
 	}
 }
 

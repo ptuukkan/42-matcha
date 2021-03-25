@@ -24,7 +24,7 @@ import ProfileStatistics from './ProfileStatistics';
 const ProfilePage = () => {
 	const rootStore = useContext(RootStoreContext);
 	const { profile, getProfile, updateProfile } = rootStore.profileStore;
-	const { openModal } = rootStore.modalStore;
+	const { openModal, closeModal } = rootStore.modalStore;
 
 	useEffect(() => {
 		if (!profile) {
@@ -61,7 +61,12 @@ const ProfilePage = () => {
 							<Header sub color="pink">
 								Famerate
 							</Header>
-							<Rating icon="heart" disabled defaultRating={7} maxRating={10} />
+							<Rating
+								icon="heart"
+								disabled
+								rating={profile.fameRating}
+								maxRating={10}
+							/>
 						</Item.Description>
 						<Item.Description>
 							<Header sub color="pink">
@@ -83,16 +88,34 @@ const ProfilePage = () => {
 					</Item.Content>
 				</Item>
 				<Menu compact size="tiny">
-					<Menu.Item onClick={() => openModal(<ProfileStatistics profileThumbnails={profile.likes!} title="Likes" />)}>
+					<Menu.Item
+						onClick={() =>
+							openModal(
+								<ProfileStatistics
+									profileThumbnails={profile.likes}
+									title="Likes"
+								/>
+							)
+						}
+					>
 						<Icon name="heart" /> Likes
 						<Label color="red" floating>
-							{profile.likes!.length}
+							{profile.likes.length}
 						</Label>
 					</Menu.Item>
-					<Menu.Item onClick={() => openModal(<ProfileStatistics profileThumbnails={profile.visits!} title="Visits" />)}>
+					<Menu.Item
+						onClick={() =>
+							openModal(
+								<ProfileStatistics
+									profileThumbnails={profile.visits}
+									title="Visits"
+								/>
+							)
+						}
+					>
 						<Icon name="users" /> Visits
 						<Label color="teal" floating>
-							{profile.visits!.length}
+							{profile.visits.length}
 						</Label>
 					</Menu.Item>
 				</Menu>
@@ -103,7 +126,11 @@ const ProfilePage = () => {
 					content="Edit profile"
 					onClick={() =>
 						openModal(
-							<ProfileForm profile={profile!} updateProfile={updateProfile} />,
+							<ProfileForm
+								profile={profile!}
+								updateProfile={updateProfile}
+								closeModal={closeModal}
+							/>,
 							'large'
 						)
 					}
@@ -112,11 +139,7 @@ const ProfilePage = () => {
 					floated="right"
 					size="tiny"
 					content="Edit credentials"
-					onClick={() =>
-						openModal(
-							<ChangeCredentials />, "large"
-						)
-					}
+					onClick={() => openModal(<ChangeCredentials />, 'large')}
 				/>
 				{profile!.images.length > 1 && (
 					<Item>

@@ -78,6 +78,7 @@ pub struct LoginResponse {
 }
 
 impl User {
+	#[allow(dead_code)]
 	pub fn new(email_address: &str, password: &str, username: &str) -> User {
 		User {
 			key: String::new(),

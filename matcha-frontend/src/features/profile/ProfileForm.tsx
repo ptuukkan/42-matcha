@@ -26,9 +26,10 @@ const sexualPreference = [
 interface IProps {
 	profile: IProfile;
 	updateProfile: (data: IProfileFormValues) => Promise<void | any>;
+	closeModal: () => void;
 }
 
-const ProfileForm: React.FC<IProps> = ({ profile, updateProfile }) => {
+const ProfileForm: React.FC<IProps> = ({ profile, updateProfile, closeModal }) => {
 	const [interests, setInterests] = useState<IInterestOption[]>([]);
 	const [interestsLoading, setInterestsLoading] = useState(false);
 
@@ -112,10 +113,12 @@ const ProfileForm: React.FC<IProps> = ({ profile, updateProfile }) => {
 						/>
 						<Button
 							type="button"
+							basic
 							floated="right"
-							content="Cancel"
+							content="OK"
 							disabled={submitting}
 							style={{ marginBottom: '10px' }}
+							onClick={closeModal}
 						/>
 					</Form>
 				)}

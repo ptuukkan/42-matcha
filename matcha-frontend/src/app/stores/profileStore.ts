@@ -1,13 +1,13 @@
 import { FORM_ERROR } from 'final-form';
 import { action, makeObservable, observable, runInAction } from 'mobx';
 import agent from '../api/agent';
-import { IProfile, IProfileFormValues, stringToGender, stringToSexPref } from '../models/profile';
+import { IPrivateProfile, IProfileFormValues, stringToGender, stringToSexPref } from '../models/profile';
 import { RootStore } from './rootStore';
 
 export default class ProfileStore {
 	rootStore: RootStore;
 	loading = false;
-	profile: IProfile | null = null;
+	profile: IPrivateProfile | null = null;
 
 	constructor(rootStore: RootStore) {
 		this.rootStore = rootStore;

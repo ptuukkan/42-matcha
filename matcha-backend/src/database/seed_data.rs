@@ -3,6 +3,7 @@ use crate::models::base::CreateResponse;
 use crate::application::{profile, profile::visit, profile::like};
 use crate::application::user;
 use crate::database::api;
+use crate::database::setup;
 use crate::errors::AppError;
 use crate::models::profile::Profile;
 use crate::models::profile::ProfileFormValues;
@@ -13,6 +14,8 @@ use std::env;
 
 pub async fn seed_data() -> Result<(), AppError> {
 
+	setup::reset_db().await?;
+	setup::arango_setup().await?;
 
 	let jake_user = create_user("Jake", "Peralta", "jake@test.com").await?;
 	let profile = update_profile(

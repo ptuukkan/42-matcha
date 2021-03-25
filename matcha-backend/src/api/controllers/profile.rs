@@ -17,13 +17,13 @@ async fn get_profile(user: User, Path(id): Path<String>) -> Result<HttpResponse,
 	Ok(HttpResponse::Ok().json(profile))
 }
 
-#[get("/profile/like/{id}")]
+#[get("/profile/{id}/like")]
 async fn like_profile(user: User, Path(id): Path<String>) -> Result<HttpResponse, Error> {
-	profile::like(&user, &id).await?;
-	Ok(HttpResponse::Ok().finish())
+	let res = profile::like(&user, &id).await?;
+	Ok(HttpResponse::Ok().json(&res))
 }
 
-#[delete("/profile/like/{id}")]
+#[delete("/profile/{id}/like")]
 async fn unlike_profile(user: User, Path(id): Path<String>) -> Result<HttpResponse, Error> {
 	profile::unlike(&user, &id).await?;
 	Ok(HttpResponse::Ok().finish())

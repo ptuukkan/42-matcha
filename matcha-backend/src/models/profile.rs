@@ -175,6 +175,7 @@ impl From<Profile> for PrivateProfileDto {
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PublicProfileDto {
+	id: String,
 	first_name: String,
 	last_name: String,
 	gender: Option<Gender>,
@@ -184,11 +185,13 @@ pub struct PublicProfileDto {
 	pub fame_rating: usize,
 	pub images: Vec<ImageDto>,
 	pub connected: bool,
+	pub liked: bool,
 }
 
 impl From<Profile> for PublicProfileDto {
 	fn from(profile: Profile) -> Self {
 		Self {
+			id: profile.key,
 			first_name: profile.first_name,
 			last_name: profile.last_name,
 			gender: profile.gender,
@@ -198,6 +201,7 @@ impl From<Profile> for PublicProfileDto {
 			fame_rating: 0,
 			images: vec![],
 			connected: false,
+			liked: false,
 		}
 	}
 }

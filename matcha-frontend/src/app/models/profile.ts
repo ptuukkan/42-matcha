@@ -13,8 +13,18 @@ export interface IProfile {
 	/* 	location: ILocation; */
 	interests: string[];
 	images: IImage[];
-	likes?: IProfileThumbnail[];
-	visits?: IProfileThumbnail[];
+	fameRating: number;
+}
+
+export interface IPrivateProfile extends IProfile {
+	likes: IProfileThumbnail[];
+	visits: IProfileThumbnail[];
+}
+
+export interface IPublicProfile extends IProfile {
+	id: string;
+	connected: boolean;
+	liked: boolean;
 }
 
 export interface IProfileThumbnail {
@@ -65,3 +75,7 @@ export const stringToSexPref = (data: string): SexualPreference => {
 	if (data === 'Female') return SexualPreference.Female;
 	return SexualPreference.Both;
 };
+
+export interface ILikeResponse {
+	connected: boolean;
+}

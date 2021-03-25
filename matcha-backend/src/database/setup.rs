@@ -97,3 +97,9 @@ async fn create_relations_graph(db_url: &str) -> Result<(), AppError> {
 
 	Ok(())
 }
+
+pub async fn reset_db() -> Result<(), AppError> {
+	let url = env::var("DB_BASE_URL")? + "_api/database/matcha";
+	api::delete(&url).await?;
+	Ok(())
+}

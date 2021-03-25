@@ -10,7 +10,7 @@ import {
 	IUser,
 } from '../models/user';
 import { history } from '../..';
-import { IImage, IProfile, IProfileFormValues } from '../models/profile';
+import { IImage, ILikeResponse, IPrivateProfile, IProfileFormValues, IPublicProfile } from '../models/profile';
 import { IInterestOption } from '../models/interest';
 
 axios.defaults.baseURL = process.env.REACT_APP_API_URL;
@@ -78,12 +78,14 @@ const Profile = {
 		requests.put('/profile', data),
 	addImage: (data: FormData): Promise<IImage> =>
 		requests.post('/profile/image', data),
-	current: (): Promise<IProfile> => requests.get('/profile'),
-	get: (id: string): Promise<IProfile> => requests.get(`/profile/${id}`),
+	current: (): Promise<IPrivateProfile> => requests.get('/profile'),
+	get: (id: string): Promise<IPublicProfile> => requests.get(`/profile/${id}`),
 	removeImage: (id: string): Promise<void> =>
 		requests.delete(`/profile/image/${id}`),
 	imageToMain: (id: string): Promise<void> =>
 		requests.put(`/profile/image/${id}`, {}),
+	like: (id: string): Promise<ILikeResponse> => requests.get(`/profile/${id}/like`),
+	unlike: (id: string): Promise<void> => requests.delete(`/profile/${id}/like`),
 };
 
 const Interests = {

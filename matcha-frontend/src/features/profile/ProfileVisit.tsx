@@ -1,17 +1,16 @@
-import React, { Fragment, useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { useHistory, useParams } from 'react-router';
-import { Link } from 'react-router-dom';
-import { Button, Header, Icon, Item, Label, Loader, Menu, Rating } from 'semantic-ui-react';
+import { Button, Header, Item, Label, Loader, Rating } from 'semantic-ui-react';
 import agent from '../../app/api/agent';
-import { IProfile } from '../../app/models/profile';
-import ProfileForm from './ProfileForm';
+import { IPublicProfile } from '../../app/models/profile';
+import ProfileVisitLikeButton from './ProfileVisitLikeButton';
 
 interface IParams {
 	id: string;
 }
 
 const ProfileVisit = () => {
-	const [profile, setProfile] = useState<null | IProfile>(null);
+	const [profile, setProfile] = useState<null | IPublicProfile>(null);
 	const { id } = useParams<IParams>();
 	const history = useHistory();
 
@@ -45,17 +44,27 @@ const ProfileVisit = () => {
 					/>
 					<Item.Content>
 						<Item.Header>
-							{profile?.firstName} {profile?.lastName}
+							{profile!.firstName} {profile!.lastName}
+							{profile!.connected && (
+								<Label color="teal" horizontal style={{ float: 'right' }}>
+									Connected
+								</Label>
+							)}
 						</Item.Header>
 						<Item.Meta>
-							<Item>Gender: {profile?.gender}</Item>
-							<Item>Sexual Preference: {profile?.sexualPreference}</Item>
+							<Item>Gender: {profile!.gender}</Item>
+							<Item>Sexual Preference: {profile!.sexualPreference}</Item>
 						</Item.Meta>
 						<Item.Description>
 							<Header sub color="pink">
 								Famerate
 							</Header>
-							<Rating icon="heart" disabled defaultRating={7} maxRating={10} />
+							<Rating
+								icon="heart"
+								disabled
+								rating={profile!.fameRating}
+								maxRating={10}
+							/>
 						</Item.Description>
 						<Item.Description>
 							<Header sub color="pink">
@@ -76,7 +85,7 @@ const ProfileVisit = () => {
 						</Item.Extra>
 					</Item.Content>
 				</Item>
-				<Button content="Like" />
+				<ProfileVisitLikeButton profile={profile!} setProfile={setProfile} />
 				{profile!.images.length > 1 && (
 					<Item>
 						{profile!.images
@@ -90,6 +99,5 @@ const ProfileVisit = () => {
 		</Fragment>
 	);
 };
-
 
 export default ProfileVisit;
