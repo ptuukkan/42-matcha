@@ -13,7 +13,7 @@ async fn get_my_profile(user: User) -> Result<HttpResponse, Error> {
 
 #[get("/profile/{id}")]
 async fn get_profile(user: User, Path(id): Path<String>) -> Result<HttpResponse, Error> {
-	let profile = profile::get(user, &id).await?;
+	let profile = profile::get(&user, &id).await?;
 	Ok(HttpResponse::Ok().json(profile))
 }
 
@@ -28,7 +28,6 @@ async fn unlike_profile(user: User, Path(id): Path<String>) -> Result<HttpRespon
 	profile::unlike(&user, &id).await?;
 	Ok(HttpResponse::Ok().finish())
 }
-
 
 #[put("/profile")]
 async fn update_profile(
@@ -62,7 +61,6 @@ async fn get_interests(_user: User) -> Result<HttpResponse, Error> {
 	let interests = profile::interest::get().await?;
 	Ok(HttpResponse::Ok().json(interests))
 }
-
 
 pub fn routes(config: &mut web::ServiceConfig) {
 	config

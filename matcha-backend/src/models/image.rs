@@ -1,3 +1,4 @@
+use crate::database::cursor::CursorRequest;
 use core::convert::TryFrom;
 use crate::database::api;
 use crate::errors::AppError;
@@ -50,6 +51,23 @@ impl Image {
 	pub async fn delete(&self) -> Result<(), AppError> {
 		api::delete(&self.key_url()?).await?;
 		Ok(())
+	}
+
+	pub async fn get_profile_images(profile_key: &str) -> Result<Vec<Image>, AppError> {
+		let query = format!(
+			"FOR p IN profiles filter p._key == '{}' return DOCUMENT(\"images\", p.images)",
+			profile_key
+		);
+		let mut result = CursorRequest::from(query)
+			.send()
+			.await?
+			.extract_all::<Vec<Image>>()
+			.await?;
+		if let Some(images) = result.pop() {
+			Ok(images)
+		} else {
+			Err(AppError::internal("No images found"))
+		}
 	}
 }
 

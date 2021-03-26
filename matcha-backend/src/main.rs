@@ -43,6 +43,7 @@ async fn main() -> std::io::Result<()> {
 			.service(Files::new("/img", "./images").show_files_listing())
 			.configure(api::controllers::user::routes)
 			.configure(api::controllers::profile::routes)
+			.configure(api::controllers::browse::routes)
 	})
 	.bind("127.0.0.1:8080")?;
 	info!("Starting server");

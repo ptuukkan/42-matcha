@@ -88,6 +88,10 @@ const Profile = {
 	unlike: (id: string): Promise<void> => requests.delete(`/profile/${id}/like`),
 };
 
+const Browse = {
+	list: (): Promise<IPublicProfile[]> => requests.get('/browse/list'),
+}
+
 const Interests = {
 	get: (): Promise<IInterestOption[]> => requests.get('/interests'),
 };
@@ -96,6 +100,7 @@ const agent = {
 	User,
 	Profile,
 	Interests,
+	Browse,
 };
 
 export default agent;

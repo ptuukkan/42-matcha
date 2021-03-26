@@ -16,21 +16,21 @@ pub struct Profile {
 	pub key: String,
 	pub first_name: String,
 	pub last_name: String,
-	gender: Option<Gender>,
-	sexual_preference: SexualPreference,
+	pub gender: Option<Gender>,
+	pub sexual_preference: SexualPreference,
 	biography: Option<String>,
 	interests: Vec<String>,
 	pub images: Vec<String>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-enum Gender {
+#[derive(Debug, Serialize, Deserialize, PartialEq)]
+pub enum Gender {
 	Male,
 	Female,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-enum SexualPreference {
+pub enum SexualPreference {
 	Male,
 	Female,
 	Both,
@@ -82,6 +82,16 @@ impl Profile {
 		let url = format!("{}{}", Self::url()?, key);
 		let profile = api::get::<Self>(&url).await?;
 		Ok(profile)
+	}
+
+	pub async fn get_all() -> Result<Vec<Self>, AppError> {
+		let query = "FOR p IN profiles return p";
+		let result = CursorRequest::from(query)
+			.send()
+			.await?
+			.extract_all::<Self>()
+			.await?;
+		Ok(result)
 	}
 
 	pub async fn delete(&self) -> Result<(), AppError> {
@@ -186,7 +196,7 @@ impl From<Profile> for PrivateProfileDto {
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PublicProfileDto {
-	id: String,
+	pub id: String,
 	first_name: String,
 	last_name: String,
 	gender: Option<Gender>,

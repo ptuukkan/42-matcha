@@ -1,5 +1,5 @@
 use crate::errors::AppError;
-use crate::models::image::ImageDto;
+use crate::models::image::{Image, ImageDto};
 use crate::models::like::Like;
 use crate::models::profile::{PrivateProfileDto, Profile, ProfileFormValues, PublicProfileDto};
 use crate::models::user::User;
@@ -39,28 +39,16 @@ pub async fn update(user: User, mut values: ProfileFormValues) -> Result<(), App
 	Ok(())
 }
 
-pub async fn get(user: User, id: &str) -> Result<PublicProfileDto, AppError> {
-	let profile = Profile::get(id).await?;
+pub async fn get(user: &User, profile_key: &str) -> Result<PublicProfileDto, AppError> {
+	let profile = Profile::get(profile_key).await?;
 	// if !profile.is_complete() {
 	// 	return Err(AppError::not_found("Profile not found"));
 	// }
 	if user.profile != profile.key {
-		visit(&user.profile, id).await?;
+		visit(&user.profile, profile_key).await?;
 	}
 
-	let images: Vec<ImageDto> = profile
-		.get_images()
-		.await?
-		.iter()
-		.filter_map(|x| ImageDto::try_from(x).ok())
-		.collect();
-	let mut profile_dto = PublicProfileDto::from(profile);
-	profile_dto.images = images;
-	profile_dto.liked = Like::find(&user.profile, id).await?.is_some();
-	if profile_dto.liked && Like::find(id, &user.profile).await?.is_some() {
-		profile_dto.connected = true;
-	}
-	profile_dto.fame_rating = fame_rating(&id).await?;
+	let profile_dto = load_profile_dto(user, profile_key).await?;
 	Ok(profile_dto)
 }
 
@@ -115,12 +103,22 @@ async fn fame_rating(profile_key: &str) -> Result<usize, AppError> {
 			fame = 10.0;
 		}
 	}
-	println!("total likes: {}", total_likes);
-	println!("total visits: {}", total_visits);
-	println!("total profiles: {}", total_profiles);
-	println!("profile visits: {}", profile_visits);
-	println!("profile likes: {}", profile_likes);
-	println!("avg, {}", avg);
-	println!("fame, {}", fame);
 	Ok(fame as usize)
+}
+
+pub async fn load_profile_dto(user: &User, profile_key: &str) -> Result<PublicProfileDto, AppError> {
+	let profile = Profile::get(profile_key).await?;
+	let images: Vec<ImageDto> = Image::get_profile_images(profile_key)
+		.await?
+		.iter()
+		.filter_map(|x| ImageDto::try_from(x).ok())
+		.collect();
+	let mut profile_dto = PublicProfileDto::from(profile);
+	profile_dto.images = images;
+	profile_dto.liked = Like::find(&user.profile, profile_key).await?.is_some();
+	if profile_dto.liked && Like::find(profile_key, &user.profile).await?.is_some() {
+		profile_dto.connected = true;
+	}
+	profile_dto.fame_rating = fame_rating(profile_key).await?;
+	Ok(profile_dto)
 }

@@ -22,6 +22,7 @@ import SubModalContainer from '../common/modals/SubModalContainer';
 import ProfileVisit from '../../features/profile/ProfileVisit';
 import ChangeCredentials from '../../features/user/ChangeCredentials';
 import { getPosition } from '../common/location/locationUtils';
+import Browse from '../../features/browse/Browse';
 
 const App = () => {
 	// const [profile, setProfile] = useState(Profiles.profiles[0]);
@@ -67,7 +68,7 @@ const App = () => {
 					<Switch>
 						<Route path="/verify/:link" component={EmailVerification} />
 						<Route path="/resetpassword/:link" component={ChangePassword} />
-						<Route exact path="/" component={Landing} />
+						<Route exact path="/" component={user ? Browse : Landing} />
 						<Route
 							render={() => (
 								<Fragment>
