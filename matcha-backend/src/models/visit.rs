@@ -24,10 +24,6 @@ impl Visit {
 		Ok(db_url + "_api/gharial/relations/edge/visits/")
 	}
 
-	fn key_url(&self) -> Result<String, AppError> {
-		Ok(format!("{}{}", &Self::url()?, self.key))
-	}
-
 	fn collection_url() -> Result<String, AppError> {
 		let db_url: String = env::var("DB_URL")?;
 		Ok(db_url + "_api/collection/visits/")

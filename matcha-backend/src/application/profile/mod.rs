@@ -105,15 +105,22 @@ async fn fame_rating(profile_key: &str) -> Result<usize, AppError> {
 	let total_profiles = Profile::count().await?;
 	let profile_visits = Visit::find_inbound(profile_key).await?.len();
 	let profile_likes = Like::find_inbound(profile_key).await?.len();
-	let avg = (total_likes + total_visits) / total_profiles;
-	let mut fame: usize;
+	let avg = (total_likes + total_visits) as f32 / total_profiles as f32;
+	let mut fame: f32;
 	if profile_visits + profile_likes == 0 {
-		fame = 0;
+		fame = 0.0;
 	} else {
-		fame = (profile_likes + profile_visits) / avg * 5;
-		if fame > 10 {
-			fame = 10;
+		fame = (profile_likes + profile_visits) as f32 / avg * 5.0;
+		if fame > 10.0 {
+			fame = 10.0;
 		}
 	}
-	Ok(fame)
+	println!("total likes: {}", total_likes);
+	println!("total visits: {}", total_visits);
+	println!("total profiles: {}", total_profiles);
+	println!("profile visits: {}", profile_visits);
+	println!("profile likes: {}", profile_likes);
+	println!("avg, {}", avg);
+	println!("fame, {}", fame);
+	Ok(fame as usize)
 }
