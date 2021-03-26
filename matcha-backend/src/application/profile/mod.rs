@@ -20,11 +20,12 @@ pub async fn get_my(user: User) -> Result<PrivateProfileDto, AppError> {
 		.collect();
 	let visits = Visit::find_inbound(&profile.key).await?;
 	let likes = Like::find_inbound(&profile.key).await?;
+	let fame = fame_rating(&profile.key).await?;
 	let mut profile_dto = PrivateProfileDto::from(profile);
 	profile_dto.images = images;
-	profile_dto.fame_rating = visits.len() + likes.len();
 	profile_dto.visits = visits;
 	profile_dto.likes = likes;
+	profile_dto.fame_rating = fame;
 
 	Ok(profile_dto)
 }
@@ -59,16 +60,12 @@ pub async fn get(user: User, id: &str) -> Result<PublicProfileDto, AppError> {
 	if profile_dto.liked && Like::find(id, &user.profile).await?.is_some() {
 		profile_dto.connected = true;
 	}
-	let visits = Visit::find_inbound(&id).await?;
-	let likes = Like::find_inbound(&id).await?;
-	profile_dto.fame_rating = visits.len() + likes.len();
+	profile_dto.fame_rating = fame_rating(&id).await?;
 	Ok(profile_dto)
 }
 
 pub async fn visit(from: &str, to: &str) -> Result<(), AppError> {
-	if let Some(mut visit) = Visit::find(from, to).await? {
-		visit.count += 1;
-		visit.update().await?;
+	if Visit::find(from, to).await?.is_some() {
 		Ok(())
 	} else {
 		let visit = Visit::new(from, to);
@@ -100,4 +97,23 @@ pub async fn unlike(user: &User, profile_key: &str) -> Result<(), AppError> {
 	} else {
 		Err(AppError::bad_request("Like not found"))
 	}
+}
+
+async fn fame_rating(profile_key: &str) -> Result<usize, AppError> {
+	let total_likes = Like::count().await?;
+	let total_visits = Visit::count().await?;
+	let total_profiles = Profile::count().await?;
+	let profile_visits = Visit::find_inbound(profile_key).await?.len();
+	let profile_likes = Like::find_inbound(profile_key).await?.len();
+	let avg = (total_likes + total_visits) / total_profiles;
+	let mut fame: usize;
+	if profile_visits + profile_likes == 0 {
+		fame = 0;
+	} else {
+		fame = (profile_likes + profile_visits) / avg * 5;
+		if fame > 10 {
+			fame = 10;
+		}
+	}
+	Ok(fame)
 }

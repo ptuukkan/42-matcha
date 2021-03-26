@@ -16,7 +16,6 @@ pub struct Visit {
 	from: String,
 	#[serde(rename = "_to")]
 	to: String,
-	pub count: u32,
 }
 
 impl Visit {
@@ -29,12 +28,16 @@ impl Visit {
 		Ok(format!("{}{}", &Self::url()?, self.key))
 	}
 
+	fn collection_url() -> Result<String, AppError> {
+		let db_url: String = env::var("DB_URL")?;
+		Ok(db_url + "_api/collection/visits/")
+	}
+
 	pub fn new(from: &str, to: &str) -> Self {
 		Self {
 			key: String::new(),
 			from: format!("profiles/{}", from),
 			to: format!("profiles/{}", to),
-			count: 1,
 		}
 	}
 
@@ -47,11 +50,6 @@ impl Visit {
 		} else {
 			Ok(())
 		}
-	}
-
-	pub async fn update(&self) -> Result<(), AppError> {
-		api::patch(&self.key_url()?, &self).await?;
-		Ok(())
 	}
 
 	pub async fn find(from: &str, to: &str) -> Result<Option<Self>, AppError> {
@@ -86,5 +84,11 @@ impl Visit {
 			.filter_map(|x| ProfileThumbnail::try_from(x).ok())
 			.collect();
 		Ok(vertices)
+	}
+
+	pub async fn count() -> Result<usize, AppError> {
+		let url = format!("{}count", Self::collection_url()?);
+		let res: api::ArangoCollectionCount = api::get(&url).await?;
+		Ok(res.count)
 	}
 }

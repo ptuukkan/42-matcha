@@ -33,6 +33,11 @@ enum ArangoResponse<T> {
 	Error(ArangoResponseError),
 }
 
+#[derive(Deserialize)]
+pub struct ArangoCollectionCount {
+	pub count: usize,
+}
+
 pub async fn get_arango_jwt() -> Result<String, AppError> {
 	let jwt: String;
 

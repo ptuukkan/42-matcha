@@ -57,6 +57,11 @@ impl Profile {
 		Ok(format!("{}{}", &Self::url()?, self.key))
 	}
 
+	fn collection_url() -> Result<String, AppError> {
+		let db_url: String = env::var("DB_URL")?;
+		Ok(db_url + "_api/collection/profiles/")
+	}
+
 	pub async fn create(&mut self) -> Result<(), AppError> {
 		let res = api::post::<Profile, CreateResponse>(&Profile::url()?, &self).await?;
 		self.key = res.key;
@@ -106,6 +111,12 @@ impl Profile {
 			&& self.biography.is_some()
 			&& !self.images.is_empty()
 			&& !self.interests.is_empty()
+	}
+
+	pub async fn count() -> Result<usize, AppError> {
+		let url = format!("{}count", Self::collection_url()?);
+		let res: api::ArangoCollectionCount = api::get(&url).await?;
+		Ok(res.count)
 	}
 }
 

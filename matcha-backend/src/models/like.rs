@@ -28,6 +28,11 @@ impl Like {
 		Ok(format!("{}{}", &Self::url()?, self.key))
 	}
 
+	fn collection_url() -> Result<String, AppError> {
+		let db_url: String = env::var("DB_URL")?;
+		Ok(db_url + "_api/collection/likes/")
+	}
+
 	pub fn new(from: &str, to: &str) -> Self {
 		Self {
 			key: String::new(),
@@ -84,5 +89,11 @@ impl Like {
 			.filter_map(|x| ProfileThumbnail::try_from(x).ok())
 			.collect();
 		Ok(vertices)
+	}
+
+	pub async fn count() -> Result<usize, AppError> {
+		let url = format!("{}count", Self::collection_url()?);
+		let res: api::ArangoCollectionCount = api::get(&url).await?;
+		Ok(res.count)
 	}
 }
