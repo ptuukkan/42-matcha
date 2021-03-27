@@ -17,7 +17,7 @@ export interface IProfile {
 }
 
 export interface IPrivateProfile extends IProfile {
-	overwriteLocation: boolean;
+	locationOverride: boolean;
 	likes: IProfileThumbnail[];
 	location: ILocation;
 	visits: IProfileThumbnail[];

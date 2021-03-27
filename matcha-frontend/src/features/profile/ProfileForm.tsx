@@ -1,5 +1,12 @@
 import { Form as FinalForm, Field } from 'react-final-form';
-import { Form, Button, Divider, Loader, Header } from 'semantic-ui-react';
+import {
+	Form,
+	Button,
+	Divider,
+	Loader,
+	Header,
+	Checkbox,
+} from 'semantic-ui-react';
 import agent from '../../app/api/agent';
 import TextInput from '../../app/common/form/TextInput';
 import React, { useEffect, useState } from 'react';
@@ -11,6 +18,7 @@ import { IInterestOption } from '../../app/models/interest';
 import ErrorMessage from '../../app/common/form/ErrorMessage';
 import ProfileImages from './ProfileImages';
 import { IProfile, IProfileFormValues } from '../../app/models/profile';
+import CheckboxInput from '../../app/common/form/CheckboxInput';
 
 const gender = [
 	{ key: 'female', value: 'Female', text: 'Female' },
@@ -29,7 +37,23 @@ interface IProps {
 	closeModal: () => void;
 }
 
-const ProfileForm: React.FC<IProps> = ({ profile, updateProfile, closeModal }) => {
+interface IConditionProps {
+	when: any;
+	is: any;
+	children: any;
+}
+
+const Condition: React.FC<IConditionProps> = ({ when, is, children }) => (
+	<Field name={when} subscription={{ value: true }}>
+		{({ input: { value } }) => (value === is ? children : null)}
+	</Field>
+);
+
+const ProfileForm: React.FC<IProps> = ({
+	profile,
+	updateProfile,
+	closeModal,
+}) => {
 	const [interests, setInterests] = useState<IInterestOption[]>([]);
 	const [interestsLoading, setInterestsLoading] = useState(false);
 
@@ -46,7 +70,7 @@ const ProfileForm: React.FC<IProps> = ({ profile, updateProfile, closeModal }) =
 	return (
 		<>
 			<FinalForm
-				onSubmit={updateProfile}
+				onSubmit={data => console.log(data)}
 				initialValues={profile}
 				validate={formValidation.validateForm}
 				render={({
@@ -94,8 +118,25 @@ const ProfileForm: React.FC<IProps> = ({ profile, updateProfile, closeModal }) =
 								component={TextInput}
 								placeholder="Biography"
 								name="biography"
-							/>
+								/>
 						</Form.Group>
+						<b>Override location?</b>
+						<br></br>
+						<Field name="locationOverride" component="input" type="checkbox" />
+						<Condition when="locationOverride" is={true}>
+							<Form.Group widths={2}>
+								<Field
+									name="location.latitude"
+									placeholder="Latitude"
+									component={TextInput}
+								/>
+								<Field
+									name="location.longitude"
+									placeholder="Longitude"
+									component={TextInput}
+								/>
+							</Form.Group>
+						</Condition>
 						<Divider />
 						<ProfileImages />
 						<Divider />
