@@ -1,3 +1,4 @@
+use crate::models::location::LocationDto;
 use crate::errors::AppError;
 use crate::models::image::{Image, ImageDto};
 use crate::models::like::Like;
@@ -25,7 +26,7 @@ pub async fn get_my(user: &User) -> Result<PrivateProfileDto, AppError> {
 	let likes = Like::find_inbound(&profile.key).await?;
 	let fame = fame_rating(&profile.key).await?;
 	let mut profile_dto = PrivateProfileDto::from(profile);
-	profile_dto.location = location;
+	profile_dto.location = LocationDto::from(location);
 	profile_dto.images = images;
 	profile_dto.visits = visits;
 	profile_dto.likes = likes;
@@ -41,7 +42,7 @@ pub async fn update(user: &User, mut values: ProfileFormValues) -> Result<(), Ap
 		if ol {
 			let loc = values.location.unwrap();
 			let mut profile_location = Location::get(&profile.location).await?;
-			profile_location.coordinate = loc.coordinate;
+			profile_location.coordinate = vec![loc.longitude, loc.longitude];
 			profile_location.update().await?;
 			values.location = None;
 		}
