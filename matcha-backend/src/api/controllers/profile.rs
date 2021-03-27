@@ -1,4 +1,3 @@
-use crate::models::location::LocationInput;
 use crate::application::profile;
 use crate::models::profile::ProfileFormValues;
 use crate::models::user::User;
@@ -8,7 +7,7 @@ use actix_web::{error::Error};
 
 #[get("/profile")]
 async fn get_my_profile(user: User) -> Result<HttpResponse, Error> {
-	let profile = profile::get_my(user).await?;
+	let profile = profile::get_my(&user).await?;
 	Ok(HttpResponse::Ok().json(profile))
 }
 
@@ -30,24 +29,12 @@ async fn unlike_profile(user: User, Path(id): Path<String>) -> Result<HttpRespon
 	Ok(HttpResponse::Ok().finish())
 }
 
-/* 
-#[put("/profile/updatelocation")]
-async fn update_location(
-	user: User,
-	values: Json<LocationInput>,
-) -> Result<HttpResponse, Error> {
-	println!("{:#?}", values);
-	profile::update_location(&user, values).await?;
-	Ok(HttpResponse::Ok().finish())
-}
- */
-
 #[put("/profile")]
 async fn update_profile(
 	user: User,
 	values: Json<ProfileFormValues>,
 ) -> Result<HttpResponse, Error> {
-	profile::update(user, values.into_inner()).await?;
+	profile::update(&user, values.into_inner()).await?;
 	Ok(HttpResponse::Ok().finish())
 }
 

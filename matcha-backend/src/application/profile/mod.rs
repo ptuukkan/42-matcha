@@ -1,19 +1,18 @@
 use crate::errors::AppError;
 use crate::models::image::{Image, ImageDto};
 use crate::models::like::Like;
+use crate::models::location::Location;
 use crate::models::profile::{PrivateProfileDto, Profile, ProfileFormValues, PublicProfileDto};
-use crate::models::location::LocationInput;
 use crate::models::user::User;
 use crate::models::visit::Visit;
 use serde_json::{json, Value};
-use actix_web::web::Json;
 use std::convert::TryFrom;
 
 pub mod image;
-pub mod location;
 pub mod interest;
+pub mod location;
 
-pub async fn get_my(user: User) -> Result<PrivateProfileDto, AppError> {
+pub async fn get_my(user: &User) -> Result<PrivateProfileDto, AppError> {
 	let profile = Profile::get(&user.profile).await?;
 	let images: Vec<ImageDto> = profile
 		.get_images()
@@ -22,11 +21,11 @@ pub async fn get_my(user: User) -> Result<PrivateProfileDto, AppError> {
 		.filter_map(|x| ImageDto::try_from(x).ok())
 		.collect();
 	let visits = Visit::find_inbound(&profile.key).await?;
-	// Hae location
+	let location = Location::get(&profile.location).await?;
 	let likes = Like::find_inbound(&profile.key).await?;
 	let fame = fame_rating(&profile.key).await?;
 	let mut profile_dto = PrivateProfileDto::from(profile);
-	//Assign location
+	profile_dto.location = location;
 	profile_dto.images = images;
 	profile_dto.visits = visits;
 	profile_dto.likes = likes;
@@ -35,9 +34,18 @@ pub async fn get_my(user: User) -> Result<PrivateProfileDto, AppError> {
 	Ok(profile_dto)
 }
 
-pub async fn update(user: User, mut values: ProfileFormValues) -> Result<(), AppError> {
+pub async fn update(user: &User, mut values: ProfileFormValues) -> Result<(), AppError> {
 	let profile = Profile::get(&user.profile).await?;
-	// Jos location override otetaan se
+	if values.overwrite_location.is_some() && values.location.is_some() {
+		let ol = values.overwrite_location.unwrap();
+		if ol {
+			let loc = values.location.unwrap();
+			let mut profile_location = Location::get(&profile.location).await?;
+			profile_location.coordinate = loc.coordinate;
+			profile_location.update().await?;
+			values.location = None;
+		}
+	}
 	if let Some(interests) = values.interests {
 		values.interests = interest::create(interests).await?;
 	}
@@ -112,7 +120,10 @@ async fn fame_rating(profile_key: &str) -> Result<usize, AppError> {
 	Ok(fame as usize)
 }
 
-pub async fn load_profile_dto(user: &User, profile_key: &str) -> Result<PublicProfileDto, AppError> {
+pub async fn load_profile_dto(
+	user: &User,
+	profile_key: &str,
+) -> Result<PublicProfileDto, AppError> {
 	let profile = Profile::get(profile_key).await?;
 	let images: Vec<ImageDto> = Image::get_profile_images(profile_key)
 		.await?

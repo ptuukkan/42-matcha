@@ -255,7 +255,6 @@ async fn update_profile(
 	});
 
 	let data: ProfileFormValues = serde_json::from_value(body)?;
-
 	profile.update_from_form(&data).await?;
 
 	let profile = Profile::get(&user.profile).await?;

@@ -6,6 +6,7 @@ use crate::models::base::CreateResponse;
 use crate::models::image::{Image, ImageDto};
 use crate::models::user::RegisterFormValues;
 use serde::{Deserialize, Serialize};
+use serde_with_macros::skip_serializing_none;
 use std::convert::TryFrom;
 use std::env;
 
@@ -39,13 +40,15 @@ pub enum SexualPreference {
 	Both,
 }
 
+#[skip_serializing_none]
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct ProfileFormValues {
 	first_name: Option<String>,
 	last_name: Option<String>,
 	gender: Option<Gender>,
-	overwrite_location: Option<bool>,
+	pub overwrite_location: Option<bool>,
+	pub location: Option<Location>,
 	sexual_preference: Option<SexualPreference>,
 	biography: Option<String>,
 	pub interests: Option<Vec<String>>,
@@ -176,7 +179,7 @@ pub struct PrivateProfileDto {
 	sexual_preference: SexualPreference,
 	biography: Option<String>,
 	interests: Vec<String>,
-	location: Location,
+	pub location: Location,
 	overwrite_location: bool,
 	pub fame_rating: usize,
 	pub images: Vec<ImageDto>,

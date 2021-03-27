@@ -12,7 +12,6 @@ actix-web = "3.3.2"
 actix-cors = "0.5.4"
 dotenv = "0.15.0"
 serde = "1.0.118"
-serde_json = "1.0"
 derive_more = "0.99.11"
 lettre = "0.9"
 lettre_email = "0.9"
@@ -26,6 +25,9 @@ actix-web-validator = "2.0.3"
 validator = { version = "0.12", features = ["derive"] }
 actix-files = "0.5.0"
 regex = "1.4.5"
+serde_json = "1.0"
+serde_with_macros = "1.4.1"
+
 
 [dev-dependencies]
 lazy_static = "1.4.0"
