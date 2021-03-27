@@ -36,8 +36,8 @@ pub async fn get_my(user: &User) -> Result<PrivateProfileDto, AppError> {
 
 pub async fn update(user: &User, mut values: ProfileFormValues) -> Result<(), AppError> {
 	let profile = Profile::get(&user.profile).await?;
-	if values.overwrite_location.is_some() && values.location.is_some() {
-		let ol = values.overwrite_location.unwrap();
+	if values.location_override.is_some() && values.location.is_some() {
+		let ol = values.location_override.unwrap();
 		if ol {
 			let loc = values.location.unwrap();
 			let mut profile_location = Location::get(&profile.location).await?;

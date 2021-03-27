@@ -12,7 +12,7 @@ pub async fn create() -> Result<String, AppError> {
 
 pub async fn update(user: &User, location_input: LocationInput) -> Result<(), AppError> {
 	let profile = Profile::get(&user.profile).await?;
-	if profile.overwrite_location {
+	if profile.location_override {
 		return Ok(())
 	}
 	let mut location = Location::get(&profile.location).await?;
