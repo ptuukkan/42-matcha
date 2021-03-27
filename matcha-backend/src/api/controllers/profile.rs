@@ -1,3 +1,4 @@
+use crate::models::location::LocationInput;
 use crate::application::profile;
 use crate::models::profile::ProfileFormValues;
 use crate::models::user::User;
@@ -28,6 +29,18 @@ async fn unlike_profile(user: User, Path(id): Path<String>) -> Result<HttpRespon
 	profile::unlike(&user, &id).await?;
 	Ok(HttpResponse::Ok().finish())
 }
+
+/* 
+#[put("/profile/updatelocation")]
+async fn update_location(
+	user: User,
+	values: Json<LocationInput>,
+) -> Result<HttpResponse, Error> {
+	println!("{:#?}", values);
+	profile::update_location(&user, values).await?;
+	Ok(HttpResponse::Ok().finish())
+}
+ */
 
 #[put("/profile")]
 async fn update_profile(

@@ -1,3 +1,4 @@
+use crate::models::location::Location;
 use crate::database::api;
 use crate::database::cursor::CursorRequest;
 use crate::errors::AppError;
@@ -19,7 +20,9 @@ pub struct Profile {
 	pub gender: Option<Gender>,
 	pub sexual_preference: SexualPreference,
 	biography: Option<String>,
+	pub overwrite_location: bool,
 	interests: Vec<String>,
+	pub location: String,
 	pub images: Vec<String>,
 }
 
@@ -42,6 +45,7 @@ pub struct ProfileFormValues {
 	first_name: Option<String>,
 	last_name: Option<String>,
 	gender: Option<Gender>,
+	overwrite_location: Option<bool>,
 	sexual_preference: Option<SexualPreference>,
 	biography: Option<String>,
 	pub interests: Option<Vec<String>>,
@@ -139,6 +143,8 @@ impl From<&RegisterFormValues> for Profile {
 			gender: None,
 			sexual_preference: SexualPreference::Both,
 			biography: None,
+			overwrite_location: false,
+			location: String::new(),
 			interests: vec![],
 			images: vec![],
 		}
@@ -170,6 +176,8 @@ pub struct PrivateProfileDto {
 	sexual_preference: SexualPreference,
 	biography: Option<String>,
 	interests: Vec<String>,
+	location: Location,
+	overwrite_location: bool,
 	pub fame_rating: usize,
 	pub images: Vec<ImageDto>,
 	pub likes: Vec<ProfileThumbnail>,
@@ -186,6 +194,8 @@ impl From<Profile> for PrivateProfileDto {
 			biography: profile.biography,
 			interests: profile.interests,
 			fame_rating: 0,
+			overwrite_location: profile.overwrite_location,
+			location: Location::new(),
 			images: vec![],
 			likes: vec![],
 			visits: vec![],

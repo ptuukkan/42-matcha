@@ -5,6 +5,8 @@ import { RootStore } from './rootStore';
 import { history } from '../..';
 import { FORM_ERROR } from 'final-form';
 import { IValidationError } from '../models/errors';
+import { getPosition } from '../common/location/locationUtils';
+import { ILocation } from '../models/profile';
 
 export default class UserStore {
 	rootStore: RootStore;
@@ -86,8 +88,19 @@ export default class UserStore {
 	};
 
 	getUser = async () => {
+		let location: ILocation = {latitude: 0, longitude: 0};
 		try {
-			const user = await agent.User.current();
+			const geoLocation = await getPosition();
+			location.latitude = geoLocation.coords.latitude;
+			location.longitude = geoLocation.coords.longitude;
+		} catch (error) {
+			const ipLocation = await agent.Location.get();
+			location.latitude = ipLocation.latitude;
+			location.longitude = ipLocation.longitude;
+		}
+
+		const user = await agent.User.current(location);
+		try {
 			runInAction(() => {
 				this.user = user;
 			});

@@ -1,4 +1,4 @@
-const getPosition = (
+export const getPosition = (
 	options?: PositionOptions
 ): Promise<GeolocationPosition> => {
 	if ('geolocation' in navigator) {
@@ -10,5 +10,3 @@ const getPosition = (
 		return Promise.reject(error);
 	}
 };
-
-export { getPosition };

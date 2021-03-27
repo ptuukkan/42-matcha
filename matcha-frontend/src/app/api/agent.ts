@@ -10,7 +10,7 @@ import {
 	IUser,
 } from '../models/user';
 import { history } from '../..';
-import { IImage, ILikeResponse, IPrivateProfile, IProfileFormValues, IPublicProfile } from '../models/profile';
+import { IImage, ILikeResponse, ILocation, IPrivateProfile, IProfileFormValues, IPublicProfile } from '../models/profile';
 import { IInterestOption } from '../models/interest';
 
 axios.defaults.baseURL = process.env.REACT_APP_API_URL;
@@ -63,7 +63,7 @@ const User = {
 		requests.post('/user/register', user),
 	login: (user: ILoginFormValues): Promise<IUser> =>
 		requests.post('/user/login', user),
-	current: (): Promise<IUser> => requests.get('/user/current'),
+	current: (location :ILocation): Promise<IUser> => requests.post('/user/current', location),
 	verify: (link: string): Promise<void> => requests.get(`/user/verify/${link}`),
 	forget: (data: IForgetPassword): Promise<void> =>
 		requests.post(`/user/password/reset`, data),
@@ -88,6 +88,10 @@ const Profile = {
 	unlike: (id: string): Promise<void> => requests.delete(`/profile/${id}/like`),
 };
 
+const Location = {
+	get: (): Promise<ILocation> => requests.get('https://ipapi.co/json/'),
+}
+
 const Browse = {
 	list: (): Promise<IPublicProfile[]> => requests.get('/browse/list'),
 }
@@ -100,6 +104,7 @@ const agent = {
 	User,
 	Profile,
 	Interests,
+	Location,
 	Browse,
 };
 

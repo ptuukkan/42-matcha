@@ -2,12 +2,15 @@ use crate::errors::AppError;
 use crate::models::image::{Image, ImageDto};
 use crate::models::like::Like;
 use crate::models::profile::{PrivateProfileDto, Profile, ProfileFormValues, PublicProfileDto};
+use crate::models::location::LocationInput;
 use crate::models::user::User;
 use crate::models::visit::Visit;
 use serde_json::{json, Value};
+use actix_web::web::Json;
 use std::convert::TryFrom;
 
 pub mod image;
+pub mod location;
 pub mod interest;
 
 pub async fn get_my(user: User) -> Result<PrivateProfileDto, AppError> {
@@ -19,9 +22,11 @@ pub async fn get_my(user: User) -> Result<PrivateProfileDto, AppError> {
 		.filter_map(|x| ImageDto::try_from(x).ok())
 		.collect();
 	let visits = Visit::find_inbound(&profile.key).await?;
+	// Hae location
 	let likes = Like::find_inbound(&profile.key).await?;
 	let fame = fame_rating(&profile.key).await?;
 	let mut profile_dto = PrivateProfileDto::from(profile);
+	//Assign location
 	profile_dto.images = images;
 	profile_dto.visits = visits;
 	profile_dto.likes = likes;
@@ -32,6 +37,7 @@ pub async fn get_my(user: User) -> Result<PrivateProfileDto, AppError> {
 
 pub async fn update(user: User, mut values: ProfileFormValues) -> Result<(), AppError> {
 	let profile = Profile::get(&user.profile).await?;
+	// Jos location override otetaan se
 	if let Some(interests) = values.interests {
 		values.interests = interest::create(interests).await?;
 	}

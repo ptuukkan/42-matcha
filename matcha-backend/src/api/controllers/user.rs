@@ -2,7 +2,9 @@ use actix_web::HttpRequest;
 use crate::models::user::User;
 use crate::models::user::RegisterFormValues;
 use crate::models::user::CredentialChangeValues;
+use crate::application::profile::location;
 use actix_web_validator::Json;
+use crate::models::location::LocationInput;
 use crate::application::user;
 use crate::models::user::{
 	LoginFormValues, ResetFormValues, ResetPasswordValues,
@@ -49,8 +51,9 @@ async fn verify(web::Path(link): web::Path<String>) -> Result<HttpResponse, Erro
 	Ok(HttpResponse::Ok().finish())
 }
 
-#[get("/user/current")]
-async fn current_user(user: User) -> Result<HttpResponse, Error> {
+#[post("/user/current")]
+async fn current_user(user: User, location: Json<LocationInput>) -> Result<HttpResponse, Error> {
+	location::update(&user, location.into_inner()).await?;
 	Ok(HttpResponse::Ok().json(user.login_response("").await?))
 }
 

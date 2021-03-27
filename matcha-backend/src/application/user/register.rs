@@ -3,6 +3,7 @@ use crate::errors::{AppError, ValidationError};
 use crate::models::profile::Profile;
 use crate::models::user::RegisterFormValues;
 use crate::models::user::User;
+use crate::application::profile::location;
 use lettre::{SendableEmail, SendmailTransport, Transport};
 use lettre_email::EmailBuilder;
 use regex::Regex;
@@ -24,6 +25,7 @@ pub async fn register(values: RegisterFormValues) -> Result<(), AppError> {
 		return Err(AppError::ValidationError(validation_error));
 	}
 	let mut profile = Profile::from(&values);
+	profile.location = location::create().await?;
 	profile.create().await?;
 	user.profile = profile.key.to_owned();
 	if user.create().await.is_err() {

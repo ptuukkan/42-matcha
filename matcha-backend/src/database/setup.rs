@@ -30,6 +30,8 @@ pub async fn arango_setup() -> Result<(), AppError> {
 	create_arango_collection("users", "2", &db_url).await?;
 	create_arango_collection("images", "2", &db_url).await?;
 	create_arango_collection("interests", "2", &db_url).await?;
+	create_arango_collection("locations", "2", &db_url).await?;
+	create_geoindex(&db_url).await?;
 	Ok(())
 }
 
@@ -40,6 +42,21 @@ async fn get_arango_dbs(db_base_url: &str) -> Result<Vec<String>, AppError> {
 		return Err(AppError::internal("Getting DB List failed"));
 	}
 	Ok(res.result)
+}
+
+async fn create_geoindex(db_base_url: &str) -> Result<(), AppError> {
+	let url = db_base_url.to_owned() + "_api/index?collection=locations";
+	let body = json!({
+		"type" : "geo", 
+		"fields" : [ 
+		  "coordinate" 
+		]
+	});
+	let res: ArangoResponse = api::post(&url, &body).await?;
+	if res.error {
+		return Err(AppError::internal("Locations collection creation failed"));
+	}
+	Ok(())
 }
 
 async fn create_arango_db(db_name: &str, db_base_url: &str) -> Result<(), AppError> {

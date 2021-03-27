@@ -17,7 +17,9 @@ export interface IProfile {
 }
 
 export interface IPrivateProfile extends IProfile {
+	overwriteLocation: boolean;
 	likes: IProfileThumbnail[];
+	location: ILocation;
 	visits: IProfileThumbnail[];
 }
 
@@ -43,7 +45,6 @@ export interface IProfileFormValues {
 }
 
 export interface ILocation {
-	city: string;
 	latitude: number;
 	longitude: number;
 }

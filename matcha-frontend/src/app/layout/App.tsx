@@ -23,6 +23,8 @@ import ProfileVisit from '../../features/profile/ProfileVisit';
 import ChangeCredentials from '../../features/user/ChangeCredentials';
 import { getPosition } from '../common/location/locationUtils';
 import Browse from '../../features/browse/Browse';
+import { ILocation } from '../models/profile';
+import agent from '../api/agent';
 
 const App = () => {
 	// const [profile, setProfile] = useState(Profiles.profiles[0]);
@@ -40,7 +42,6 @@ const App = () => {
 			getUser()
 				.catch(() => logoutUser())
 				.finally(() => setAppLoaded(true));
-			getPosition().then((location) => console.log(location))
 		} else {
 			setAppLoaded(true);
 		}
@@ -52,8 +53,6 @@ const App = () => {
 				<Loader />
 			</Dimmer>
 		);
-
-
 
 	return (
 		<div
