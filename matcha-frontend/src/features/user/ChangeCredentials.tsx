@@ -6,27 +6,22 @@ import { formValidation } from './ChangeCredentialsValidation';
 import { observer } from 'mobx-react-lite';
 import { useContext, useState } from 'react';
 import { RootStoreContext } from '../../app/stores/rootStore';
-import { ICredentialFormValues } from '../../app/models/user';
 
 const ChangeCredentials = () => {
 	const rootStore = useContext(RootStoreContext);
-	const { closeModal } = rootStore.modalStore;
 	const { changeCredentials } = rootStore.userStore;
-	const [successOpen, setSuccessOpen] = useState(false);
-
-	const onSubmit = (data: ICredentialFormValues) => {
-		changeCredentials(data).then(() => setSuccessOpen(true));
-	};
+	const [successOpen, setSuccessOpen] = useState(true);
 
 	return (
 		<div>
 			<Header>Change credentials</Header>
 			<FinalForm
-				onSubmit={onSubmit}
+				onSubmit={changeCredentials}
 				validate={formValidation.validateForm}
 				render={({
 					handleSubmit,
 					submitting,
+					submitSucceeded,
 					submitError,
 					dirtySinceLastSubmit,
 				}) => (
@@ -46,24 +41,23 @@ const ChangeCredentials = () => {
 						{submitError && !dirtySinceLastSubmit && (
 							<ErrorMessage message={submitError} />
 						)}
+						<Modal size="tiny" open={submitSucceeded && successOpen} closeOnDimmerClick>
+							<Modal.Header>Success</Modal.Header>
+							<Modal.Actions>
+								<Button
+									content="Go Back"
+									labelPosition="right"
+									icon="checkmark"
+									onClick={() => {
+										setSuccessOpen(false);
+									}}
+									positive
+								/>
+							</Modal.Actions>
+						</Modal>
 					</Form>
 				)}
 			/>
-			<Modal size="tiny" open={successOpen}>
-				<Modal.Header>Success</Modal.Header>
-				<Modal.Actions>
-					<Button
-						content="Go Back"
-						labelPosition="right"
-						icon="checkmark"
-						onClick={() => {
-							setSuccessOpen(false);
-							closeModal();
-						}}
-						positive
-					/>
-				</Modal.Actions>
-			</Modal>
 		</div>
 	);
 };

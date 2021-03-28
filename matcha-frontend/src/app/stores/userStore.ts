@@ -61,7 +61,7 @@ export default class UserStore {
 
 	changeCredentials = async (data: ICredentialFormValues) => {
 		try {
-			await agent.User.credentials(data);
+			await agent.User.credentials(data);		
 		} catch (error) {
 			if (error.error_type === 'ValidationError') {
 				return error.errors.reduce((obj: any, item: IValidationError) => {

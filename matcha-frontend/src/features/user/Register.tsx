@@ -10,17 +10,18 @@ import { formValidation } from './RegisterValidation';
 const Register = () => {
 	const rootStore = useContext(RootStoreContext);
 	const { registerUser } = rootStore.userStore;
-	const [successOpen, setSuccessOpen] = useState(false);
+	const [successOpen, setSuccessOpen] = useState(true);
 
 	return (
 		<Fragment>
 			<FinalForm
-				onSubmit={(data) => registerUser(data).then(() => setSuccessOpen(true))}
+				onSubmit={registerUser}
 				validate={formValidation.validateForm}
 				render={({
 					handleSubmit,
 					submitting,
 					submitError,
+					submitSucceeded,
 					dirtySinceLastSubmit,
 				}) => (
 					<Form onSubmit={handleSubmit} error>
@@ -55,24 +56,24 @@ const Register = () => {
 							<ErrorMessage message={submitError} />
 						)}
 						<Button primary loading={submitting} content="Register" />
+						<Modal open={submitSucceeded && successOpen} size="small">
+							<Modal.Header>All done!</Modal.Header>
+							<Modal.Content>
+								<p>Confirmation email sent!</p>
+								<i>Please check your email</i>
+							</Modal.Content>
+							<Modal.Actions>
+								<Button
+									primary
+									icon="check"
+									content="All Done"
+									onClick={() => setSuccessOpen(false)}
+								/>
+							</Modal.Actions>
+						</Modal>
 					</Form>
 				)}
 			/>
-			<Modal open={successOpen} size="small">
-				<Modal.Header>All done!</Modal.Header>
-				<Modal.Content>
-					<p>Confirmation email sent!</p>
-					<i>Please check your email</i>
-				</Modal.Content>
-				<Modal.Actions>
-					<Button
-						primary
-						icon="check"
-						content="All Done"
-						onClick={() => setSuccessOpen(false)}
-					/>
-				</Modal.Actions>
-			</Modal>
 		</Fragment>
 	);
 };
