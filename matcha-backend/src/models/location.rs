@@ -60,3 +60,18 @@ impl From<LocationInput> for Location {
 	}
 }
  */
+
+#[derive(Serialize, Deserialize, Debug, Validate)]
+pub struct LocationDto {
+	pub latitude: f32,
+	pub longitude: f32,
+}
+
+impl From<Location> for LocationDto {
+	fn from(location: Location) -> Self {
+		Self {
+			latitude: location.coordinate[0],
+			longitude: location.coordinate[1],
+		}
+	}
+}

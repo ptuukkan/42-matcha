@@ -1,4 +1,5 @@
 use crate::models::location::Location;
+use crate::models::location::LocationDto;
 use crate::database::api;
 use crate::database::cursor::CursorRequest;
 use crate::errors::AppError;
@@ -48,7 +49,7 @@ pub struct ProfileFormValues {
 	last_name: Option<String>,
 	gender: Option<Gender>,
 	pub location_override: Option<bool>,
-	pub location: Option<Location>,
+	pub location: Option<LocationDto>,
 	sexual_preference: Option<SexualPreference>,
 	biography: Option<String>,
 	pub interests: Option<Vec<String>>,
@@ -180,7 +181,7 @@ pub struct PrivateProfileDto {
 	biography: Option<String>,
 	interests: Vec<String>,
 	location_override: bool,
-	pub location: Location,
+	pub location: LocationDto,
 	pub fame_rating: usize,
 	pub images: Vec<ImageDto>,
 	pub likes: Vec<ProfileThumbnail>,
@@ -198,7 +199,7 @@ impl From<Profile> for PrivateProfileDto {
 			interests: profile.interests,
 			fame_rating: 0,
 			location_override: profile.location_override,
-			location: Location::new(),
+			location: LocationDto::from(Location::new()),
 			images: vec![],
 			likes: vec![],
 			visits: vec![],

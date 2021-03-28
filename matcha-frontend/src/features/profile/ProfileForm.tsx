@@ -70,7 +70,7 @@ const ProfileForm: React.FC<IProps> = ({
 	return (
 		<>
 			<FinalForm
-				onSubmit={data => console.log(data)}
+				onSubmit={(data) => console.log(data)}
 				initialValues={profile}
 				validate={formValidation.validateForm}
 				render={({
@@ -118,11 +118,20 @@ const ProfileForm: React.FC<IProps> = ({
 								component={TextInput}
 								placeholder="Biography"
 								name="biography"
-								/>
+							/>
 						</Form.Group>
-						<b>Override location?</b>
-						<br></br>
-						<Field name="locationOverride" component="input" type="checkbox" />
+						<Field
+							name="locationOverride"
+							type="checkbox"
+							render={({ input }) => (
+								<Form.Field>
+									<div className="ui checkbox">
+										<input type="checkbox" {...input} />
+										<label>Override location</label>
+									</div>
+								</Form.Field>
+							)}
+						/>
 						<Condition when="locationOverride" is={true}>
 							<Form.Group widths={2}>
 								<Field
