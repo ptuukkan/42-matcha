@@ -25,8 +25,8 @@ async fn register(values: Json<RegisterFormValues>) -> Result<HttpResponse, Erro
 }
 
 #[post("/user/credentials")]
-async fn credentials(req: HttpRequest, values: Json<CredentialChangeValues>) -> Result<HttpResponse, Error> {
-	user::credentials::change(req, values.into_inner()).await?;
+async fn credentials(user: User, values: Json<CredentialChangeValues>) -> Result<HttpResponse, Error> {
+	user::credentials::change(user, values.into_inner()).await?;
 	Ok(HttpResponse::Created().finish())
 }
 
