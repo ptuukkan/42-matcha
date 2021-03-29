@@ -36,6 +36,7 @@ const validationSchema = {
 			},
 			alphabetic,
 		],
+		birthDate: [Validators.required.validator],
 		interests: [interestValidator, arrayRequired.validator],
 		biography: [Validators.required.validator],
 		gender: [Validators.required.validator],

@@ -22,5 +22,6 @@
   },
   "include": [
     "src",
+	"./typings-custom/**/*.ts"
   ],
 }

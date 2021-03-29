@@ -16,6 +16,7 @@ import { IInterestOption } from '../../app/models/interest';
 import ErrorMessage from '../../app/common/form/ErrorMessage';
 import ProfileImages from './ProfileImages';
 import { IPrivateProfile, IProfileFormValues, profileToFormValues } from '../../app/models/profile';
+import DateInput from '../../app/common/form/DateInput';
 
 const gender = [
 	{ key: 'female', value: 'Female', text: 'Female' },
@@ -90,7 +91,12 @@ const ProfileForm: React.FC<IProps> = ({
 								placeholder="Last name"
 							/>
 						</Form.Group>
-						<Form.Group widths={2}>
+						<Form.Group widths={3}>
+							<Field 
+								name="birthDate"
+								component={DateInput}
+								label="Birth Date"
+							/>
 							<Field
 								name="gender"
 								options={gender}
