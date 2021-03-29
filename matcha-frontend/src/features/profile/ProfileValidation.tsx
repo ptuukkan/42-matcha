@@ -3,6 +3,8 @@ import { createFinalFormValidation } from '@lemoncode/fonk-final-form';
 import { alphabetic } from '../../app/common/form/validators/alphabetic';
 import { interestValidator } from '../../app/common/form/validators/interestValidator';
 import { arrayRequired } from '@lemoncode/fonk-array-required-validator';
+import { latitudeValidator } from '../../app/common/form/validators/latitudeValidator';
+import { longitudeValidator } from '../../app/common/form/validators/longitudeValidator';
 
 const validationSchema = {
 	field: {
@@ -38,6 +40,8 @@ const validationSchema = {
 		biography: [Validators.required.validator],
 		gender: [Validators.required.validator],
 		sexualPreference: [Validators.required.validator],
+		'location.latitude': [Validators.required.validator, latitudeValidator],
+		'location.longitude': [Validators.required.validator, longitudeValidator],
 	},
 };
 

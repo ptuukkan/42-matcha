@@ -1,5 +1,4 @@
 import { makeAutoObservable, observable } from 'mobx';
-import { ModalProps } from 'semantic-ui-react';
 import { RootStore } from './rootStore';
 
 interface IModalProps {

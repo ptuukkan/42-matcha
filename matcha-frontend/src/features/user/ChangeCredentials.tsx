@@ -2,10 +2,21 @@ import { Form as FinalForm, Field } from 'react-final-form';
 import { Button, Form, Header, Modal } from 'semantic-ui-react';
 import ErrorMessage from '../../app/common/form/ErrorMessage';
 import TextInput from '../../app/common/form/TextInput';
-import { formValidation } from './ChangeCredentialsValidation';
 import { observer } from 'mobx-react-lite';
 import { useContext, useState } from 'react';
 import { RootStoreContext } from '../../app/stores/rootStore';
+import { Validators } from '@lemoncode/fonk';
+import { createFinalFormValidation } from '@lemoncode/fonk-final-form';
+import { passwordComplexity } from '../../app/common/form/validators/passwordComplexity';
+
+const validationSchema = {
+	field: {
+		emailAddress: [Validators.required.validator, Validators.email.validator],
+		password: [Validators.required.validator, passwordComplexity],
+	},
+};
+
+const formValidation = createFinalFormValidation(validationSchema);
 
 const ChangeCredentials = () => {
 	const rootStore = useContext(RootStoreContext);

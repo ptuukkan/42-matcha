@@ -1,6 +1,6 @@
-import React, { Fragment, useContext } from 'react';
+import { useContext } from 'react';
 import { Form as FinalForm, Field } from 'react-final-form';
-import { Form, Button, Modal, Header } from 'semantic-ui-react';
+import { Form, Button, Header } from 'semantic-ui-react';
 import { RootStoreContext } from '../../app/stores/rootStore';
 import { observer } from 'mobx-react-lite';
 import ForgotPassword from './ForgotPassword';

@@ -49,6 +49,11 @@ export default class ProfileStore {
 				this.profile!.interests = data.interests;
 				this.profile!.lastName = data.lastName;
 				this.profile!.sexualPreference = stringToSexPref(data.sexualPreference);
+				this.profile!.locationOverride = data.locationOverride;
+				if (data.locationOverride) {
+					this.profile!.location.latitude = data.location.latitude;
+					this.profile!.location.longitude = data.location.longitude;
+				}
 			})
 		} catch (error) {
 			return { [FORM_ERROR]: error.message };

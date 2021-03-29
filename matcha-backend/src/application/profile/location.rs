@@ -1,6 +1,6 @@
 use crate::errors::AppError;
 use crate::models::location::Location;
-use crate::models::location::LocationInput;
+use crate::models::location::LocationDto;
 use crate::models::profile::Profile;
 use crate::models::user::User;
 
@@ -10,7 +10,7 @@ pub async fn create() -> Result<String, AppError> {
 	Ok(location.key)
 }
 
-pub async fn update(user: &User, location_input: LocationInput) -> Result<(), AppError> {
+pub async fn update(user: &User, location_input: LocationDto) -> Result<(), AppError> {
 	let profile = Profile::get(&user.profile).await?;
 	if profile.location_override {
 		return Ok(())

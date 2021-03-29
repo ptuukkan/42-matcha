@@ -2,14 +2,10 @@ use crate::database::api;
 use crate::errors::AppError;
 use crate::models::base::CreateResponse;
 use actix_web_validator::Validate;
-use serde::{Deserialize, Serialize};
+use serde::Deserializer;
+use serde::{de, Deserialize, Serialize};
+use serde_json::Value;
 use std::env;
-
-#[derive(Serialize, Deserialize, Debug, Validate)]
-pub struct LocationInput {
-	pub latitude: f32,
-	pub longitude: f32,
-}
 
 #[derive(Serialize, Deserialize, Debug, Validate)]
 pub struct Location {
@@ -50,21 +46,23 @@ impl Location {
 		Ok(())
 	}
 }
-/*
-impl From<LocationInput> for Location {
-	fn from(location: LocationInput) -> Self {
-		Self {
-			// Key here
-			key: String::from("Sample_key")
-		}
-	}
-}
- */
 
 #[derive(Serialize, Deserialize, Debug, Validate)]
 pub struct LocationDto {
+	#[serde(deserialize_with = "de_coordinate")]
 	pub latitude: f32,
+	#[serde(deserialize_with = "de_coordinate")]
 	pub longitude: f32,
+}
+
+fn de_coordinate<'de, D: Deserializer<'de>>(deserializer: D) -> Result<f32, D::Error> {
+	Ok(match Value::deserialize(deserializer)? {
+		Value::String(s) => s.trim().parse().map_err(de::Error::custom)?,
+		Value::Number(num) => num
+			.as_f64()
+			.ok_or_else(|| de::Error::custom("Invalid number"))? as f32,
+		_ => return Err(de::Error::custom("wrong type")),
+	})
 }
 
 impl From<Location> for LocationDto {

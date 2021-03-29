@@ -3,9 +3,7 @@ import {
 	Form,
 	Button,
 	Divider,
-	Loader,
 	Header,
-	Checkbox,
 } from 'semantic-ui-react';
 import agent from '../../app/api/agent';
 import TextInput from '../../app/common/form/TextInput';
@@ -17,8 +15,7 @@ import { formValidation } from './ProfileValidation';
 import { IInterestOption } from '../../app/models/interest';
 import ErrorMessage from '../../app/common/form/ErrorMessage';
 import ProfileImages from './ProfileImages';
-import { IProfile, IProfileFormValues } from '../../app/models/profile';
-import CheckboxInput from '../../app/common/form/CheckboxInput';
+import { IPrivateProfile, IProfileFormValues, profileToFormValues } from '../../app/models/profile';
 
 const gender = [
 	{ key: 'female', value: 'Female', text: 'Female' },
@@ -32,7 +29,7 @@ const sexualPreference = [
 ];
 
 interface IProps {
-	profile: IProfile;
+	profile: IPrivateProfile;
 	updateProfile: (data: IProfileFormValues) => Promise<void | any>;
 	closeModal: () => void;
 }
@@ -70,8 +67,8 @@ const ProfileForm: React.FC<IProps> = ({
 	return (
 		<>
 			<FinalForm
-				onSubmit={(data) => console.log(data)}
-				initialValues={profile}
+				onSubmit={updateProfile}
+				initialValues={profileToFormValues(profile)}
 				validate={formValidation.validateForm}
 				render={({
 					handleSubmit,

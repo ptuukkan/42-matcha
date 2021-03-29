@@ -1,7 +1,6 @@
 import { observer } from 'mobx-react-lite';
-import React, { useContext, useState } from 'react';
+import { useContext } from 'react';
 import { useEffect } from 'react';
-import { Link, useHistory, useParams } from 'react-router-dom';
 import {
 	Item,
 	Button,
@@ -11,11 +10,7 @@ import {
 	Rating,
 	Loader,
 	Header,
-	Image,
-	Card,
 } from 'semantic-ui-react';
-import agent from '../../app/api/agent';
-import { IProfile } from '../../app/models/profile';
 import { RootStoreContext } from '../../app/stores/rootStore';
 import ChangeCredentials from '../user/ChangeCredentials';
 import ProfileForm from './ProfileForm';

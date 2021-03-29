@@ -1,13 +1,9 @@
-import React, { Fragment, useContext, useEffect, useState } from 'react';
+import { Fragment, useContext, useEffect, useState } from 'react';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import Navigation from '../../features/nav/Navigation';
 import { Container, Dimmer, Loader } from 'semantic-ui-react';
-import Profiles from '../../testProfiles1.json';
 import Chat from '../../features/chat/Chat';
-import Profile from '../../features/profile/ProfileForm';
 import Footer from '../../features/nav/Footer';
-import Login from '../../features/user/Login';
-import Register from '../../features/user/Register';
 import Landing from '../../features/home/Landing';
 import { RootStoreContext } from '../stores/rootStore';
 import { observer } from 'mobx-react-lite';
@@ -21,10 +17,7 @@ import PrivateRoute from './PrivateRoute';
 import SubModalContainer from '../common/modals/SubModalContainer';
 import ProfileVisit from '../../features/profile/ProfileVisit';
 import ChangeCredentials from '../../features/user/ChangeCredentials';
-import { getPosition } from '../common/location/locationUtils';
 import Browse from '../../features/browse/Browse';
-import { ILocation } from '../models/profile';
-import agent from '../api/agent';
 
 const App = () => {
 	// const [profile, setProfile] = useState(Profiles.profiles[0]);

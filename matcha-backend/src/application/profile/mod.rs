@@ -42,11 +42,11 @@ pub async fn update(user: &User, mut values: ProfileFormValues) -> Result<(), Ap
 		if ol {
 			let loc = values.location.unwrap();
 			let mut profile_location = Location::get(&profile.location).await?;
-			profile_location.coordinate = vec![loc.longitude, loc.longitude];
+			profile_location.coordinate = vec![loc.latitude, loc.longitude];
 			profile_location.update().await?;
-			values.location = None;
 		}
 	}
+	values.location = None;
 	if let Some(interests) = values.interests {
 		values.interests = interest::create(interests).await?;
 	}

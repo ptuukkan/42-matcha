@@ -42,6 +42,8 @@ export interface IProfileFormValues {
 	biography: string;
 	sexualPreference: string;
 	interests: string[];
+	locationOverride: boolean;
+	location: ILocation;
 }
 
 export interface ILocation {
@@ -80,3 +82,18 @@ export const stringToSexPref = (data: string): SexualPreference => {
 export interface ILikeResponse {
 	connected: boolean;
 }
+
+export const profileToFormValues = (
+	profile: IPrivateProfile
+): IProfileFormValues => {
+	return {
+		firstName: profile.firstName,
+		lastName: profile.lastName,
+		gender: profile.gender,
+		sexualPreference: profile.sexualPreference,
+		biography: profile.biography,
+		locationOverride: profile.locationOverride,
+		location: profile.location,
+		interests: profile.interests,
+	};
+};
