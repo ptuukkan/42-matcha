@@ -64,38 +64,28 @@ const Browse = () => {
 				{profiles!.map((p) => (
 					<Card fluid key={p.id}>
 						<Image
-							src={p.images.find(i => i.isMain)?.url}
+							src={p.images.find((i) => i.isMain)?.url}
 							wrapped
 							ui={false}
 						/>
 
 						<div className="profileinfo">
-							<Header as="h1">
-								{`${p.firstName} ${p.lastName}, ${p.age}`}
-							</Header>
-							{/* <Icon name={profile.gender === 'male' ? 'mars' : 'venus'} /> */}
-							{/* 					<Card.Meta>
-							Distance:{' '}
-							{getDistance(
-								location.lat,
-								profile.location.latitude,
-								location.lon,
-								profile.location.longitude
-							)}{' '}
-							km
-						</Card.Meta> */}
-							{/* 					Age: {nyt - birth}
-							 */}{' '}
-							<Card.Description>{p.biography}</Card.Description>
-							<br></br>
-							<Button circular icon="cancel" size="massive" color="black" />
-							<Button
-								circular
-								icon="like"
-								floated="right"
-								size="massive"
-								color="red"
-							/>
+							<Card.Content>
+								<Header as="h1" style={{marginBottom: 0}}>
+									{`${p.firstName} ${p.lastName}, ${p.age}`}
+								</Header>
+								<Card.Meta>{p.distance} kms away</Card.Meta>
+								<Card.Description style={{marginTop: 7}}>{p.biography}</Card.Description>
+								<br />
+								<Button circular icon="cancel" size="massive" color="black" />
+								<Button
+									circular
+									icon="like"
+									floated="right"
+									size="massive"
+									color="red"
+								/>
+							</Card.Content>
 						</div>
 					</Card>
 				))}

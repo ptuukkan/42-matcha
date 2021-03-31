@@ -1,19 +1,18 @@
-use serde_json::Value;
-use crate::models::base::CreateResponse;
-use crate::application::{profile, profile::visit, profile::like};
 use crate::application::user;
+use crate::application::{profile, profile::like, profile::visit};
 use crate::database::api;
 use crate::database::setup;
 use crate::errors::AppError;
+use crate::models::base::CreateResponse;
 use crate::models::profile::Profile;
 use crate::models::profile::ProfileFormValues;
 use crate::models::user::RegisterFormValues;
 use crate::models::user::User;
 use serde_json::json;
+use serde_json::Value;
 use std::env;
 
 pub async fn seed_data() -> Result<(), AppError> {
-
 	setup::reset_db().await?;
 	setup::arango_setup().await?;
 
@@ -24,6 +23,9 @@ pub async fn seed_data() -> Result<(), AppError> {
 		"Female",
 		"Ultimate detective / genius",
 		vec!["die-hard".to_owned()],
+		"1990-01-28",
+		60.2,
+		24.9
 	)
 	.await?;
 	let profile = create_image(profile, "jake1").await?;
@@ -37,6 +39,9 @@ pub async fn seed_data() -> Result<(), AppError> {
 		"Male",
 		"This is dumb",
 		vec!["motorcycles".to_owned()],
+		"1987-05-03",
+		60.2,
+		25.05
 	)
 	.await?;
 	let profile = create_image(profile, "rosa1").await?;
@@ -50,6 +55,9 @@ pub async fn seed_data() -> Result<(), AppError> {
 		"Female",
 		"I like yogurt and gym",
 		vec!["yogyrt".to_owned(), "gym".to_owned()],
+		"1983-10-13",
+		60.3,
+		25.04
 	)
 	.await?;
 	let profile = create_image(profile, "terry1").await?;
@@ -63,6 +71,9 @@ pub async fn seed_data() -> Result<(), AppError> {
 		"Male",
 		"I like to be organized with binders",
 		vec!["organizing".to_owned(), "binders".to_owned()],
+		"1992-09-20",
+		60.2,
+		24.8
 	)
 	.await?;
 	let profile = create_image(profile, "amy1").await?;
@@ -76,6 +87,9 @@ pub async fn seed_data() -> Result<(), AppError> {
 		"Female",
 		"I like cooking strange stuff",
 		vec!["cooking".to_owned()],
+		"1980-12-04",
+		60.1,
+		24.5
 	)
 	.await?;
 	let profile = create_image(profile, "charles1").await?;
@@ -89,6 +103,9 @@ pub async fn seed_data() -> Result<(), AppError> {
 		"Male",
 		"I am the real leader at 99.",
 		vec!["plotting".to_owned(), "not-working".to_owned()],
+		"1986-03-19",
+		60.167,
+		24.935
 	)
 	.await?;
 	let profile = create_image(profile, "gina1").await?;
@@ -102,6 +119,9 @@ pub async fn seed_data() -> Result<(), AppError> {
 		"Male",
 		"Captain at 99th precinct",
 		vec!["classical-music".to_owned(), "dogs".to_owned()],
+		"1970-06-07",
+		60.1618,
+		24.787
 	)
 	.await?;
 	let profile = create_image(profile, "holt1").await?;
@@ -115,6 +135,9 @@ pub async fn seed_data() -> Result<(), AppError> {
 		"Female",
 		"I work with my pal Scully at 99.",
 		vec!["pizza".to_owned(), "chairs".to_owned()],
+		"1972-04-22",
+		60.403,
+		25.103
 	)
 	.await?;
 	let profile = create_image(profile, "hitchcock1").await?;
@@ -128,6 +151,9 @@ pub async fn seed_data() -> Result<(), AppError> {
 		"Female",
 		"I work with my pal Hitchcock at 99.",
 		vec!["pizza".to_owned(), "chairs".to_owned()],
+		"1974-08-30",
+		60.376,
+		26.264
 	)
 	.await?;
 	let profile = create_image(profile, "scully1").await?;
@@ -196,7 +222,6 @@ pub async fn seed_data() -> Result<(), AppError> {
 	like(&holt_user, &hitchcock.key).await?;
 	like(&holt_user, &scully.key).await?;
 
-
 	visit(&scully.key, &terry.key).await?;
 	visit(&scully.key, &jake.key).await?;
 	visit(&scully.key, &holt.key).await?;
@@ -237,25 +262,34 @@ async fn create_user(f: &str, l: &str, e: &str) -> Result<User, AppError> {
 
 async fn update_profile(
 	user: &User,
-	g: &str,
-	s: &str,
-	b: &str,
-	i: Vec<String>,
+	gender: &str,
+	sexpref: &str,
+	bio: &str,
+	interests: Vec<String>,
+	birth_date: &str,
+	latitude: f32,
+	longitude: f32,
 ) -> Result<Profile, AppError> {
-	let int = profile::interest::create(i).await?;
-	let profile = Profile::get(&user.profile).await?;
+	let int = profile::interest::create(interests).await?;
+	let p = Profile::get(&user.profile).await?;
 
 	let body = json!({
-		"firstName": &profile.first_name,
-		"lastName": &profile.last_name,
-		"gender": g,
-		"sexualPreference": s,
-		"biography": b,
+		"firstName": &p.first_name,
+		"lastName": &p.last_name,
+		"gender": gender,
+		"sexualPreference": sexpref,
+		"biography": bio,
 		"interests": int,
+		"birthDate": format!("{}T", birth_date),
+		"locationOverride": true,
+		"location": {
+			"latitude": latitude,
+			"longitude": longitude,
+		}
 	});
 
 	let data: ProfileFormValues = serde_json::from_value(body)?;
-	profile.update_from_form(&data).await?;
+	profile::update(user, data).await?;
 
 	let profile = Profile::get(&user.profile).await?;
 	Ok(profile)
@@ -268,7 +302,6 @@ async fn create_image(mut profile: Profile, file: &str) -> Result<Profile, AppEr
 		"_key": file,
 		"isMain": profile.images.is_empty(),
 	});
-
 
 	api::post::<Value, CreateResponse>(&url, &body).await?;
 	profile.images.push(file.to_owned());

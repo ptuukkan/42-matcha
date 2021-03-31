@@ -54,7 +54,6 @@ pub async fn update(user: &User, mut values: ProfileFormValues) -> Result<(), Ap
 	}
 	if let Some(birth_date) = values.birth_date {
 		let split: Vec<&str> = birth_date.split('T').collect();
-		println!("'{}'", split[0]);
 		NaiveDate::parse_from_str(split[0], "%Y-%m-%d")?;
 		if NaiveDate::parse_from_str(split[0], "%Y-%m-%d").is_ok() {
 			values.birth_date = Some(split[0].to_owned());
