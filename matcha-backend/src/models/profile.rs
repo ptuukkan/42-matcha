@@ -98,14 +98,17 @@ impl Profile {
 		Ok(profile)
 	}
 
-	pub async fn get_with_distance(my_profile: &str, their_profile: &str) -> Result<ProfileWithDistance, AppError> {
+	pub async fn get_with_distance(
+		my_profile: &str,
+		their_profile: &str,
+	) -> Result<ProfileWithDistance, AppError> {
 		let query = format!(
-			"let my_location = (FOR p IN profiles filter p._key == '{m}' return DOCUMENT('locations', p.location))
-			let their_location = (FOR p IN profiles filter p._key == '{t}' return DOCUMENT('locations', p.location))
-			let their_profile = (FOR p IN profiles filter p._key == '{t}' return p)
-			let distance = DISTANCE(their_location[0].coordinate[0], their_location[0].coordinate[1], my_location[0].coordinate[0], my_location[0].coordinate[1])
-				return {{profile: their_profile, distance: ROUND(distance / 1000)}}
-			
+			"LET my_location = (FOR p IN profiles FILTER p._key == '{m}' RETURN DOCUMENT('locations', p.location))
+			LET their_location = (FOR p IN profiles FILTER p._key == '{t}' RETURN DOCUMENT('locations', p.location))
+			LET their_profile = (FOR p IN profiles FILTER p._key == '{t}' RETURN p)
+			LET distance = DISTANCE(their_location[0].coordinate[0], their_location[0].coordinate[1], my_location[0].coordinate[0], my_location[0].coordinate[1])
+			RETURN {{ profile: their_profile, distance: ROUND(distance / 1000) }}
+
 	  		",
 			m = &my_profile, t = &their_profile
 		);
@@ -123,12 +126,11 @@ impl Profile {
 
 	pub async fn get_all(profile_key: &str) -> Result<Vec<ProfileWithDistance>, AppError> {
 		let query = format!(
-			"let locat = (FOR p IN profiles filter p._key == \"{}\" return DOCUMENT(\"locations\", p.location))
+			"LET locat = (FOR p IN profiles FILTER p._key == \"{}\" RETURN DOCUMENT(\"locations\", p.location))
 
 			FOR loc IN locations
 			  LET distance = DISTANCE(loc.coordinate[0], loc.coordinate[1], locat[0].coordinate[0], locat[0].coordinate[1])
-			  SORT distance
-			  for p in profiles filter p.location == loc._key RETURN {{ profile: p, distance: distance }}
+			  FOR p IN profiles FILTER p.location == loc._key RETURN {{ profile: p, distance: ROUND(distance / 1000) }}
 	  		",
 			&profile_key
 		);
