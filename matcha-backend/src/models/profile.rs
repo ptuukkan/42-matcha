@@ -1,10 +1,10 @@
-use crate::models::location::Location;
-use crate::models::location::LocationDto;
 use crate::database::api;
 use crate::database::cursor::CursorRequest;
 use crate::errors::AppError;
 use crate::models::base::CreateResponse;
 use crate::models::image::{Image, ImageDto};
+use crate::models::location::Location;
+use crate::models::location::LocationDto;
 use crate::models::user::RegisterFormValues;
 use serde::{Deserialize, Serialize};
 use serde_with_macros::skip_serializing_none;
@@ -26,6 +26,12 @@ pub struct Profile {
 	pub location_override: bool,
 	pub location: String,
 	pub images: Vec<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ProfileWithDistance {
+	pub profile: Profile,
+	pub distance: i32,
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
@@ -92,12 +98,40 @@ impl Profile {
 		Ok(profile)
 	}
 
-	pub async fn get_all() -> Result<Vec<Self>, AppError> {
-		let query = "FOR p IN profiles return p";
+	pub async fn get_with_distance(my_profile: &str, their_profile: &str) -> Result<ProfileWithDistance, AppError> {
+		let query = format!(
+			"let locat = (FOR p IN profiles filter p._key == \"{}\" return DOCUMENT(\"locations\", p.location))
+			let profile_location = (FOR p IN profiles filter p._key == \"{}\" return DOCUMENT(\"locations\", p.location))
+			FOR loc IN locations
+			  LET distance = DISTANCE(loc.coordinate[0], loc.coordinate[1], locat[0].coordinate[0], locat[0].coordinate[1])
+			  SORT distance
+			  for p in profiles filter p.location == loc._key RETURN {{ profile: p, distance: distance }}
+	  		",
+			&my_profile, &their_profile
+		);
 		let result = CursorRequest::from(query)
 			.send()
 			.await?
-			.extract_all::<Self>()
+			.extract_all::<ProfileWithDistance>()
+			.await?;
+		Ok(result)
+	}
+
+	pub async fn get_all(profile_key: &str) -> Result<Vec<ProfileWithDistance>, AppError> {
+		let query = format!(
+			"let locat = (FOR p IN profiles filter p._key == \"{}\" return DOCUMENT(\"locations\", p.location))
+
+			FOR loc IN locations
+			  LET distance = DISTANCE(loc.coordinate[0], loc.coordinate[1], locat[0].coordinate[0], locat[0].coordinate[1])
+			  SORT distance
+			  for p in profiles filter p.location == loc._key RETURN {{ profile: p, distance: distance }}
+	  		",
+			&profile_key
+		);
+		let result = CursorRequest::from(query)
+			.send()
+			.await?
+			.extract_all::<ProfileWithDistance>()
 			.await?;
 		Ok(result)
 	}
@@ -217,6 +251,7 @@ pub struct PublicProfileDto {
 	sexual_preference: SexualPreference,
 	biography: Option<String>,
 	interests: Vec<String>,
+	pub distance: i32,
 	pub fame_rating: usize,
 	pub images: Vec<ImageDto>,
 	pub connected: bool,
@@ -234,6 +269,7 @@ impl From<Profile> for PublicProfileDto {
 			biography: profile.biography,
 			interests: profile.interests,
 			fame_rating: 0,
+			distance: 0,
 			images: vec![],
 			connected: false,
 			liked: false,
