@@ -9,7 +9,7 @@ use crate::models::user::User;
 
 pub async fn list(user: &User) -> Result<Vec<PublicProfileDto>, AppError> {
 	let my_profile = Profile::get(&user.profile).await?;
-	let profiles: Vec<ProfileWithDistance> = Profile::get_all(&my_profile.key)
+	let profiles: Vec<ProfileWithDistance> = ProfileWithDistance::get_all(&my_profile.key)
 		.await?
 		.into_iter()
 		.filter(|x| filter_profile(&my_profile, &x.profile))
