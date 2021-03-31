@@ -27,10 +27,9 @@ export interface IPrivateProfile extends IProfile {
 export interface IPublicProfile extends IProfile {
 	id: string;
 	age: number;
-	distance: number,
+	distance: number;
 	connected: boolean;
 	liked: boolean;
-	distance: number;
 }
 
 export interface IProfileThumbnail {
