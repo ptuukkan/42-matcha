@@ -45,6 +45,7 @@ export default class ProfileStore {
 			runInAction(() => {
 				this.profile!.firstName = data.firstName;
 				this.profile!.biography = data.biography;
+				this.profile!.birthDate = data.birthDate;
 				this.profile!.gender = stringToGender(data.gender);
 				this.profile!.interests = data.interests;
 				this.profile!.lastName = data.lastName;

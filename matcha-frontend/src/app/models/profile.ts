@@ -21,7 +21,7 @@ export interface IPrivateProfile extends IProfile {
 	likes: IProfileThumbnail[];
 	location: ILocation;
 	visits: IProfileThumbnail[];
-	birthDate?: string;
+	birthDate?: Date;
 }
 
 export interface IPublicProfile extends IProfile {
