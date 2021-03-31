@@ -71,7 +71,7 @@ const Browse = () => {
 
 						<div className="profileinfo">
 							<Header as="h1">
-								{p.firstName} {p.lastName}
+								{`${p.firstName} ${p.lastName}, ${p.age}`}
 							</Header>
 							{/* <Icon name={profile.gender === 'male' ? 'mars' : 'venus'} /> */}
 							{/* 					<Card.Meta>

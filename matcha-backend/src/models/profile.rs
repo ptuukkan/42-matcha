@@ -7,7 +7,7 @@ use crate::models::location::Location;
 use crate::models::location::LocationDto;
 use crate::models::user::RegisterFormValues;
 use serde::{Deserialize, Serialize};
-use chrono::{naive::NaiveDate, Utc};
+use chrono::{naive::NaiveDate, Utc, Datelike};
 use serde_with_macros::skip_serializing_none;
 use std::convert::TryFrom;
 use std::env;
@@ -20,7 +20,7 @@ pub struct Profile {
 	pub key: String,
 	pub first_name: String,
 	pub last_name: String,
-	pub birth_date: Option<BirthDate>,
+	pub birth_date: Option<String>,
 	pub gender: Option<Gender>,
 	pub sexual_preference: SexualPreference,
 	biography: Option<String>,
@@ -28,13 +28,6 @@ pub struct Profile {
 	pub location_override: bool,
 	pub location: String,
 	pub images: Vec<String>,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct BirthDate {
-	year: i32,
-	month: u32,
-	day: u32,
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
@@ -56,7 +49,7 @@ pub enum SexualPreference {
 pub struct ProfileFormValues {
 	first_name: Option<String>,
 	last_name: Option<String>,
-	birth_date: Option<String>,
+	pub birth_date: Option<String>,
 	gender: Option<Gender>,
 	pub location_override: Option<bool>,
 	pub location: Option<LocationDto>,
@@ -178,7 +171,7 @@ impl TryFrom<&ProfileSlice> for ProfileThumbnail {
 pub struct PrivateProfileDto {
 	first_name: String,
 	last_name: String,
-	birth_date: Option<BirthDate>,
+	birth_date: Option<String>,
 	gender: Option<Gender>,
 	sexual_preference: SexualPreference,
 	biography: Option<String>,
@@ -229,15 +222,25 @@ pub struct PublicProfileDto {
 	pub liked: bool,
 }
 
-impl From<Profile> for PublicProfileDto {
-	fn from(profile: Profile) -> Self {
-		let today = Utc::today();
-		let birth_date = NaiveDate::fom
-		today.
-		Self {
+impl TryFrom<Profile> for PublicProfileDto {
+	type Error = AppError;
+
+	fn try_from(profile: Profile) -> Result<Self, Self::Error> {
+		let mut age: u8 = 0;
+		if let Some(birth_date) = profile.birth_date {
+			let today = Utc::today();
+			let birth_date = NaiveDate::parse_from_str(&birth_date, "%Y-%m-%d")?;
+			age = today.year() as u8 - birth_date.year() as u8;
+			if today.ordinal() < birth_date.ordinal() {
+				age -= 1;
+			}
+		}
+
+		Ok(Self {
 			id: profile.key,
 			first_name: profile.first_name,
 			last_name: profile.last_name,
+			age,
 			gender: profile.gender,
 			sexual_preference: profile.sexual_preference,
 			biography: profile.biography,
@@ -247,7 +250,7 @@ impl From<Profile> for PublicProfileDto {
 			images: vec![],
 			connected: false,
 			liked: false,
-		}
+		})
 	}
 }
 

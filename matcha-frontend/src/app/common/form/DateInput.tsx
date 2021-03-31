@@ -20,8 +20,8 @@ const DateInput: React.FC<IProps> = ({
 
 	const formatDate = (value: Date) => {
 		if (!value) return "";
-		return format(value, 'dd-MM-yyyy');
-	} 
+		return format(value, 'yyyy-MM-dd');
+	}
 
 	return (
 		<Form.Field error={touched && !!error}>

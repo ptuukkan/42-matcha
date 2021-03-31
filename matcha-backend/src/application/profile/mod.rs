@@ -1,12 +1,13 @@
-use crate::models::profile::ProfileWithDistance;
-use crate::models::location::LocationDto;
 use crate::errors::AppError;
 use crate::models::image::{Image, ImageDto};
 use crate::models::like::Like;
 use crate::models::location::Location;
+use crate::models::location::LocationDto;
+use crate::models::profile::ProfileWithDistance;
 use crate::models::profile::{PrivateProfileDto, Profile, ProfileFormValues, PublicProfileDto};
 use crate::models::user::User;
 use crate::models::visit::Visit;
+use chrono::naive::NaiveDate;
 use serde_json::{json, Value};
 use std::convert::TryFrom;
 
@@ -50,6 +51,16 @@ pub async fn update(user: &User, mut values: ProfileFormValues) -> Result<(), Ap
 	values.location = None;
 	if let Some(interests) = values.interests {
 		values.interests = interest::create(interests).await?;
+	}
+	if let Some(birth_date) = values.birth_date {
+		let split: Vec<&str> = birth_date.split('T').collect();
+		println!("'{}'", split[0]);
+		NaiveDate::parse_from_str(split[0], "%Y-%m-%d")?;
+		if NaiveDate::parse_from_str(split[0], "%Y-%m-%d").is_ok() {
+			values.birth_date = Some(split[0].to_owned());
+		} else {
+			return Err(AppError::bad_request("Birth date format incorrect"));
+		}
 	}
 	profile.update_from_form(&values).await?;
 	Ok(())
@@ -132,7 +143,7 @@ pub async fn load_profile_dto(
 		.filter_map(|x| ImageDto::try_from(x).ok())
 		.collect();
 	let key = profile_with_distance.profile.key.to_owned();
-	let mut profile_dto = PublicProfileDto::from(profile_with_distance.profile);
+	let mut profile_dto = PublicProfileDto::try_from(profile_with_distance.profile)?;
 	profile_dto.images = images;
 	profile_dto.distance = profile_with_distance.distance;
 	profile_dto.liked = Like::find(&user.profile, &key).await?.is_some();

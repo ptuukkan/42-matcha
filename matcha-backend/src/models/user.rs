@@ -34,7 +34,7 @@ pub struct RegisterFormValues {
 	#[validate(length(min = 2, max = 32))]
 	pub last_name: String,
 	#[validate(email)]
-	email_address: String,
+	pub email_address: String,
 	#[validate(length(min = 2, max = 32))]
 	username: String,
 	#[validate(length(min = 6))]

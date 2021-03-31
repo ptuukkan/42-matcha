@@ -21,10 +21,12 @@ export interface IPrivateProfile extends IProfile {
 	likes: IProfileThumbnail[];
 	location: ILocation;
 	visits: IProfileThumbnail[];
+	birthDate?: string;
 }
 
 export interface IPublicProfile extends IProfile {
 	id: string;
+	age: number;
 	connected: boolean;
 	liked: boolean;
 }
@@ -38,6 +40,7 @@ export interface IProfileThumbnail {
 export interface IProfileFormValues {
 	firstName: string;
 	lastName: string;
+	birthDate?: Date;
 	gender: string;
 	biography: string;
 	sexualPreference: string;
@@ -89,6 +92,7 @@ export const profileToFormValues = (
 	return {
 		firstName: profile.firstName,
 		lastName: profile.lastName,
+		birthDate: profile.birthDate ? new Date(profile.birthDate) : undefined,
 		gender: profile.gender,
 		sexualPreference: profile.sexualPreference,
 		biography: profile.biography,

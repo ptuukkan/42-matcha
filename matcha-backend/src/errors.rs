@@ -288,3 +288,10 @@ impl From<std::io::Error> for AppError {
 		Self::InternalError(InternalError::from(from_error.to_string()))
 	}
 }
+
+impl From<chrono::ParseError> for AppError {
+	fn from(from_error: chrono::ParseError) -> Self {
+		Self::InternalError(InternalError::from(from_error.to_string()))
+	}
+}
+

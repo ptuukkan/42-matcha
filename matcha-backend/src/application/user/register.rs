@@ -34,7 +34,7 @@ pub async fn register(values: RegisterFormValues) -> Result<(), AppError> {
 	}
 	let re = Regex::new(r".*test\.com$").unwrap();
 	if re.is_match(&user.email_address) {
-		if let Some(mut user) = User::find("emailAddress", "jake@test.com").await?.pop() {
+		if let Some(mut user) = User::find("emailAddress", &values.email_address).await?.pop() {
 			user.link = None;
 			user.update().await?;
 		}
