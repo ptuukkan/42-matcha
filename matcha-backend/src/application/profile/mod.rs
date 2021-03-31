@@ -56,15 +56,15 @@ pub async fn update(user: &User, mut values: ProfileFormValues) -> Result<(), Ap
 }
 
 pub async fn get(user: &User, profile_key: &str) -> Result<PublicProfileDto, AppError> {
-	let profile = Profile::get(profile_key).await?;
+	let profile = Profile::get_with_distance(&user.profile, profile_key).await?;
 	// if !profile.is_complete() {
 	// 	return Err(AppError::not_found("Profile not found"));
 	// }
-	if user.profile != profile.key {
+	if user.profile != profile.profile.key {
 		visit(&user.profile, profile_key).await?;
 	}
 
-	let profile_dto = load_profile_dto(user, profile_key).await?;
+	let profile_dto = load_profile_dto(user, profile).await?;
 	Ok(profile_dto)
 }
 
