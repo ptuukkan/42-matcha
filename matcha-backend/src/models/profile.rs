@@ -102,16 +102,6 @@ impl Profile {
 		Ok(profile)
 	}
 
-	pub async fn get_all() -> Result<Vec<Self>, AppError> {
-		let query = "FOR p IN profiles return p";
-		let result = CursorRequest::from(query)
-			.send()
-			.await?
-			.extract_all::<Self>()
-			.await?;
-		Ok(result)
-	}
-
 	pub async fn delete(&self) -> Result<(), AppError> {
 		api::delete(&self.key_url()?).await?;
 		Ok(())
@@ -232,6 +222,7 @@ pub struct PublicProfileDto {
 	sexual_preference: SexualPreference,
 	biography: Option<String>,
 	interests: Vec<String>,
+	pub distance: i32,
 	pub fame_rating: usize,
 	pub images: Vec<ImageDto>,
 	pub connected: bool,
@@ -252,6 +243,7 @@ impl From<Profile> for PublicProfileDto {
 			biography: profile.biography,
 			interests: profile.interests,
 			fame_rating: 0,
+			distance: 0,
 			images: vec![],
 			connected: false,
 			liked: false,
@@ -275,4 +267,53 @@ pub struct ProfileThumbnail {
 	id: String,
 	first_name: String,
 	image: ImageDto,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ProfileWithDistance {
+	pub profile: Profile,
+	pub distance: i32,
+}
+
+impl ProfileWithDistance {
+	pub async fn get(my_profile: &str, their_profile: &str) -> Result<Self, AppError> {
+		let query = format!(
+			"LET my_location = (FOR p IN profiles FILTER p._key == '{m}' RETURN DOCUMENT('locations', p.location))
+			LET their_location = (FOR p IN profiles FILTER p._key == '{t}' RETURN DOCUMENT('locations', p.location))
+			LET their_profile = (FOR p IN profiles FILTER p._key == '{t}' RETURN p)
+			LET distance = DISTANCE(their_location[0].coordinate[0], their_location[0].coordinate[1], my_location[0].coordinate[0], my_location[0].coordinate[1])
+			RETURN {{ profile: their_profile, distance: ROUND(distance / 1000) }}
+
+	  		",
+			m = &my_profile, t = &their_profile
+		);
+		let mut result = CursorRequest::from(query)
+			.send()
+			.await?
+			.extract_all::<Self>()
+			.await?;
+		if let Some(profile) = result.pop() {
+			Ok(profile)
+		} else {
+			Err(AppError::not_found("Profile not found"))
+		}
+	}
+
+	pub async fn get_all(profile_key: &str) -> Result<Vec<Self>, AppError> {
+		let query = format!(
+			"LET locat = (FOR p IN profiles FILTER p._key == \"{}\" RETURN DOCUMENT(\"locations\", p.location))
+
+			FOR loc IN locations
+			  LET distance = DISTANCE(loc.coordinate[0], loc.coordinate[1], locat[0].coordinate[0], locat[0].coordinate[1])
+			  FOR p IN profiles FILTER p.location == loc._key RETURN {{ profile: p, distance: ROUND(distance / 1000) }}
+	  		",
+			&profile_key
+		);
+		let result = CursorRequest::from(query)
+			.send()
+			.await?
+			.extract_all::<Self>()
+			.await?;
+		Ok(result)
+	}
 }

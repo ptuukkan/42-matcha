@@ -1,3 +1,4 @@
+use crate::models::profile::ProfileWithDistance;
 use crate::models::location::LocationDto;
 use crate::errors::AppError;
 use crate::models::image::{Image, ImageDto};
@@ -55,15 +56,15 @@ pub async fn update(user: &User, mut values: ProfileFormValues) -> Result<(), Ap
 }
 
 pub async fn get(user: &User, profile_key: &str) -> Result<PublicProfileDto, AppError> {
-	let profile = Profile::get(profile_key).await?;
+	let profile = ProfileWithDistance::get(&user.profile, profile_key).await?;
 	// if !profile.is_complete() {
 	// 	return Err(AppError::not_found("Profile not found"));
 	// }
-	if user.profile != profile.key {
+	if user.profile != profile.profile.key {
 		visit(&user.profile, profile_key).await?;
 	}
 
-	let profile_dto = load_profile_dto(user, profile_key).await?;
+	let profile_dto = load_profile_dto(user, profile).await?;
 	Ok(profile_dto)
 }
 
@@ -123,20 +124,21 @@ async fn fame_rating(profile_key: &str) -> Result<usize, AppError> {
 
 pub async fn load_profile_dto(
 	user: &User,
-	profile_key: &str,
+	profile_with_distance: ProfileWithDistance,
 ) -> Result<PublicProfileDto, AppError> {
-	let profile = Profile::get(profile_key).await?;
-	let images: Vec<ImageDto> = Image::get_profile_images(profile_key)
+	let images: Vec<ImageDto> = Image::get_profile_images(&profile_with_distance.profile.key)
 		.await?
 		.iter()
 		.filter_map(|x| ImageDto::try_from(x).ok())
 		.collect();
-	let mut profile_dto = PublicProfileDto::from(profile);
+	let key = profile_with_distance.profile.key.to_owned();
+	let mut profile_dto = PublicProfileDto::from(profile_with_distance.profile);
 	profile_dto.images = images;
-	profile_dto.liked = Like::find(&user.profile, profile_key).await?.is_some();
-	if profile_dto.liked && Like::find(profile_key, &user.profile).await?.is_some() {
+	profile_dto.distance = profile_with_distance.distance;
+	profile_dto.liked = Like::find(&user.profile, &key).await?.is_some();
+	if profile_dto.liked && Like::find(&key, &user.profile).await?.is_some() {
 		profile_dto.connected = true;
 	}
-	profile_dto.fame_rating = fame_rating(profile_key).await?;
+	profile_dto.fame_rating = fame_rating(&key).await?;
 	Ok(profile_dto)
 }
