@@ -1,12 +1,13 @@
-use crate::models::location::Location;
-use crate::models::location::LocationDto;
 use crate::database::api;
 use crate::database::cursor::CursorRequest;
 use crate::errors::AppError;
 use crate::models::base::CreateResponse;
 use crate::models::image::{Image, ImageDto};
+use crate::models::location::Location;
+use crate::models::location::LocationDto;
 use crate::models::user::RegisterFormValues;
 use serde::{Deserialize, Serialize};
+use chrono::{naive::NaiveDate, Utc};
 use serde_with_macros::skip_serializing_none;
 use std::convert::TryFrom;
 use std::env;
@@ -19,6 +20,7 @@ pub struct Profile {
 	pub key: String,
 	pub first_name: String,
 	pub last_name: String,
+	pub birth_date: Option<BirthDate>,
 	pub gender: Option<Gender>,
 	pub sexual_preference: SexualPreference,
 	biography: Option<String>,
@@ -26,6 +28,13 @@ pub struct Profile {
 	pub location_override: bool,
 	pub location: String,
 	pub images: Vec<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct BirthDate {
+	year: i32,
+	month: u32,
+	day: u32,
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
@@ -47,6 +56,7 @@ pub enum SexualPreference {
 pub struct ProfileFormValues {
 	first_name: Option<String>,
 	last_name: Option<String>,
+	birth_date: Option<String>,
 	gender: Option<Gender>,
 	pub location_override: Option<bool>,
 	pub location: Option<LocationDto>,
@@ -125,7 +135,8 @@ impl Profile {
 	}
 
 	pub fn is_complete(&self) -> bool {
-		self.gender.is_some()
+		self.birth_date.is_some()
+			&& self.gender.is_some()
 			&& self.biography.is_some()
 			&& !self.images.is_empty()
 			&& !self.interests.is_empty()
@@ -144,6 +155,7 @@ impl From<&RegisterFormValues> for Profile {
 			key: "".to_owned(),
 			first_name: values.first_name.to_owned(),
 			last_name: values.last_name.to_owned(),
+			birth_date: None,
 			gender: None,
 			sexual_preference: SexualPreference::Both,
 			biography: None,
@@ -176,6 +188,7 @@ impl TryFrom<&ProfileSlice> for ProfileThumbnail {
 pub struct PrivateProfileDto {
 	first_name: String,
 	last_name: String,
+	birth_date: Option<BirthDate>,
 	gender: Option<Gender>,
 	sexual_preference: SexualPreference,
 	biography: Option<String>,
@@ -193,6 +206,7 @@ impl From<Profile> for PrivateProfileDto {
 		Self {
 			first_name: profile.first_name,
 			last_name: profile.last_name,
+			birth_date: profile.birth_date,
 			gender: profile.gender,
 			sexual_preference: profile.sexual_preference,
 			biography: profile.biography,
@@ -213,6 +227,7 @@ pub struct PublicProfileDto {
 	pub id: String,
 	first_name: String,
 	last_name: String,
+	age: u8,
 	gender: Option<Gender>,
 	sexual_preference: SexualPreference,
 	biography: Option<String>,
@@ -225,6 +240,9 @@ pub struct PublicProfileDto {
 
 impl From<Profile> for PublicProfileDto {
 	fn from(profile: Profile) -> Self {
+		let today = Utc::today();
+		let birth_date = NaiveDate::fom
+		today.
 		Self {
 			id: profile.key,
 			first_name: profile.first_name,

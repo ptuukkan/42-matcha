@@ -27,7 +27,7 @@ actix-files = "0.5.0"
 regex = "1.4.5"
 serde_json = "1.0"
 serde_with_macros = "1.4.1"
-
+chrono = "0.4"
 
 [dev-dependencies]
 lazy_static = "1.4.0"
