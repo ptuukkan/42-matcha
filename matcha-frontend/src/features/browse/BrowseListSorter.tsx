@@ -1,5 +1,5 @@
 import React, { Fragment, useState } from 'react';
-import { Button, Header } from 'semantic-ui-react';
+import { Button, ButtonGroup, Header } from 'semantic-ui-react';
 import { IPublicProfile } from '../../app/models/profile';
 
 interface IProps {
@@ -69,7 +69,7 @@ const BrowseListSorter: React.FC<IProps> = ({ profiles, setProfiles }) => {
 
 	return (
 		<Fragment>
-			<Header size="medium" content="Sort profiles" />
+			<Header size="medium" content="Sort" />
 			<Button
 				active={activeSort === 1}
 				onClick={() => sort('age')}
@@ -77,6 +77,8 @@ const BrowseListSorter: React.FC<IProps> = ({ profiles, setProfiles }) => {
 				icon={ageDir ? 'caret down' : 'caret up'}
 				labelPosition="right"
 			/>
+			<br />
+			<br />
 			<Button
 				active={activeSort === 2}
 				onClick={() => sort('distance')}
@@ -84,6 +86,8 @@ const BrowseListSorter: React.FC<IProps> = ({ profiles, setProfiles }) => {
 				icon={disDir ? 'caret down' : 'caret up'}
 				labelPosition="right"
 			/>
+			<br />
+			<br />
 			<Button
 				active={activeSort === 3}
 				onClick={() => sort('fameRate')}
