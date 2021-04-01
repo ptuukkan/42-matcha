@@ -1,14 +1,14 @@
 import { profile } from 'console';
-import React, { Fragment, useState } from 'react'
-import { Button } from 'semantic-ui-react';
+import React, { Fragment, useState } from 'react';
+import { Button, Header } from 'semantic-ui-react';
 import { IPublicProfile } from '../../app/models/profile';
 
 interface IProps {
-	profiles: IPublicProfile[]
-	setProfiles: React.Dispatch<React.SetStateAction<IPublicProfile[]>>
+	profiles: IPublicProfile[];
+	setProfiles: React.Dispatch<React.SetStateAction<IPublicProfile[]>>;
 }
 
-const ProfileListSorter: React.FC<IProps> = ({profiles, setProfiles}) => {
+const ProfileListSorter: React.FC<IProps> = ({ profiles, setProfiles }) => {
 	const [activeSort, setActiveSort] = useState(0);
 	const [ageDir, setAgeDir] = useState(true);
 	const [disDir, setDisDir] = useState(true);
@@ -42,9 +42,9 @@ const ProfileListSorter: React.FC<IProps> = ({profiles, setProfiles}) => {
 					setActiveSort(2);
 				}
 				if (dir) {
-					newProfiles.sort((a, b) => a.distance - b.distance);
-				} else {
 					newProfiles.sort((a, b) => b.distance - a.distance);
+				} else {
+					newProfiles.sort((a, b) => a.distance - b.distance);
 				}
 				setProfiles(newProfiles);
 				break;
@@ -54,12 +54,12 @@ const ProfileListSorter: React.FC<IProps> = ({profiles, setProfiles}) => {
 					setFamDir(!famDir);
 					dir = !dir;
 				} else {
-					setActiveSort(3)
+					setActiveSort(3);
 				}
 				if (dir) {
-					newProfiles.sort((a, b) => a.fameRating - b.fameRating);
-				} else {
 					newProfiles.sort((a, b) => b.fameRating - a.fameRating);
+				} else {
+					newProfiles.sort((a, b) => a.fameRating - b.fameRating);
 				}
 				setProfiles(newProfiles);
 				break;
@@ -68,12 +68,10 @@ const ProfileListSorter: React.FC<IProps> = ({profiles, setProfiles}) => {
 		}
 	};
 
-	console.log(profiles);
-	console.log(activeSort);
-
 	return (
 		<Fragment>
-				<Button
+			<Header size="medium" content="Sort profiles" />
+			<Button
 				active={activeSort === 1}
 				onClick={() => sort('age')}
 				content="Age"
@@ -95,7 +93,7 @@ const ProfileListSorter: React.FC<IProps> = ({profiles, setProfiles}) => {
 				labelPosition="right"
 			/>
 		</Fragment>
-	)
-}
+	);
+};
 
-export default ProfileListSorter
+export default ProfileListSorter;
