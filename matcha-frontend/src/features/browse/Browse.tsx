@@ -9,6 +9,7 @@ import BrowseListFilter from './BrowseListFilter';
 
 const Browse = () => {
 	const [profiles, setProfiles] = useState<IPublicProfile[]>([]);
+	const [ages, setAges] = useState<Number[]>([18, 100]);
 	const [loading, setLoading] = useState(false);
 
 	useEffect(() => {
@@ -28,9 +29,13 @@ const Browse = () => {
 			<Grid.Column width={10}>
 				<Rail position="left">
 					<BrowseListSorter profiles={profiles} setProfiles={setProfiles} />
-					<BrowseListFilter />
+					<BrowseListFilter setAges={setAges} />
 				</Rail>
-				<BrowseList profiles={profiles} />
+				<BrowseList
+					profiles={profiles.filter(
+						(p) => p.age > ages![0] && p.age < ages![1]
+					)}
+				/>
 			</Grid.Column>
 		</Grid>
 	);
