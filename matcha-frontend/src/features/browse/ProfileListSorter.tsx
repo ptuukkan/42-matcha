@@ -1,3 +1,4 @@
+import { profile } from 'console';
 import React, { Fragment, useState } from 'react'
 import { Button } from 'semantic-ui-react';
 import { IPublicProfile } from '../../app/models/profile';
@@ -15,14 +16,17 @@ const ProfileListSorter: React.FC<IProps> = ({profiles, setProfiles}) => {
 
 	const sort = (sortBy: string) => {
 		const newProfiles = [...profiles];
+		let dir;
 		switch (sortBy) {
 			case 'age':
+				dir = ageDir;
 				if (activeSort === 1) {
 					setAgeDir(!ageDir);
+					dir = !dir;
 				} else {
 					setActiveSort(1);
 				}
-				if (ageDir) {
+				if (dir) {
 					newProfiles.sort((a, b) => b.age - a.age);
 				} else {
 					newProfiles.sort((a, b) => a.age - b.age);
@@ -30,12 +34,14 @@ const ProfileListSorter: React.FC<IProps> = ({profiles, setProfiles}) => {
 				setProfiles(newProfiles);
 				break;
 			case 'distance':
+				dir = disDir;
 				if (activeSort === 2) {
 					setDisDir(!disDir);
+					dir = !dir;
 				} else {
 					setActiveSort(2);
 				}
-				if (disDir) {
+				if (dir) {
 					newProfiles.sort((a, b) => a.distance - b.distance);
 				} else {
 					newProfiles.sort((a, b) => b.distance - a.distance);
@@ -43,12 +49,14 @@ const ProfileListSorter: React.FC<IProps> = ({profiles, setProfiles}) => {
 				setProfiles(newProfiles);
 				break;
 			case 'fameRate':
+				dir = famDir;
 				if (activeSort === 3) {
 					setFamDir(!famDir);
+					dir = !dir;
 				} else {
 					setActiveSort(3)
 				}
-				if (famDir) {
+				if (dir) {
 					newProfiles.sort((a, b) => a.fameRating - b.fameRating);
 				} else {
 					newProfiles.sort((a, b) => b.fameRating - a.fameRating);
@@ -59,6 +67,9 @@ const ProfileListSorter: React.FC<IProps> = ({profiles, setProfiles}) => {
 				break;
 		}
 	};
+
+	console.log(profiles);
+	console.log(activeSort);
 
 	return (
 		<Fragment>
