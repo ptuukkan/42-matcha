@@ -3,8 +3,8 @@ import './browse.css';
 import { Grid, Loader } from 'semantic-ui-react';
 import { IPublicProfile } from '../../app/models/profile';
 import agent from '../../app/api/agent';
-import ProfileList from './ProfileList';
-import ProfileListSorter from './ProfileListSorter';
+import BrowseList from './BrowseList';
+import BrowseListSorter from './BrowseListSorter';
 
 const Browse = () => {
 	const [profiles, setProfiles] = useState<IPublicProfile[]>([]);
@@ -25,8 +25,8 @@ const Browse = () => {
 	return (
 		<Grid centered>
 			<Grid.Column width={10}>
-				<ProfileListSorter profiles={profiles} setProfiles={setProfiles} />
-				<ProfileList profiles={profiles} />
+				<BrowseListSorter profiles={profiles} setProfiles={setProfiles} />
+				<BrowseList profiles={profiles} />
 			</Grid.Column>
 		</Grid>
 	);

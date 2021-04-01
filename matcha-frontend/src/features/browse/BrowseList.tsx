@@ -6,7 +6,7 @@ interface IProps {
 	profiles: IPublicProfile[];
 }
 
-const ProfileList: React.FC<IProps> = ({ profiles }) => {
+const BrowseList: React.FC<IProps> = ({ profiles }) => {
 	return (
 		<Fragment>
 			{profiles.map((p) => (
@@ -40,4 +40,4 @@ const ProfileList: React.FC<IProps> = ({ profiles }) => {
 	);
 };
 
-export default ProfileList;
+export default BrowseList;

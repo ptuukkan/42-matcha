@@ -1,4 +1,3 @@
-import { profile } from 'console';
 import React, { Fragment, useState } from 'react';
 import { Button, Header } from 'semantic-ui-react';
 import { IPublicProfile } from '../../app/models/profile';
@@ -8,7 +7,7 @@ interface IProps {
 	setProfiles: React.Dispatch<React.SetStateAction<IPublicProfile[]>>;
 }
 
-const ProfileListSorter: React.FC<IProps> = ({ profiles, setProfiles }) => {
+const BrowseListSorter: React.FC<IProps> = ({ profiles, setProfiles }) => {
 	const [activeSort, setActiveSort] = useState(0);
 	const [ageDir, setAgeDir] = useState(true);
 	const [disDir, setDisDir] = useState(true);
@@ -96,4 +95,4 @@ const ProfileListSorter: React.FC<IProps> = ({ profiles, setProfiles }) => {
 	);
 };
 
-export default ProfileListSorter;
+export default BrowseListSorter;
