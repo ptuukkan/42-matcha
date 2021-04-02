@@ -16,7 +16,8 @@ const Browse = () => {
 		setLoading(true);
 		agent.Browse.list()
 			.then((profileList) => {
-				setProfiles(profileList);
+				let profiles = [...profileList.filter(p => !p.liked)]
+				setProfiles(profiles);
 			})
 			.catch((error) => console.log(error))
 			.finally(() => setLoading(false));
@@ -34,7 +35,7 @@ const Browse = () => {
 				<BrowseList
 					profiles={profiles.filter(
 						(p) => p.age > ages![0] && p.age < ages![1]
-					)}
+					)} setProfiles={setProfiles} 
 				/>
 			</Grid.Column>
 		</Grid>

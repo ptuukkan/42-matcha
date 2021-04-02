@@ -20,15 +20,9 @@ import ChangeCredentials from '../../features/user/ChangeCredentials';
 import Browse from '../../features/browse/Browse';
 
 const App = () => {
-	// const [profile, setProfile] = useState(Profiles.profiles[0]);
 	const [appLoaded, setAppLoaded] = useState(false);
 	const rootStore = useContext(RootStoreContext);
 	const { token, getUser, logoutUser, user } = rootStore.userStore;
-
-	// const getRandomUser = () => {
-	// 	let i = Math.floor(Math.random() * Profiles.profiles.length);
-	// 	setProfile(Profiles.profiles[i]);
-	// };
 
 	useEffect(() => {
 		if (token) {

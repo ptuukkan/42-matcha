@@ -1,12 +1,24 @@
 import React, { Fragment } from 'react';
 import { Image, Button, Card, Header, Icon, Rating } from 'semantic-ui-react';
+import agent from '../../app/api/agent';
 import { IPublicProfile } from '../../app/models/profile';
 
 interface IProps {
 	profiles: IPublicProfile[];
+	setProfiles: React.Dispatch<React.SetStateAction<IPublicProfile[]>>;
 }
 
-const BrowseList: React.FC<IProps> = ({ profiles }) => {
+const BrowseList: React.FC<IProps> = ({setProfiles,  profiles }) => {
+
+	const like = (p: IPublicProfile) => {
+		agent.Profile.like(p.id)
+		.then(() => {
+			let updatedProfiles = [...profiles.filter(profile => profile.id !== p.id)]
+			setProfiles(updatedProfiles);
+		})
+		.catch((error) => console.log(error))
+	}
+
 	return (
 		<Fragment>
 			{profiles.map((p) => (
@@ -26,12 +38,14 @@ const BrowseList: React.FC<IProps> = ({ profiles }) => {
 						<Card.Description>{p.biography}</Card.Description>
 						<br></br>
 						<Button circular icon="cancel" size="massive" color="black" />
+						
 						<Button
 							circular
 							icon="like"
 							floated="right"
 							size="massive"
 							color="red"
+							onClick={() => like(p)}
 						/>
 					</div>
 				</Card>
