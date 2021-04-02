@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react';
-import { Image, Button, Card, Header, Icon, Rating } from 'semantic-ui-react';
+import { Image, Button, Card, Header, Icon, Rating, Label } from 'semantic-ui-react';
 import agent from '../../app/api/agent';
 import { IPublicProfile } from '../../app/models/profile';
 
@@ -28,6 +28,8 @@ const BrowseList: React.FC<IProps> = ({setProfiles,  profiles }) => {
 						<Header as="h1">{`${p.firstName} ${p.lastName}, ${p.age}`}</Header>
 						<Icon name={p.gender === 'Female' ? 'mars' : 'venus'} />
 						Distance: {p.distance} km
+						<br></br>
+						{p.interests.map(inter => <Label color='blue' key={inter}>{inter}</Label>)}
 						<Header>Fame Rating</Header>
 						<Rating
 							icon="heart"
@@ -38,7 +40,6 @@ const BrowseList: React.FC<IProps> = ({setProfiles,  profiles }) => {
 						<Card.Description>{p.biography}</Card.Description>
 						<br></br>
 						<Button circular icon="cancel" size="massive" color="black" />
-						
 						<Button
 							circular
 							icon="like"

@@ -7,10 +7,12 @@ import BrowseList from './BrowseList';
 import BrowseListSorter from './BrowseListSorter';
 import BrowseListFilter from './BrowseListFilter';
 
+
 const Browse = () => {
 	const [profiles, setProfiles] = useState<IPublicProfile[]>([]);
 	const [ages, setAges] = useState<Number[]>([18, 100]);
 	const [loading, setLoading] = useState(false);
+	
 
 	useEffect(() => {
 		setLoading(true);

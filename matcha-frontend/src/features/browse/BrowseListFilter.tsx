@@ -13,7 +13,6 @@ const BrowseListFilter: React.FC<IProps> = ({ setAges }) => {
 	return (
 		<Fragment>
 			<Header size="medium" content="Filter" />
-
 			<Range
 				defaultValue={[0, 100]}
 				allowCross={false}
