@@ -6,21 +6,32 @@ const { createSliderWithTooltip } = Slider;
 const Range = createSliderWithTooltip(Slider.Range);
 
 interface IProps {
-	setAges: React.Dispatch<React.SetStateAction<Number[]>>;
+	minValue: number;
+	maxValue: number;
+	name: string;
+	setValue: React.Dispatch<React.SetStateAction<Number[]>>;
 }
 
-const BrowseListFilter: React.FC<IProps> = ({ setAges }) => {
+const BrowseListFilter: React.FC<IProps> = ({
+	setValue,
+	minValue,
+	maxValue,
+	name,
+}) => {
+	const [label, setLabel] = useState([minValue, maxValue]);
+
 	return (
 		<Fragment>
-			<Header size="medium" content="Filter" />
+			<Header size="medium" content={name} /> {label[0]} - {label[1]}
 			<Range
-				defaultValue={[0, 100]}
+				max={maxValue}
+				min={minValue}
+				defaultValue={[minValue, maxValue]}
 				allowCross={false}
-				marks={{
-					0: '0',
-					100: '100',
+				onChange={(d) => {
+					setValue(d);
+					setLabel(d);
 				}}
-				onChange={d => setAges(d)}
 			/>
 		</Fragment>
 	);

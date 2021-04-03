@@ -1,5 +1,13 @@
 import React, { Fragment } from 'react';
-import { Image, Button, Card, Header, Icon, Rating, Label } from 'semantic-ui-react';
+import {
+	Image,
+	Button,
+	Card,
+	Header,
+	Icon,
+	Rating,
+	Label,
+} from 'semantic-ui-react';
 import agent from '../../app/api/agent';
 import { IPublicProfile } from '../../app/models/profile';
 
@@ -8,16 +16,17 @@ interface IProps {
 	setProfiles: React.Dispatch<React.SetStateAction<IPublicProfile[]>>;
 }
 
-const BrowseList: React.FC<IProps> = ({setProfiles,  profiles }) => {
-
+const BrowseList: React.FC<IProps> = ({ setProfiles, profiles }) => {
 	const like = (p: IPublicProfile) => {
 		agent.Profile.like(p.id)
-		.then(() => {
-			let updatedProfiles = [...profiles.filter(profile => profile.id !== p.id)]
-			setProfiles(updatedProfiles);
-		})
-		.catch((error) => console.log(error))
-	}
+			.then(() => {
+				let updatedProfiles = [
+					...profiles.filter((profile) => profile.id !== p.id),
+				];
+				setProfiles(updatedProfiles);
+			})
+			.catch((error) => console.log(error));
+	};
 
 	return (
 		<Fragment>
@@ -29,7 +38,13 @@ const BrowseList: React.FC<IProps> = ({setProfiles,  profiles }) => {
 						<Icon name={p.gender === 'Female' ? 'mars' : 'venus'} />
 						Distance: {p.distance} km
 						<br></br>
-						{p.interests.map(inter => <Label color='blue' key={inter}>{inter}</Label>)}
+						Common interests: {p.commonInterests}
+						<br></br>
+						{p.interests.map((inter) => (
+							<Label color="blue" key={inter}>
+								{inter}
+							</Label>
+						))}
 						<Header>Fame Rating</Header>
 						<Rating
 							icon="heart"
@@ -41,6 +56,7 @@ const BrowseList: React.FC<IProps> = ({setProfiles,  profiles }) => {
 						<br></br>
 						<Button circular icon="cancel" size="massive" color="black" />
 						<Button
+							disabled={!p.liked}
 							circular
 							icon="like"
 							floated="right"

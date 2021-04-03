@@ -68,7 +68,11 @@ const App = () => {
 											path="/profile"
 											component={ProfilePage}
 										/>
-										<PrivateRoute exact path="/credentials" component={ChangeCredentials}/>
+										<PrivateRoute
+											exact
+											path="/credentials"
+											component={ChangeCredentials}
+										/>
 										<PrivateRoute exact path="/chat" component={Chat} />
 										<PrivateRoute component={NotFound} />
 									</Switch>
