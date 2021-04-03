@@ -1,5 +1,5 @@
-import React, { Fragment, useContext, useEffect, useState } from 'react';
-import { Button, ButtonGroup, Header } from 'semantic-ui-react';
+import React, { Fragment, useState } from 'react';
+import { Button, Header } from 'semantic-ui-react';
 import { IPublicProfile } from '../../app/models/profile';
 
 interface IProps {

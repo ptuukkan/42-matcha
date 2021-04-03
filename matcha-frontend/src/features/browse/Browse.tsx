@@ -1,6 +1,6 @@
-import React, { useState, useEffect, Fragment, useContext } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import './browse.css';
-import { Grid, Loader, Rail, Segment } from 'semantic-ui-react';
+import { Grid, Loader, Rail } from 'semantic-ui-react';
 import { IPublicProfile } from '../../app/models/profile';
 import agent from '../../app/api/agent';
 import BrowseList from './BrowseList';
@@ -16,13 +16,10 @@ const Browse = () => {
 	const [commonInterests, setcommonInterests] = useState<Number[]>([0, 10]);
 	const [loading, setLoading] = useState(false);
 	const rootStore = useContext(RootStoreContext);
-	const { profile, getProfile } = rootStore.profileStore;
+	const { profile } = rootStore.profileStore;
 
 	useEffect(() => {
 		setLoading(true);
-		if (!profile) {
-			getProfile().catch((e) => console.log(e));
-		}
 		agent.Browse.list()
 			.then((profileList) => {
 				let profiles = [...profileList];
@@ -31,11 +28,12 @@ const Browse = () => {
 						profile!.interests.includes(interest)
 					).length;
 				});
+				console.log(profiles);
 				setProfiles(profiles);
 			})
 			.catch((error) => console.log(error))
 			.finally(() => setLoading(false));
-	}, [profile, getProfile]);
+	}, [profile]);
 
 	if (loading) return <Loader active />;
 
@@ -72,14 +70,14 @@ const Browse = () => {
 				<BrowseList
 					profiles={profiles.filter(
 						(p) =>
-							p.age > ages![0] &&
-							p.age < ages![1] &&
-							p.distance > radius[0] &&
-							p.distance < radius[1] &&
-							p.fameRating > famerate[0] &&
-							p.fameRating < famerate[1] &&
-							p.commonInterests > commonInterests[0] &&
-							p.commonInterests < commonInterests[1]
+							p.age >= ages[0] &&
+							p.age <= ages[1] &&
+							p.distance >= radius[0] &&
+							p.distance <= radius[1] &&
+							p.fameRating >= famerate[0] &&
+							p.fameRating <= famerate[1] &&
+							p.commonInterests >= commonInterests[0] &&
+							p.commonInterests <= commonInterests[1]
 					)}
 					setProfiles={setProfiles}
 				/>

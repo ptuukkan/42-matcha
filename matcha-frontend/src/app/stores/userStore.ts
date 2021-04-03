@@ -61,7 +61,7 @@ export default class UserStore {
 
 	changeCredentials = async (data: ICredentialFormValues) => {
 		try {
-			await agent.User.credentials(data);		
+			await agent.User.credentials(data);
 		} catch (error) {
 			if (error.error_type === 'ValidationError') {
 				return error.errors.reduce((obj: any, item: IValidationError) => {
@@ -80,6 +80,7 @@ export default class UserStore {
 				this.user = user;
 			});
 			this.setToken(user.token);
+			await this.rootStore.profileStore.getProfile();
 			this.rootStore.modalStore.closeModal();
 			history.push('/');
 		} catch (error) {
@@ -98,12 +99,12 @@ export default class UserStore {
 			location.latitude = ipLocation.latitude;
 			location.longitude = ipLocation.longitude;
 		}
-
 		const user = await agent.User.current(location);
 		try {
 			runInAction(() => {
 				this.user = user;
 			});
+			await this.rootStore.profileStore.getProfile();
 		} catch (error) {
 			console.log(error);
 		}

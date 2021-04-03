@@ -4,13 +4,12 @@ import ImageCropper from './ImageCropper';
 import ImageDropzone from './ImageDropzone';
 
 export interface IProps {
-	loading: boolean;
 	setAddImageMode: (value: boolean) => void;
 	addImage: (data: FormData) => void;
 
 }
 
-const ImageUpload: React.FC<IProps> = ({ loading, setAddImageMode, addImage }) => {
+const ImageUpload: React.FC<IProps> = ({ setAddImageMode, addImage }) => {
 	const [files, setFiles] = useState<any[]>([]);
 	const [image, setImage] = useState<Blob | null>(null);
 
@@ -47,7 +46,6 @@ const ImageUpload: React.FC<IProps> = ({ loading, setAddImageMode, addImage }) =
 								<Button
 									positive
 									icon="check"
-									loading={loading}
 									onClick={() => {
 										let fd = new FormData()
 										fd.append('image', image!)
@@ -58,7 +56,6 @@ const ImageUpload: React.FC<IProps> = ({ loading, setAddImageMode, addImage }) =
 								/>
 								<Button
 									icon="close"
-									disabled={loading}
 									onClick={() => setFiles([])}
 								/>
 							</Button.Group>

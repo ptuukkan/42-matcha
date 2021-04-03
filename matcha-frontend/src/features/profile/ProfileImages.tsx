@@ -9,7 +9,6 @@ const ProfileImages = () => {
 	const rootStore = useContext(RootStoreContext);
 	const {
 		profile,
-		loading,
 		removeImage,
 		addImage,
 		setMain,
@@ -36,7 +35,6 @@ const ProfileImages = () => {
 				<ImageUpload
 					setAddImageMode={setAddImageMode}
 					addImage={addImage}
-					loading={loading}
 				/>
 			) : (
 				<ProfileImagesDisplay
