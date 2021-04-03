@@ -28,7 +28,6 @@ const Browse = () => {
 						profile!.interests.includes(interest)
 					).length;
 				});
-				console.log(profiles);
 				setProfiles(profiles);
 			})
 			.catch((error) => console.log(error))

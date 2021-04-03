@@ -285,8 +285,7 @@ impl ProfileWithDistance {
 			LET their_location = (FOR p IN profiles FILTER p._key == '{t}' RETURN DOCUMENT('locations', p.location))
 			LET their_profile = (FOR p IN profiles FILTER p._key == '{t}' RETURN p)
 			LET distance = DISTANCE(their_location[0].coordinate[0], their_location[0].coordinate[1], my_location[0].coordinate[0], my_location[0].coordinate[1])
-			RETURN {{ profile: their_profile, distance: ROUND(distance / 1000) }}
-
+			RETURN {{ profile: their_profile[0], distance: ROUND(distance / 1000) }}
 	  		",
 			m = &my_profile, t = &their_profile
 		);
