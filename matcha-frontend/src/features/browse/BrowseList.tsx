@@ -56,7 +56,7 @@ const BrowseList: React.FC<IProps> = ({ setProfiles, profiles }) => {
 						to={`/profile/${p.id}`}
 					/>
 					<div className="profileinfo">
-						<Header as="h1">{`${p.firstName} ${p.lastName}, ${p.age}`}</Header>
+						<Header as="h1">{`${p.firstName}, ${p.age}`}</Header>
 						<Icon name={p.gender === 'Female' ? 'mars' : 'venus'} />
 						Distance: {p.distance} km
 						<br></br>

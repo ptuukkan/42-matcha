@@ -2,6 +2,7 @@ import { Fragment, useEffect, useState } from 'react';
 import { useHistory, useParams } from 'react-router';
 import { Header, Item, Label, Loader, Rating } from 'semantic-ui-react';
 import agent from '../../app/api/agent';
+import NotFound from '../../app/layout/NotFound';
 import { IPublicProfile } from '../../app/models/profile';
 import ProfileVisitLikeButton from './ProfileVisitLikeButton';
 
@@ -12,7 +13,7 @@ interface IParams {
 const ProfileVisit = () => {
 	const [profile, setProfile] = useState<null | IPublicProfile>(null);
 	const { id } = useParams<IParams>();
-	const history = useHistory();
+	const [error, setError] = useState(false);
 
 	useEffect(() => {
 		if (!profile) {
@@ -20,10 +21,12 @@ const ProfileVisit = () => {
 				.then((p) => setProfile(p))
 				.catch((error) => {
 					console.log(error);
-					history.push('/notfound');
+					setError(true);
 				});
 		}
 	});
+
+	if (error) return <NotFound />;
 
 	if (!profile) return <Loader active />;
 
