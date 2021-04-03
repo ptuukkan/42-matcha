@@ -116,7 +116,7 @@ const BrowseListSorter: React.FC<IProps> = ({ profiles, setProfiles }) => {
 			<Button
 				active={activeSort === 3}
 				onClick={() => sort('interests')}
-				content="interests"
+				content="Mutual Interests"
 				icon={intDir ? 'caret down' : 'caret up'}
 				labelPosition="right"
 			/>

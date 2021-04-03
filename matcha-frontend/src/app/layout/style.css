@@ -1,3 +1,12 @@
+body::-webkit-scrollbar {
+	display: none;
+}
+
+body {
+	-ms-overflow-style: none; /* IE and Edge */
+	scrollbar-width: none; /* Firefox */
+}
+
 .main_container {
 	padding-top: 90px;
 	flex: 1;
