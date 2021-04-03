@@ -20,8 +20,10 @@ interface IProps {
 const BrowseList: React.FC<IProps> = ({ setProfiles, profiles }) => {
 	const like = (p: IPublicProfile) => {
 		agent.Profile.like(p.id)
-			.then(() => {
-				let updatedProfile = { ...p, liked: true };
+			.then((res) => {
+				let updatedProfile = res.connected
+					? { ...p, liked: true, connected: true }
+					: { ...p, liked: true };
 				setProfiles(
 					profiles.map((profile) =>
 						profile.id !== updatedProfile.id ? profile : updatedProfile
