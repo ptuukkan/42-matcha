@@ -1,17 +1,12 @@
 import { Link } from 'react-router-dom';
 import {
-	Container,
 	Card,
 	Image,
 	Header,
-	Dropdown,
-	Rail,
-	Divider,
 	Grid,
 	Loader,
 	Sidebar,
 	Menu,
-	Icon,
 	Segment,
 	Button,
 	Rating,
@@ -22,9 +17,11 @@ import agent from '../../app/api/agent';
 import { RootStoreContext } from '../../app/stores/rootStore';
 import BrowseListSorter from '../browse/BrowseListSorter';
 import BrowseListFilter from '../browse/BrowseListFilter';
+import InterestsSorter from './InterestSorter';
 
 const Research = () => {
 	const [profiles, setProfiles] = useState<IPublicProfile[]>([]);
+	const [interests, setInterests] = useState<string[]>([]);
 	const [ages, setAges] = useState<Number[]>([18, 100]);
 	const [radius, setRadius] = useState<Number[]>([0, 1000]);
 	const [famerate, setFamerate] = useState<Number[]>([0, 10]);
@@ -52,7 +49,7 @@ const Research = () => {
 
 	if (loading) return <Loader active />;
 
-	console.log(profiles);
+	console.log(interests);
 	return (
 		<Grid columns={1}>
 			<Grid.Column>
@@ -65,9 +62,10 @@ const Research = () => {
 						onHide={() => setShowSideBar(false)}
 						vertical
 						visible={showSideBar}
-						width="thin"
+						width='wide'
 					>
 						<BrowseListSorter profiles={profiles} setProfiles={setProfiles} />
+						<Header>Filter</Header>
 						<BrowseListFilter
 							setValue={setAges}
 							minValue={18}
@@ -92,6 +90,7 @@ const Research = () => {
 							maxValue={10}
 							name={'Famerate'}
 						/>
+						<InterestsSorter setValue={setInterests}/>
 					</Sidebar>
 
 					<Sidebar.Pusher>
@@ -108,12 +107,15 @@ const Research = () => {
 											p.fameRating <= famerate[1] &&
 											p.commonInterests >= commonInterests[0] &&
 											p.commonInterests <= commonInterests[1]
+											
 									)
 									.map((profile) => (
+										
 										<Card
 											key={profile.id}
 											as={Link}
 											to={`/profile/${profile.id}`}
+											
 										>
 											<Image
 												src={profile.images.find((i) => i.isMain)?.url}
@@ -135,7 +137,8 @@ const Research = () => {
 												</Card.Meta>
 											</Card.Content>
 										</Card>
-									))}
+									))
+									}
 							</Card.Group>
 						</Segment>
 					</Sidebar.Pusher>

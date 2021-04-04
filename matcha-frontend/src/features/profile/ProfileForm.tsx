@@ -59,7 +59,8 @@ const ProfileForm: React.FC<IProps> = ({
 		if (interests.length === 0) {
 			setInterestsLoading(true);
 			agent.Interests.get()
-				.then((interests) => setInterests(interests))
+				.then((interests) => {setInterests(interests)
+				console.log(interests)})
 				.catch((error) => console.log(error))
 				.finally(() => setInterestsLoading(false));
 		}
