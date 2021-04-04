@@ -10,7 +10,14 @@ async fn list(user: User) -> Result<HttpResponse, Error> {
 	Ok(HttpResponse::Ok().json(profiles))
 }
 
+#[get("/browse/list_all")]
+async fn list_all(user: User) -> Result<HttpResponse, Error> {
+	let profiles = browse::list_all(&user).await?;
+	Ok(HttpResponse::Ok().json(profiles))
+}
+
 pub fn routes(config: &mut web::ServiceConfig) {
 	config
-		.service(list);
+		.service(list)
+		.service(list_all);
 }
