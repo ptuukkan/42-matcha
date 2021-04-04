@@ -152,6 +152,11 @@ pub async fn load_profile_dto(
 		profile_dto.connected = true;
 	}
 	profile_dto.fame_rating = fame_rating(&key).await?;
+	for i in &my_profile.interests {
+		if profile_dto.interests.contains(i) {
+			profile_dto.common_interests += 1;
+		}
+	}
 	profile_dto.compatibility_rating = compatibility_rating(my_profile, &profile_dto)?;
 	Ok(profile_dto)
 }
@@ -174,11 +179,7 @@ fn compatibility_rating(
 		rating -= their_profile.distance / 10;
 	}
 	rating -= 10 - their_profile.fame_rating as i32;
-	for i in &my_profile.interests {
-		if their_profile.interests.contains(i) {
-			rating += 5;
-		}
-	}
+	rating += their_profile.common_interests * 5;
 	if rating < 0 {
 		Ok(0)
 	} else if rating > 100 {

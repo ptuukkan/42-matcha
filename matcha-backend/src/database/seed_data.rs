@@ -22,7 +22,7 @@ pub async fn seed_data() -> Result<(), AppError> {
 		"Male",
 		"Female",
 		"Ultimate detective / genius",
-		vec!["die-hard".to_owned()],
+		vec!["die-hard", "beer", "movies", "guns", "video-games", "cooking", "jogging", "laser-tag"],
 		"1990-01-28",
 		60.2,
 		24.9
@@ -38,7 +38,7 @@ pub async fn seed_data() -> Result<(), AppError> {
 		"Female",
 		"Male",
 		"This is dumb",
-		vec!["motorcycles".to_owned()],
+		vec!["motorcycles", "beer", "guns", "kung-fu", "karate", "boxing", "jogging"],
 		"1987-05-03",
 		60.2,
 		25.05
@@ -54,7 +54,7 @@ pub async fn seed_data() -> Result<(), AppError> {
 		"Male",
 		"Female",
 		"I like yogurt and gym",
-		vec!["yogyrt".to_owned(), "gym".to_owned()],
+		vec!["yogurt", "gym", "beer", "whisky", "boxing", "child-care", "hiking", "football"],
 		"1983-10-13",
 		60.3,
 		25.04
@@ -70,7 +70,7 @@ pub async fn seed_data() -> Result<(), AppError> {
 		"Female",
 		"Male",
 		"I like to be organized with binders",
-		vec!["organizing".to_owned(), "binders".to_owned()],
+		vec!["organizing", "binders", "movies", "video-games", "reading", "math", "cooking", "board-games", "cocktails"],
 		"1992-09-20",
 		60.2,
 		24.8
@@ -86,7 +86,7 @@ pub async fn seed_data() -> Result<(), AppError> {
 		"Male",
 		"Female",
 		"I like cooking strange stuff",
-		vec!["cooking".to_owned()],
+		vec!["cooking", "child-care", "hiking", "movies", "reading", "board-games", "surfing", "cocktails"],
 		"1980-12-04",
 		60.1,
 		24.5
@@ -102,7 +102,7 @@ pub async fn seed_data() -> Result<(), AppError> {
 		"Female",
 		"Male",
 		"I am the real leader at 99.",
-		vec!["plotting".to_owned(), "not-working".to_owned()],
+		vec!["plotting", "not-working", "vlog", "gossip", "cocktails", "gym", "fashion", "guns"],
 		"1986-03-19",
 		60.167,
 		24.935
@@ -118,7 +118,7 @@ pub async fn seed_data() -> Result<(), AppError> {
 		"Male",
 		"Male",
 		"Captain at 99th precinct",
-		vec!["classical-music".to_owned(), "dogs".to_owned()],
+		vec!["classical-music", "dogs", "whisky", "jogging", "reading", "polo", "cricket", "bowling"],
 		"1970-06-07",
 		60.1618,
 		24.787
@@ -134,7 +134,7 @@ pub async fn seed_data() -> Result<(), AppError> {
 		"Male",
 		"Female",
 		"I work with my pal Scully at 99.",
-		vec!["pizza".to_owned(), "chairs".to_owned()],
+		vec!["pizza", "chairs", "eating", "movies", "gambling", "not-working"],
 		"1972-04-22",
 		60.403,
 		25.103
@@ -150,7 +150,7 @@ pub async fn seed_data() -> Result<(), AppError> {
 		"Male",
 		"Female",
 		"I work with my pal Hitchcock at 99.",
-		vec!["pizza".to_owned(), "chairs".to_owned()],
+		vec!["pizza", "chairs", "eating", "movies", "not-working", "gambling"],
 		"1974-08-30",
 		60.376,
 		26.264
@@ -265,12 +265,16 @@ async fn update_profile(
 	gender: &str,
 	sexpref: &str,
 	bio: &str,
-	interests: Vec<String>,
+	interests: Vec<&str>,
 	birth_date: &str,
 	latitude: f32,
 	longitude: f32,
 ) -> Result<Profile, AppError> {
-	let int = profile::interest::create(interests).await?;
+	let mut owned_interests: Vec<String> = vec![];
+	for i in interests {
+		owned_interests.push(i.to_owned());
+	}
+	let int = profile::interest::create(owned_interests).await?;
 	let p = Profile::get(&user.profile).await?;
 
 	let body = json!({

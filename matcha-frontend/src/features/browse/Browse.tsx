@@ -23,12 +23,7 @@ const Browse = () => {
 		setLoading(true);
 		agent.Browse.list()
 			.then((profileList) => {
-				profileList.forEach((element) => {
-					element.commonInterests = element.interests.filter((interest) =>
-						profile!.interests.includes(interest)
-					).length;
-				});
-				profileList.sort((a, b) => b.commonInterests - a.commonInterests);
+				profileList.sort((a, b) => b.compatibilityRating - a.compatibilityRating);
 				setProfiles(profileList);
 			})
 			.catch((error) => console.log(error))
