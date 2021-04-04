@@ -235,7 +235,7 @@ pub struct PublicProfileDto {
 	pub connected: bool,
 	pub liked: bool,
 	pub compatibility_rating: u8,
-	pub common_interests: i32,
+	pub mutual_interests: i32,
 }
 
 impl TryFrom<Profile> for PublicProfileDto {
@@ -259,7 +259,7 @@ impl TryFrom<Profile> for PublicProfileDto {
 			connected: false,
 			liked: false,
 			compatibility_rating: 0,
-			common_interests: 0,
+			mutual_interests: 0,
 		})
 	}
 }

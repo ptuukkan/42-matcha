@@ -4,6 +4,7 @@ import { Header, Item, Label, Loader, Rating } from 'semantic-ui-react';
 import agent from '../../app/api/agent';
 import NotFound from '../../app/layout/NotFound';
 import { IPublicProfile } from '../../app/models/profile';
+import ProfileVisitInterests from './ProfileVisitInterests';
 import ProfileVisitLikeButton from './ProfileVisitLikeButton';
 
 interface IParams {
@@ -80,12 +81,7 @@ const ProfileVisit = () => {
 								Interests
 							</Header>
 						</Item.Description>
-						<Item.Extra>
-							{profile &&
-								profile.interests.map((interests) => (
-									<Label key={interests}>{interests}</Label>
-								))}
-						</Item.Extra>
+						<ProfileVisitInterests interests={profile!.interests} />
 					</Item.Content>
 				</Item>
 				<ProfileVisitLikeButton profile={profile!} setProfile={setProfile} />

@@ -14,7 +14,7 @@ const Browse = () => {
 	const [ages, setAges] = useState<Number[]>([18, 100]);
 	const [radius, setRadius] = useState<Number[]>([0, 1000]);
 	const [famerate, setFamerate] = useState<Number[]>([0, 10]);
-	const [commonInterests, setcommonInterests] = useState<Number[]>([0, 10]);
+	const [mutualInterests, setMutualInterests] = useState<Number[]>([0, 10]);
 	const [loading, setLoading] = useState(false);
 	const rootStore = useContext(RootStoreContext);
 	const { profile } = rootStore.profileStore;
@@ -56,10 +56,10 @@ const Browse = () => {
 						name={'Radius'}
 					/>
 					<BrowseListFilter
-						setValue={setcommonInterests}
+						setValue={setMutualInterests}
 						minValue={0}
 						maxValue={10}
-						name={'Common interests'}
+						name={'Mutual interests'}
 					/>
 					<BrowseListFilter
 						setValue={setFamerate}
@@ -79,8 +79,8 @@ const Browse = () => {
 							p.distance <= radius[1] &&
 							p.fameRating >= famerate[0] &&
 							p.fameRating <= famerate[1] &&
-							p.commonInterests >= commonInterests[0] &&
-							p.commonInterests <= commonInterests[1]
+							p.mutualInterests >= mutualInterests[0] &&
+							p.mutualInterests <= mutualInterests[1]
 					)}
 					setProfiles={setProfiles}
 				/>

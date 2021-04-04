@@ -73,9 +73,9 @@ const BrowseListSorter: React.FC<IProps> = ({ profiles, setProfiles }) => {
 					setActiveSort(4);
 				}
 				if (dir) {
-					newProfiles.sort((a, b) => b.commonInterests - a.commonInterests);
+					newProfiles.sort((a, b) => b.mutualInterests - a.mutualInterests);
 				} else {
-					newProfiles.sort((a, b) => a.commonInterests - b.commonInterests);
+					newProfiles.sort((a, b) => a.mutualInterests - b.mutualInterests);
 				}
 				setProfiles(newProfiles);
 				break;

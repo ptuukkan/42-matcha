@@ -30,7 +30,7 @@ export interface IPublicProfile extends IProfile {
 	distance: number;
 	connected: boolean;
 	liked: boolean;
-	commonInterests: number;
+	mutualInterests: number;
 	interests: string[];
 	compatibilityRating: number;
 }
