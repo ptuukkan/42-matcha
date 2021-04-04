@@ -1,4 +1,5 @@
 import React, { Fragment } from 'react';
+import { Link } from 'react-router-dom';
 import {
 	Image,
 	Button,
@@ -19,11 +20,28 @@ interface IProps {
 const BrowseList: React.FC<IProps> = ({ setProfiles, profiles }) => {
 	const like = (p: IPublicProfile) => {
 		agent.Profile.like(p.id)
+			.then((res) => {
+				let updatedProfile = res.connected
+					? { ...p, liked: true, connected: true }
+					: { ...p, liked: true };
+				setProfiles(
+					profiles.map((profile) =>
+						profile.id !== updatedProfile.id ? profile : updatedProfile
+					)
+				);
+			})
+			.catch((error) => console.log(error));
+	};
+
+	const unlike = (p: IPublicProfile) => {
+		agent.Profile.unlike(p.id)
 			.then(() => {
-				let updatedProfiles = [
-					...profiles.filter((profile) => profile.id !== p.id),
-				];
-				setProfiles(updatedProfiles);
+				let updatedProfile = { ...p, liked: false };
+				setProfiles(
+					profiles.map((profile) =>
+						profile.id !== updatedProfile.id ? profile : updatedProfile
+					)
+				);
 			})
 			.catch((error) => console.log(error));
 	};
@@ -32,7 +50,13 @@ const BrowseList: React.FC<IProps> = ({ setProfiles, profiles }) => {
 		<Fragment>
 			{profiles.map((p) => (
 				<Card fluid key={p.id}>
-					<Image src={p.images.find((i) => i.isMain)?.url} wrapped ui={false} />
+					<Image
+						src={p.images.find((i) => i.isMain)?.url}
+						wrapped
+						ui={false}
+						as={Link}
+						to={`/profile/${p.id}`}
+					/>
 					<div className="profileinfo">
 						<Header as="h1">{`${p.firstName}, ${p.age}  ${p.compatibilityRating}`}</Header>
 						<Icon name={p.gender === 'Female' ? 'mars' : 'venus'} />
@@ -54,15 +78,15 @@ const BrowseList: React.FC<IProps> = ({ setProfiles, profiles }) => {
 						/>
 						<Card.Description>{p.biography}</Card.Description>
 						<br></br>
-						<Button circular icon="cancel" size="massive" color="black" />
+						<Button as={Link} to={`/profile/${p.id}`} color={'red'}>
+							View profile
+						</Button>
 						<Button
-							disabled={!p.liked}
-							circular
-							icon="like"
+							content={!p.liked ? 'Like' : 'Unlike'}
+							icon={!p.liked ? 'like' : 'cancel'}
 							floated="right"
-							size="massive"
-							color="red"
-							onClick={() => like(p)}
+							color={!p.liked ? 'red' : 'black'}
+							onClick={!p.liked ? () => like(p) : () => unlike(p)}
 						/>
 					</div>
 				</Card>
