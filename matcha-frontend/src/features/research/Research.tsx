@@ -1,116 +1,142 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 import {
-	Container,
 	Card,
 	Image,
 	Header,
-	Dropdown,
-	Divider,
 	Grid,
+	Loader,
+	Sidebar,
+	Menu,
+	Segment,
+	Button,
+	Rating,
 } from 'semantic-ui-react';
-import { IProfile } from '../../app/models/profile';
+import React, { useState, useEffect, useContext } from 'react';
+import { IPublicProfile } from '../../app/models/profile';
+import agent from '../../app/api/agent';
+import { RootStoreContext } from '../../app/stores/rootStore';
+import BrowseListSorter from '../browse/BrowseListSorter';
+import BrowseListFilter from '../browse/BrowseListFilter';
+import InterestsSorter from './InterestSorter';
 
-interface IProps {
-	profiles: IProfile[];
-}
+const Research = () => {
+	const [profiles, setProfiles] = useState<IPublicProfile[]>([]);
+	const [interests, setInterests] = useState<string[]>([]);
+	const [ages, setAges] = useState<Number[]>([18, 100]);
+	const [radius, setRadius] = useState<Number[]>([0, 1000]);
+	const [famerate, setFamerate] = useState<Number[]>([0, 10]);
+	const [commonInterests, setcommonInterests] = useState<Number[]>([0, 10]);
+	const [showSideBar, setShowSideBar] = useState(false);
+	const [loading, setLoading] = useState(false);
+	const rootStore = useContext(RootStoreContext);
+	const { profile } = rootStore.profileStore;
 
-const interests = [
-	{ key: 'angular', text: 'Angular', value: 'angular' },
-	{ key: 'css', text: 'CSS', value: 'css' },
-	{ key: 'design', text: 'Graphic Design', value: 'design' },
-	{ key: 'ember', text: 'Ember', value: 'ember' },
-	{ key: 'html', text: 'HTML', value: 'html' },
-	{ key: 'ia', text: 'Information Architecture', value: 'ia' },
-	{ key: 'javascript', text: 'Javascript', value: 'javascript' },
-	{ key: 'mech', text: 'Mechanical Engineering', value: 'mech' },
-	{ key: 'meteor', text: 'Meteor', value: 'meteor' },
-	{ key: 'node', text: 'NodeJS', value: 'node' },
-	{ key: 'plumbing', text: 'Plumbing', value: 'plumbing' },
-	{ key: 'python', text: 'Python', value: 'python' },
-	{ key: 'rails', text: 'Rails', value: 'rails' },
-	{ key: 'react', text: 'React', value: 'react' },
-	{ key: 'repair', text: 'Kitchen Repair', value: 'repair' },
-	{ key: 'ruby', text: 'Ruby', value: 'ruby' },
-	{ key: 'ui', text: 'UI Design', value: 'ui' },
-	{ key: 'ux', text: 'User Experience', value: 'ux' },
-];
+	useEffect(() => {
+		setLoading(true);
+		agent.Browse.list_all()
+			.then((profileList) => {
+				let profiles = [...profileList];
+				setProfiles(profiles);
+			})
+			.catch((error) => console.log(error))
+			.finally(() => setLoading(false));
+	}, [profile]);
 
-const Research: React.FC<IProps> = ({ profiles }) => {
+	if (loading) return <Loader active />;
+
+	console.log(interests);
 	return (
-		<Container>
-			<Grid columns={2} relaxed="very" stackable>
-				<Grid.Column>
-					<Header as="h3">Sort</Header>
-					<Dropdown
-						placeholder="Sort"
-						scrolling
-						text="Sort"
-						icon="filter"
-						labeled
-						button
-						className="icon"
-						options={[
-							{ key: 'age', value: 'age', text: 'Age' },
-							{
-								key: 'location',
-								value: 'location',
-								text: 'Location',
-							},
-							{
-								key: 'fame_rating',
-								value: 'fame_rating',
-								text: 'Fame rating',
-							},
-						]}
-					/>
-				</Grid.Column>
-				<Grid.Column textAlign="right">
-					<Header as="h3">Filter by tag</Header>
-					<Dropdown
-						multiple
-						search
-						name="selectInterest"
-						selection
-						options={interests}
-						/* value={inters.selectedIterest} */
-						allowAdditions
-						additionLabel={
-							<i style={{ color: 'red' }}>New interest: </i>
-						}
-						/* 						onAddItem={handleAddition}
-										onChange={handleMultiChange} */
-					></Dropdown>
-				</Grid.Column>
-			</Grid>
-
-			<Divider />
-{/* 			<Card.Group itemsPerRow={3}>
-				{profiles.map((profile) => (
-					<Card
-						key={profile.location.latitude - Date.now()}
-						as={Link}
-						to={'/profile'}
+		<Grid columns={1}>
+			<Grid.Column>
+				<Button onClick={() => setShowSideBar(true)}>Sort / Filter</Button>
+				<Sidebar.Pushable as={Segment}>
+					<Sidebar
+						as={Menu}
+						animation="overlay"
+						icon="labeled"
+						onHide={() => setShowSideBar(false)}
+						vertical
+						visible={showSideBar}
+						width="wide"
 					>
-						<Image
-							src={`https://robohash.org/${profile.firstName}`}
-							wrapped
-							ui={false}
+						<BrowseListSorter profiles={profiles} setProfiles={setProfiles} />
+						<Header>Filter</Header>
+						<BrowseListFilter
+							setValue={setAges}
+							minValue={18}
+							maxValue={100}
+							name={'Age'}
 						/>
-						<Header as="h5">
-							{profile.firstName} {profile.lastName}
-						</Header>
-						<Card.Content>
-							Distance: {Math.floor(Math.random() * 80)} km
-							<Card.Meta>
-								Likes:{' '}
-								{Math.abs(Math.floor(profile.location.latitude))}
-							</Card.Meta>
-						</Card.Content>
-					</Card>
-				))}
-			</Card.Group> */}
-		</Container>
+						<BrowseListFilter
+							setValue={setRadius}
+							minValue={0}
+							maxValue={1000}
+							name={'Radius'}
+						/>
+						<BrowseListFilter
+							setValue={setcommonInterests}
+							minValue={0}
+							maxValue={10}
+							name={'Common interests'}
+						/>
+						<BrowseListFilter
+							setValue={setFamerate}
+							minValue={0}
+							maxValue={10}
+							name={'Famerate'}
+						/>
+						<InterestsSorter setValue={setInterests} />
+					</Sidebar>
+
+					<Sidebar.Pusher>
+						<Segment basic>
+							<Card.Group itemsPerRow={3}>
+								{profiles
+									.filter(
+										(p) =>
+											p.age >= ages[0] &&
+											p.age <= ages[1] &&
+											p.distance >= radius[0] &&
+											p.distance <= radius[1] &&
+											p.fameRating >= famerate[0] &&
+											p.fameRating <= famerate[1] &&
+											p.mutualInterests >= commonInterests[0] &&
+											p.mutualInterests <= commonInterests[1] &&
+											p.interests.filter(x => interests.includes(x))
+									)
+									.map((profile) => (
+										<Card
+											key={profile.id}
+											as={Link}
+											to={`/profile/${profile.id}`}
+										>
+											<Image
+												src={profile.images.find((i) => i.isMain)?.url}
+												wrapped
+												ui={false}
+											/>
+											<Card.Content>
+												<Header as="h5">
+													{profile.firstName} {profile.lastName}
+												</Header>
+												Distance: {profile.distance} km
+												<Card.Meta>
+													<Rating
+														icon="heart"
+														disabled
+														rating={profile.fameRating}
+														maxRating={10}
+													/>
+												</Card.Meta>
+											</Card.Content>
+										</Card>
+									))}
+							</Card.Group>
+						</Segment>
+					</Sidebar.Pusher>
+				</Sidebar.Pushable>
+			</Grid.Column>
+		</Grid>
 	);
 };
 
