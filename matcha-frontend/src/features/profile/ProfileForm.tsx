@@ -174,7 +174,7 @@ const ProfileForm: React.FC<IProps> = ({
 							type="button"
 							basic
 							floated="right"
-							content="OK"
+							content="Close"
 							disabled={submitting}
 							style={{ marginBottom: '10px' }}
 							onClick={closeModal}

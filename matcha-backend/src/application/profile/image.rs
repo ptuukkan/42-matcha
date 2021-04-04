@@ -8,7 +8,7 @@ use std::convert::TryFrom;
 
 pub async fn create(user: User, mut parts: awmp::Parts) -> Result<ImageDto, AppError> {
 	if let Some(image_file) = parts.files.take("image").pop() {
-		let mut profile = Profile::get(&user.key).await?;
+		let mut profile = Profile::get(&user.profile).await?;
 		if profile.images.len() > 4 {
 			return Err(AppError::bad_request("Only five images allowerd"));
 		}
@@ -27,7 +27,7 @@ pub async fn create(user: User, mut parts: awmp::Parts) -> Result<ImageDto, AppE
 }
 
 pub async fn set_main(user: User, id: &str) -> Result<(), AppError> {
-	let profile = Profile::get(&user.key).await?;
+	let profile = Profile::get(&user.profile).await?;
 	if !profile.images.contains(&id.to_owned()) {
 		return Err(AppError::unauthorized(
 			"Cannot set main other images than yours",
@@ -44,7 +44,7 @@ pub async fn set_main(user: User, id: &str) -> Result<(), AppError> {
 	Ok(())
 }
 pub async fn delete(user: User, id: &str) -> Result<(), AppError> {
-	let mut profile = Profile::get(&user.key).await?;
+	let mut profile = Profile::get(&user.profile).await?;
 	if !profile.images.contains(&id.to_owned()) {
 		return Err(AppError::unauthorized(
 			"Cannot delete other images than yours",
