@@ -1,4 +1,3 @@
-import { profile } from 'console';
 import React, { useState } from 'react';
 import { Button } from 'semantic-ui-react';
 import agent from '../../app/api/agent';
