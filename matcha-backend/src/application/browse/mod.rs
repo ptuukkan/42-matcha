@@ -16,7 +16,7 @@ pub async fn list(user: &User) -> Result<Vec<PublicProfileDto>, AppError> {
 		.collect();
 	let mut profile_dtos: Vec<PublicProfileDto> = vec![];
 	for p in profiles {
-		let pdto = load_profile_dto(user, p).await?;
+		let pdto = load_profile_dto(&my_profile, p).await?;
 		profile_dtos.push(pdto);
 	}
 	Ok(profile_dtos)

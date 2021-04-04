@@ -10,6 +10,7 @@ import { RootStoreContext } from '../../app/stores/rootStore';
 
 const Browse = () => {
 	const [profiles, setProfiles] = useState<IPublicProfile[]>([]);
+	const [compatibility, setCompatibility] = useState<Number[]>([0, 100]);
 	const [ages, setAges] = useState<Number[]>([18, 100]);
 	const [radius, setRadius] = useState<Number[]>([0, 1000]);
 	const [famerate, setFamerate] = useState<Number[]>([0, 10]);
@@ -22,13 +23,13 @@ const Browse = () => {
 		setLoading(true);
 		agent.Browse.list()
 			.then((profileList) => {
-				let profiles = [...profileList];
-				profiles.forEach((element) => {
+				profileList.forEach((element) => {
 					element.commonInterests = element.interests.filter((interest) =>
 						profile!.interests.includes(interest)
 					).length;
 				});
-				setProfiles(profiles);
+				profileList.sort((a, b) => b.commonInterests - a.commonInterests);
+				setProfiles(profileList);
 			})
 			.catch((error) => console.log(error))
 			.finally(() => setLoading(false));
@@ -41,6 +42,12 @@ const Browse = () => {
 			<Grid.Column width={10}>
 				<Rail position="left">
 					<BrowseListSorter profiles={profiles} setProfiles={setProfiles} />
+					<BrowseListFilter
+						setValue={setCompatibility}
+						minValue={0}
+						maxValue={100}
+						name={'Compatibility'}
+					/>
 					<BrowseListFilter
 						setValue={setAges}
 						minValue={18}
@@ -69,6 +76,8 @@ const Browse = () => {
 				<BrowseList
 					profiles={profiles.filter(
 						(p) =>
+							p.compatibilityRating >= compatibility[0] &&
+							p.compatibilityRating <= compatibility[1] &&
 							p.age >= ages[0] &&
 							p.age <= ages[1] &&
 							p.distance >= radius[0] &&

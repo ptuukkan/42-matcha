@@ -34,7 +34,7 @@ const BrowseList: React.FC<IProps> = ({ setProfiles, profiles }) => {
 				<Card fluid key={p.id}>
 					<Image src={p.images.find((i) => i.isMain)?.url} wrapped ui={false} />
 					<div className="profileinfo">
-						<Header as="h1">{`${p.firstName}, ${p.age}`}</Header>
+						<Header as="h1">{`${p.firstName}, ${p.age}  ${p.compatibilityRating}`}</Header>
 						<Icon name={p.gender === 'Female' ? 'mars' : 'venus'} />
 						Distance: {p.distance} km
 						<br></br>

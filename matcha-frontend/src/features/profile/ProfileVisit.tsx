@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useState } from 'react';
-import { useHistory, useParams } from 'react-router';
+import { useParams } from 'react-router';
 import { Header, Item, Label, Loader, Rating } from 'semantic-ui-react';
 import agent from '../../app/api/agent';
 import NotFound from '../../app/layout/NotFound';
