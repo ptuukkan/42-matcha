@@ -18,10 +18,12 @@ import { RootStoreContext } from '../../app/stores/rootStore';
 import BrowseListSorter from '../browse/BrowseListSorter';
 import BrowseListFilter from '../browse/BrowseListFilter';
 import InterestsSorter from './InterestSorter';
+import { IInterestOption } from '../../app/models/interest';
 
 const Research = () => {
 	const [profiles, setProfiles] = useState<IPublicProfile[]>([]);
-	const [interests, setInterests] = useState<string[]>([]);
+	const [interests, setInterests] = useState<IInterestOption[]>([]);
+	const [interestList, setInterestList] = useState<string[]>([]);
 	const [ages, setAges] = useState<Number[]>([18, 100]);
 	const [radius, setRadius] = useState<Number[]>([0, 1000]);
 	const [famerate, setFamerate] = useState<Number[]>([0, 10]);
@@ -40,11 +42,15 @@ const Research = () => {
 			})
 			.catch((error) => console.log(error))
 			.finally(() => setLoading(false));
-	}, [profile]);
+		if (interests.length === 0) {
+			agent.Interests.get()
+				.then((interests) => setInterests(interests))
+				.catch((error) => console.log(error));
+		}
+	}, [profile, interests.length]);
 
 	if (loading) return <Loader active />;
 
-	console.log(interests);
 	return (
 		<Grid columns={1}>
 			<Grid.Column>
@@ -85,12 +91,12 @@ const Research = () => {
 							maxValue={10}
 							name={'Famerate'}
 						/>
-						<InterestsSorter setValue={setInterests} />
+						<InterestsSorter setValue={setInterestList} interests={interests} />
 					</Sidebar>
 
 					<Sidebar.Pusher>
 						<Segment basic>
-							<Card.Group itemsPerRow={3}>
+							<Card.Group itemsPerRow={3} stackable>
 								{profiles
 									.filter(
 										(p) =>
@@ -102,7 +108,9 @@ const Research = () => {
 											p.fameRating <= famerate[1] &&
 											p.mutualInterests >= commonInterests[0] &&
 											p.mutualInterests <= commonInterests[1] &&
-											p.interests.find((x) => interests.includes(x))
+											(interestList.length === 0
+												? p
+												: p.interests.find((x) => interestList.includes(x)))
 									)
 									.map((profile) => (
 										<Card
@@ -126,6 +134,7 @@ const Research = () => {
 														disabled
 														rating={profile.fameRating}
 														maxRating={10}
+														size="tiny"
 													/>
 												</Card.Meta>
 											</Card.Content>
