@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from "react";
-import { Dropdown } from "semantic-ui-react";
-import agent from "../../app/api/agent";
-import { IInterestOption } from "../../app/models/interest";
+import React, { useEffect, useState } from 'react';
+import { Dropdown } from 'semantic-ui-react';
+import agent from '../../app/api/agent';
+import { IInterestOption } from '../../app/models/interest';
 
 interface IProps {
 	setValue: React.Dispatch<React.SetStateAction<string[]>>;
 }
- 
-const InterestsSorter: React.FC<IProps> = ({setValue}) => {
+
+const InterestsSorter: React.FC<IProps> = ({ setValue }) => {
 	const [interests, setInterests] = useState<IInterestOption[]>([]);
 	const [interestsLoading, setInterestsLoading] = useState(false);
 
@@ -21,19 +21,18 @@ const InterestsSorter: React.FC<IProps> = ({setValue}) => {
 		}
 	}, [interests.length]);
 
-
-	return ( 
+	return (
 		<Dropdown
-		loading={interestsLoading}
-		placeholder='State'
-		fluid
-		multiple
-		search
-		selection
-		onChange={ (e,d) => console.log(d.value)}
-		options={interests}
-	  />
-	 );
-}
- 
+			loading={interestsLoading}
+			placeholder="State"
+			fluid
+			multiple
+			search
+			selection
+			onChange={(event ,{value}: any) => setValue(value)}
+			options={interests}
+		/>
+	);
+};
+
 export default InterestsSorter;

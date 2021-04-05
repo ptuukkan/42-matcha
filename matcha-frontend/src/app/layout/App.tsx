@@ -84,7 +84,7 @@ const App = () => {
 					</Switch>
 				</Router>
 			</Container>
-			<Footer />
+			{/* <Footer /> */}
 		</div>
 	);
 };

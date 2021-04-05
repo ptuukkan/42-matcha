@@ -102,7 +102,7 @@ const Research = () => {
 											p.fameRating <= famerate[1] &&
 											p.mutualInterests >= commonInterests[0] &&
 											p.mutualInterests <= commonInterests[1] &&
-											p.interests.filter(x => interests.includes(x))
+											p.interests.find((x) => interests.includes(x))
 									)
 									.map((profile) => (
 										<Card
