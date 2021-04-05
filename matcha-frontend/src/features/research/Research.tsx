@@ -18,6 +18,7 @@ import { RootStoreContext } from '../../app/stores/rootStore';
 import BrowseListSorter from '../browse/BrowseListSorter';
 import BrowseListFilter from '../browse/BrowseListFilter';
 import InterestsSorter from './InterestSorter';
+import ResearchListItem from './ResearchListItem';
 
 const Research = () => {
 	const [profiles, setProfiles] = useState<IPublicProfile[]>([]);
@@ -62,7 +63,7 @@ const Research = () => {
 						onHide={() => setShowSideBar(false)}
 						vertical
 						visible={showSideBar}
-						width='wide'
+						width="wide"
 					>
 						<BrowseListSorter profiles={profiles} setProfiles={setProfiles} />
 						<Header>Filter</Header>
@@ -90,7 +91,7 @@ const Research = () => {
 							maxValue={10}
 							name={'Famerate'}
 						/>
-						<InterestsSorter setValue={setInterests}/>
+						<InterestsSorter setValue={setInterests} />
 					</Sidebar>
 
 					<Sidebar.Pusher>
@@ -107,38 +108,10 @@ const Research = () => {
 											p.fameRating <= famerate[1] &&
 											p.commonInterests >= commonInterests[0] &&
 											p.commonInterests <= commonInterests[1]
-											
 									)
-									.map((profile) => (
-										
-										<Card
-											key={profile.id}
-											as={Link}
-											to={`/profile/${profile.id}`}
-											
-										>
-											<Image
-												src={profile.images.find((i) => i.isMain)?.url}
-												wrapped
-												ui={false}
-											/>
-											<Card.Content>
-												<Header as="h5">
-													{profile.firstName} {profile.lastName}
-												</Header>
-												Distance: {profile.distance} km
-												<Card.Meta>
-													<Rating
-														icon="heart"
-														disabled
-														rating={profile.fameRating}
-														maxRating={10}
-													/>
-												</Card.Meta>
-											</Card.Content>
-										</Card>
-									))
-									}
+									.map((profile, i) => (
+										<ResearchListItem profile={profile} key={i} />
+									))}
 							</Card.Group>
 						</Segment>
 					</Sidebar.Pusher>
