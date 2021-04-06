@@ -10,7 +10,7 @@ import { IResearchFormValues } from '../../app/models/research';
 
 
 export const initialValues: IResearchFormValues = {
-	age: [0, 100],
+	age: [18, 100],
 	fameRating: [0, 10],
 	distance: [0, 1000],
 	interests: [],
