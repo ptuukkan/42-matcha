@@ -26,18 +26,24 @@ const BrowseListItem: React.FC<IProps> = ({
 				to={`/profile/${profile.id}`}
 			/>
 			<div className="profileinfo">
-				<Header as="h1">{`${profile.firstName}, ${profile.age}  ${profile.compatibilityRating}`}</Header>
-				<Icon name={profile.gender === 'Female' ? 'mars' : 'venus'} />
-				Distance: {profile.distance} km
-				<br></br>
+				<Card.Header as="h1" style={{ marginBottom: 0 }}>
+					{`${profile.firstName}, ${profile.age}`}{' '}
+					<span style={{ float: 'right' }}>
+						<Rating
+							icon="heart"
+							disabled
+							rating={profile.fameRating}
+							maxRating={10}
+						/>
+					</span>
+				</Card.Header>
+				<Card.Meta style={{ fontSize: '1.2em' }}>
+					{profile.compatibilityRating}% compatible
+					<span style={{ float: 'right' }}>{profile.distance} km away</span>
+				</Card.Meta>
 				<BrowseListItemInterests interests={profile.interests} />
-				<Header>Fame Rating</Header>
-				<Rating
-					icon="heart"
-					disabled
-					rating={profile.fameRating}
-					maxRating={10}
-				/>
+
+				<Header sub color="pink" content="Biography" />
 				<Card.Description>{profile.biography}</Card.Description>
 				<br></br>
 				<Button
