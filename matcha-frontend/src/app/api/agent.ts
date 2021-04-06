@@ -97,6 +97,10 @@ const Browse = {
 	list_all: (): Promise<IPublicProfile[]> => requests.get('/browse/list_all'),
 }
 
+const Research = {
+	list: (): Promise<IPublicProfile[]> => requests.get('/research/list'),
+}
+
 const Interests = {
 	get: (): Promise<IInterestOption[]> => requests.get('/interests'),
 };
@@ -107,6 +111,7 @@ const agent = {
 	Interests,
 	Location,
 	Browse,
+	Research,
 };
 
 export default agent;
