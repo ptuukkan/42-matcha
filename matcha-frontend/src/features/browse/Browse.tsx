@@ -80,7 +80,7 @@ const Browse = () => {
 							p.fameRating >= famerate[0] &&
 							p.fameRating <= famerate[1] &&
 							p.mutualInterests >= mutualInterests[0] &&
-							p.mutualInterests <= mutualInterests[1]
+							p.mutualInterests <= mutualInterests[1] 
 					)}
 					setProfiles={setProfiles}
 				/>

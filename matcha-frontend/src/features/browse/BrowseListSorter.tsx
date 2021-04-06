@@ -121,25 +121,27 @@ const BrowseListSorter: React.FC<IProps> = ({ profiles, setProfiles }) => {
 				content="Age"
 				icon={ageDir ? 'caret down' : 'caret up'}
 				labelPosition="right"
-			/>
+				/>
 			<br />
 			<br />
 			<Button
+				size='small'
 				active={activeSort === 2}
 				onClick={() => sort('distance')}
 				content="Distance"
 				icon={disDir ? 'caret down' : 'caret up'}
 				labelPosition="right"
-			/>
+				/>
 			<br />
 			<br />
 			<Button
+				size='small'
 				active={activeSort === 3}
 				onClick={() => sort('fameRate')}
 				content="Fame Rating"
 				icon={famDir ? 'caret down' : 'caret up'}
 				labelPosition="right"
-			/>
+				/>
 			<br />
 			<br />
 			<Button
@@ -148,7 +150,7 @@ const BrowseListSorter: React.FC<IProps> = ({ profiles, setProfiles }) => {
 				content="Mutual Interests"
 				icon={intDir ? 'caret down' : 'caret up'}
 				labelPosition="right"
-			/>
+				/>
 		</Fragment>
 	);
 };

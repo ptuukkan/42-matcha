@@ -18,6 +18,7 @@ import SubModalContainer from '../common/modals/SubModalContainer';
 import ProfileVisit from '../../features/profile/ProfileVisit';
 import ChangeCredentials from '../../features/user/ChangeCredentials';
 import Browse from '../../features/browse/Browse';
+import Research from '../../features/research/Research';
 
 const App = () => {
 	const [appLoaded, setAppLoaded] = useState(false);
@@ -55,6 +56,7 @@ const App = () => {
 						<Route path="/verify/:link" component={EmailVerification} />
 						<Route path="/resetpassword/:link" component={ChangePassword} />
 						<Route exact path="/" component={user ? Browse : Landing} />
+						<Route exact path="/research" component={user ? Research : Landing} />
 						<Route
 							render={() => (
 								<Fragment>
