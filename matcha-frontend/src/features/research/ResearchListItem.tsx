@@ -1,7 +1,6 @@
-import { profile } from 'console';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Image, Card, Header, Rating } from 'semantic-ui-react';
+import { Image, Card, Rating } from 'semantic-ui-react';
 import { IPublicProfile } from '../../app/models/profile';
 
 interface IProps {

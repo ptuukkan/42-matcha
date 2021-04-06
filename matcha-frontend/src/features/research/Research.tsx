@@ -1,15 +1,24 @@
-import { Dimmer, Grid, Loader, Segment } from 'semantic-ui-react';
-import React, { useState, useContext, useEffect } from 'react';
+import { Dimmer, Grid, Loader } from 'semantic-ui-react';
+import { useState, useEffect } from 'react';
 import { IPublicProfile } from '../../app/models/profile';
-import { RootStoreContext } from '../../app/stores/rootStore';
 import ResearchForm from './ResearchForm';
 import ResearchList from './ResearchList';
 import { IInterestOption } from '../../app/models/interest';
 import agent from '../../app/api/agent';
 import { FORM_ERROR } from 'final-form';
+import { IResearchFormValues } from '../../app/models/research';
+
+
+const initialValues: IResearchFormValues = {
+	age: [0, 100],
+	fameRating: [0, 10],
+	distance: [0, 1000],
+	interests: [],
+};
 
 const Research = () => {
 	const [searchMode, setSearchMode] = useState(true);
+	const [searchParams, setSearchParams] = useState(initialValues);
 	const [interests, setInterests] = useState<IInterestOption[]>([]);
 	const [loading, setLoading] = useState(false);
 	const [profiles, setProfiles] = useState<IPublicProfile[]>([]);
@@ -26,10 +35,10 @@ const Research = () => {
 		}
 	}, [interests.length]);
 
-	const loadProfiles = async (params: any) => {
-		console.log(params);
+	const loadProfiles = async (params: IResearchFormValues) => {
 		try {
-			const ps = await agent.Research.list();
+			setSearchParams(params);
+			const ps = await agent.Research.list(params);
 			setProfiles(ps);
 			setSearchMode(false);
 		} catch (error) {
@@ -48,7 +57,7 @@ const Research = () => {
 		<Grid centered>
 			{searchMode ? (
 				<Grid.Column width={4}>
-						<ResearchForm interests={interests} loadProfiles={loadProfiles} />
+						<ResearchForm interests={interests} loadProfiles={loadProfiles} searchParams={searchParams} />
 				</Grid.Column>
 			) : (
 				<Grid.Column>

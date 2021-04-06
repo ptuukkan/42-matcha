@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Image, Card, Header, Icon, Rating, Button } from 'semantic-ui-react';
+import { Image, Card, Header, Rating, Button } from 'semantic-ui-react';
 import { IPublicProfile } from '../../app/models/profile';
 import BrowseListItemInterests from './BrowseListItemInterests';
 import BrowseListItemLikeButton from './BrowseListItemLikeButton';

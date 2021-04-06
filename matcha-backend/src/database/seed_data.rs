@@ -260,6 +260,7 @@ async fn create_user(f: &str, l: &str, e: &str) -> Result<User, AppError> {
 	}
 }
 
+#[allow(clippy::too_many_arguments)]
 async fn update_profile(
 	user: &User,
 	gender: &str,

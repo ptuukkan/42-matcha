@@ -10,26 +10,31 @@ import {
 import { IPublicProfile } from '../../app/models/profile';
 import BrowseListFilter from '../browse/BrowseListFilter';
 import BrowseListSorter from '../browse/BrowseListSorter';
-import InterestsSorter from './InterestSorter';
 import ResearchListItem from './ResearchListItem';
 
 interface IProps {
 	profiles: IPublicProfile[];
 	setProfiles: React.Dispatch<React.SetStateAction<IPublicProfile[]>>;
-	setSearchMode: React.Dispatch<React.SetStateAction<boolean>>
+	setSearchMode: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const ResearchList: React.FC<IProps> = ({ profiles, setProfiles, setSearchMode }) => {
+const ResearchList: React.FC<IProps> = ({
+	profiles,
+	setProfiles,
+	setSearchMode,
+}) => {
 	const [ages, setAges] = useState<Number[]>([18, 100]);
 	const [radius, setRadius] = useState<Number[]>([0, 1000]);
 	const [famerate, setFamerate] = useState<Number[]>([0, 10]);
-	const [commonInterests, setcommonInterests] = useState<Number[]>([0, 10]);
+	const [mutualInterests, setMutualInterests] = useState<Number[]>([0, 10]);
 	const [showSideBar, setShowSideBar] = useState(false);
 
 	return (
 		<Fragment>
 			<Button onClick={() => setShowSideBar(true)}>Sort / Filter</Button>
-			<Button floated="right" color="pink" onClick={() => setSearchMode(true)}>Back to Search</Button>
+			<Button floated="right" color="pink" onClick={() => setSearchMode(true)}>
+				Back to Search
+			</Button>
 			<Sidebar.Pushable as={Segment}>
 				<Sidebar
 					as={Menu}
@@ -55,10 +60,10 @@ const ResearchList: React.FC<IProps> = ({ profiles, setProfiles, setSearchMode }
 						name={'Radius'}
 					/>
 					<BrowseListFilter
-						setValue={setcommonInterests}
+						setValue={setMutualInterests}
 						minValue={0}
 						maxValue={10}
-						name={'Common interests'}
+						name={'Mutual interests'}
 					/>
 					<BrowseListFilter
 						setValue={setFamerate}
@@ -82,9 +87,9 @@ const ResearchList: React.FC<IProps> = ({ profiles, setProfiles, setSearchMode }
 										p.distance >= radius[0] &&
 										p.distance <= radius[1] &&
 										p.fameRating >= famerate[0] &&
-										p.fameRating <= famerate[1] //&&
-										// p.commonInterests >= commonInterests[0] &&
-										// p.commonInterests <= commonInterests[1]
+										p.fameRating <= famerate[1] &&
+										p.mutualInterests >= mutualInterests[0] &&
+										p.mutualInterests <= mutualInterests[1]
 								)
 								.map((profile, i) => (
 									<ResearchListItem profile={profile} key={i} />

@@ -10,8 +10,16 @@ import {
 	IUser,
 } from '../models/user';
 import { history } from '../..';
-import { IImage, ILikeResponse, ILocation, IPrivateProfile, IProfileFormValues, IPublicProfile } from '../models/profile';
+import {
+	IImage,
+	ILikeResponse,
+	ILocation,
+	IPrivateProfile,
+	IProfileFormValues,
+	IPublicProfile,
+} from '../models/profile';
 import { IInterestOption } from '../models/interest';
+import { IResearchFormValues } from '../models/research';
 
 axios.defaults.baseURL = process.env.REACT_APP_API_URL;
 
@@ -63,7 +71,8 @@ const User = {
 		requests.post('/user/register', user),
 	login: (user: ILoginFormValues): Promise<IUser> =>
 		requests.post('/user/login', user),
-	current: (location :ILocation): Promise<IUser> => requests.post('/user/current', location),
+	current: (location: ILocation): Promise<IUser> =>
+		requests.post('/user/current', location),
 	verify: (link: string): Promise<void> => requests.get(`/user/verify/${link}`),
 	forget: (data: IForgetPassword): Promise<void> =>
 		requests.post(`/user/password/reset`, data),
@@ -84,22 +93,24 @@ const Profile = {
 		requests.delete(`/profile/image/${id}`),
 	imageToMain: (id: string): Promise<void> =>
 		requests.put(`/profile/image/${id}`, {}),
-	like: (id: string): Promise<ILikeResponse> => requests.get(`/profile/${id}/like`),
+	like: (id: string): Promise<ILikeResponse> =>
+		requests.get(`/profile/${id}/like`),
 	unlike: (id: string): Promise<void> => requests.delete(`/profile/${id}/like`),
 };
 
 const Location = {
 	get: (): Promise<ILocation> => requests.get('https://ipapi.co/json/'),
-}
+};
 
 const Browse = {
 	list: (): Promise<IPublicProfile[]> => requests.get('/browse/list'),
 	list_all: (): Promise<IPublicProfile[]> => requests.get('/browse/list_all'),
-}
+};
 
 const Research = {
-	list: (): Promise<IPublicProfile[]> => requests.get('/research/list'),
-}
+	list: (values: IResearchFormValues): Promise<IPublicProfile[]> =>
+		requests.post('/research/list', values),
+};
 
 const Interests = {
 	get: (): Promise<IInterestOption[]> => requests.get('/interests'),

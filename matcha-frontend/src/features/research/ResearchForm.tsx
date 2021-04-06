@@ -5,6 +5,7 @@ import ErrorMessage from '../../app/common/form/ErrorMessage';
 import MultiSelectInput from '../../app/common/form/MultiSelectInput';
 import RangeInput from '../../app/common/form/RangeInput';
 import { IInterestOption } from '../../app/models/interest';
+import { IResearchFormValues } from '../../app/models/research';
 
 interface IProps {
 	interests: IInterestOption[];
@@ -16,20 +17,15 @@ interface IProps {
 		  }
 		| undefined
 	>;
+	searchParams: IResearchFormValues;
 }
 
-const ResearchForm: React.FC<IProps> = ({ interests, loadProfiles }) => {
-	const initialValues = {
-		age: [0, 100],
-		fameRating: [0, 10],
-		distance: [0, 1000],
-		interests: [],
-	};
+const ResearchForm: React.FC<IProps> = ({ interests, loadProfiles, searchParams }) => {
 
 	return (
 		<FinalForm
 			onSubmit={loadProfiles}
-			initialValues={initialValues}
+			initialValues={searchParams}
 			render={({
 				handleSubmit,
 				submitting,
