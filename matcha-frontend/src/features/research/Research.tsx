@@ -9,7 +9,7 @@ import { FORM_ERROR } from 'final-form';
 import { IResearchFormValues } from '../../app/models/research';
 
 
-const initialValues: IResearchFormValues = {
+export const initialValues: IResearchFormValues = {
 	age: [0, 100],
 	fameRating: [0, 10],
 	distance: [0, 1000],

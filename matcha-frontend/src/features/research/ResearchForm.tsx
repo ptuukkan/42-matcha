@@ -6,6 +6,7 @@ import MultiSelectInput from '../../app/common/form/MultiSelectInput';
 import RangeInput from '../../app/common/form/RangeInput';
 import { IInterestOption } from '../../app/models/interest';
 import { IResearchFormValues } from '../../app/models/research';
+import { initialValues } from './Research';
 
 interface IProps {
 	interests: IInterestOption[];
@@ -70,7 +71,7 @@ const ResearchForm: React.FC<IProps> = ({ interests, loadProfiles, searchParams 
 						color="pink"
 						basic
 						type="button"
-						onClick={form.reset}
+						onClick={() => form.reset(initialValues)}
 						content="Reset"
 						disabled={submitting}
 					/>
