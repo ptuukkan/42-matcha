@@ -1,6 +1,5 @@
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
-import { useEffect } from 'react';
 import {
 	Item,
 	Button,
@@ -8,7 +7,6 @@ import {
 	Icon,
 	Menu,
 	Rating,
-	Loader,
 	Header,
 } from 'semantic-ui-react';
 import { RootStoreContext } from '../../app/stores/rootStore';
@@ -18,16 +16,8 @@ import ProfileStatistics from './ProfileStatistics';
 
 const ProfilePage = () => {
 	const rootStore = useContext(RootStoreContext);
-	const { profile, getProfile, updateProfile } = rootStore.profileStore;
+	const { profile, updateProfile } = rootStore.profileStore;
 	const { openModal, closeModal } = rootStore.modalStore;
-
-	useEffect(() => {
-		if (!profile) {
-			getProfile().catch((e) => console.log(e));
-		}
-	}, [profile, getProfile]);
-
-	if (!profile) return <Loader active />;
 
 	return (
 		<>
@@ -59,7 +49,7 @@ const ProfilePage = () => {
 							<Rating
 								icon="heart"
 								disabled
-								rating={profile.fameRating}
+								rating={profile!.fameRating}
 								maxRating={10}
 							/>
 						</Item.Description>
@@ -76,8 +66,8 @@ const ProfilePage = () => {
 						</Item.Description>
 						<Item.Extra>
 							{profile &&
-								profile.interests.map((interests) => (
-									<Label key={interests}>{interests}</Label>
+								profile.interests.map((v, i) => (
+									<Label color="pink" key={i} content={v} />
 								))}
 						</Item.Extra>
 					</Item.Content>
@@ -87,7 +77,7 @@ const ProfilePage = () => {
 						onClick={() =>
 							openModal(
 								<ProfileStatistics
-									profileThumbnails={profile.likes}
+									profileThumbnails={profile!.likes}
 									title="Likes"
 								/>
 							)
@@ -95,14 +85,14 @@ const ProfilePage = () => {
 					>
 						<Icon name="heart" /> Likes
 						<Label color="red" floating>
-							{profile.likes.length}
+							{profile!.likes.length}
 						</Label>
 					</Menu.Item>
 					<Menu.Item
 						onClick={() =>
 							openModal(
 								<ProfileStatistics
-									profileThumbnails={profile.visits}
+									profileThumbnails={profile!.visits}
 									title="Visits"
 								/>
 							)
@@ -110,7 +100,7 @@ const ProfilePage = () => {
 					>
 						<Icon name="users" /> Visits
 						<Label color="teal" floating>
-							{profile.visits.length}
+							{profile!.visits.length}
 						</Label>
 					</Menu.Item>
 				</Menu>

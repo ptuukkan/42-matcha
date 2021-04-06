@@ -1,10 +1,5 @@
 import { Form as FinalForm, Field } from 'react-final-form';
-import {
-	Form,
-	Button,
-	Divider,
-	Header,
-} from 'semantic-ui-react';
+import { Form, Button, Divider, Header, Loader, Dimmer } from 'semantic-ui-react';
 import agent from '../../app/api/agent';
 import TextInput from '../../app/common/form/TextInput';
 import React, { useEffect, useState } from 'react';
@@ -15,7 +10,11 @@ import { formValidation } from './ProfileValidation';
 import { IInterestOption } from '../../app/models/interest';
 import ErrorMessage from '../../app/common/form/ErrorMessage';
 import ProfileImages from './ProfileImages';
-import { IPrivateProfile, IProfileFormValues, profileToFormValues } from '../../app/models/profile';
+import {
+	IPrivateProfile,
+	IProfileFormValues,
+	profileToFormValues,
+} from '../../app/models/profile';
 import DateInput from '../../app/common/form/DateInput';
 
 const gender = [
@@ -66,6 +65,13 @@ const ProfileForm: React.FC<IProps> = ({
 		}
 	}, [interests.length]);
 
+	if (interestsLoading)
+		return (
+			<Dimmer active inverted>
+				<Loader />
+			</Dimmer>
+		);
+
 	return (
 		<>
 			<FinalForm
@@ -78,7 +84,7 @@ const ProfileForm: React.FC<IProps> = ({
 					submitError,
 					dirtySinceLastSubmit,
 				}) => (
-					<Form onSubmit={handleSubmit} error loading={interestsLoading}>
+					<Form onSubmit={handleSubmit} error>
 						<Header size="large" color="pink" content="Personal information" />
 						<Form.Group widths={2}>
 							<Field
@@ -170,7 +176,7 @@ const ProfileForm: React.FC<IProps> = ({
 							type="button"
 							basic
 							floated="right"
-							content="OK"
+							content="Close"
 							disabled={submitting}
 							style={{ marginBottom: '10px' }}
 							onClick={closeModal}

@@ -24,7 +24,7 @@ pub struct Profile {
 	pub gender: Option<Gender>,
 	pub sexual_preference: SexualPreference,
 	biography: Option<String>,
-	interests: Vec<String>,
+	pub interests: Vec<String>,
 	pub location_override: bool,
 	pub location: String,
 	pub images: Vec<String>,
@@ -130,6 +130,20 @@ impl Profile {
 		let res: api::ArangoCollectionCount = api::get(&url).await?;
 		Ok(res.count)
 	}
+
+	pub fn age(&self) -> Result<u8, AppError> {
+		if let Some(birth_date) = &self.birth_date {
+			let today = Utc::today();
+			let birth_date = NaiveDate::parse_from_str(&birth_date, "%Y-%m-%d")?;
+			let mut age = today.year() as u8 - birth_date.year() as u8;
+			if today.ordinal() < birth_date.ordinal() {
+				age -= 1;
+			}
+			Ok(age)
+		} else {
+			Ok(0)
+		}
+	}
 }
 
 impl From<&RegisterFormValues> for Profile {
@@ -210,31 +224,25 @@ pub struct PublicProfileDto {
 	pub id: String,
 	first_name: String,
 	last_name: String,
-	age: u8,
+	pub age: u8,
 	gender: Option<Gender>,
 	sexual_preference: SexualPreference,
 	biography: Option<String>,
-	interests: Vec<String>,
+	pub interests: Vec<String>,
 	pub distance: i32,
 	pub fame_rating: usize,
 	pub images: Vec<ImageDto>,
 	pub connected: bool,
 	pub liked: bool,
+	pub compatibility_rating: u8,
+	pub mutual_interests: i32,
 }
 
 impl TryFrom<Profile> for PublicProfileDto {
 	type Error = AppError;
 
 	fn try_from(profile: Profile) -> Result<Self, Self::Error> {
-		let mut age: u8 = 0;
-		if let Some(birth_date) = profile.birth_date {
-			let today = Utc::today();
-			let birth_date = NaiveDate::parse_from_str(&birth_date, "%Y-%m-%d")?;
-			age = today.year() as u8 - birth_date.year() as u8;
-			if today.ordinal() < birth_date.ordinal() {
-				age -= 1;
-			}
-		}
+		let age = profile.age()?;
 
 		Ok(Self {
 			id: profile.key,
@@ -250,6 +258,8 @@ impl TryFrom<Profile> for PublicProfileDto {
 			images: vec![],
 			connected: false,
 			liked: false,
+			compatibility_rating: 0,
+			mutual_interests: 0,
 		})
 	}
 }

@@ -1,12 +1,7 @@
 import { observer } from 'mobx-react-lite';
 import React from 'react';
 
-import {
-	Image,
-	Button,
-	Card,
-	Grid,
-} from 'semantic-ui-react';
+import { Image, Button, Card, Grid } from 'semantic-ui-react';
 import { IProfile } from '../../app/models/profile';
 
 interface IProps {
@@ -35,6 +30,7 @@ const ProfileImagesDisplay: React.FC<IProps> = ({
 							/>
 							<Button.Group fluid widths={2}>
 								<Button
+									type="button"
 									onClick={() => setMain(image.id)}
 									disabled={image.isMain}
 									basic
@@ -42,6 +38,7 @@ const ProfileImagesDisplay: React.FC<IProps> = ({
 									content="Main"
 								/>
 								<Button
+									type="button"
 									onClick={() => removeImage(image.id)}
 									disabled={image.isMain}
 									basic

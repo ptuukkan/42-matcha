@@ -94,6 +94,7 @@ const Location = {
 
 const Browse = {
 	list: (): Promise<IPublicProfile[]> => requests.get('/browse/list'),
+	list_all: (): Promise<IPublicProfile[]> => requests.get('/browse/list_all'),
 }
 
 const Research = {

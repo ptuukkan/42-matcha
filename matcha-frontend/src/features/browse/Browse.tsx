@@ -10,10 +10,11 @@ import { RootStoreContext } from '../../app/stores/rootStore';
 
 const Browse = () => {
 	const [profiles, setProfiles] = useState<IPublicProfile[]>([]);
+	const [compatibility, setCompatibility] = useState<Number[]>([0, 100]);
 	const [ages, setAges] = useState<Number[]>([18, 100]);
 	const [radius, setRadius] = useState<Number[]>([0, 1000]);
 	const [famerate, setFamerate] = useState<Number[]>([0, 10]);
-	const [commonInterests, setcommonInterests] = useState<Number[]>([0, 10]);
+	const [mutualInterests, setMutualInterests] = useState<Number[]>([0, 10]);
 	const [loading, setLoading] = useState(false);
 	const rootStore = useContext(RootStoreContext);
 	const { profile } = rootStore.profileStore;
@@ -22,13 +23,8 @@ const Browse = () => {
 		setLoading(true);
 		agent.Browse.list()
 			.then((profileList) => {
-				let profiles = [...profileList];
-				profiles.forEach((element) => {
-					element.commonInterests = element.interests.filter((interest) =>
-						profile!.interests.includes(interest)
-					).length;
-				});
-				setProfiles(profiles);
+				profileList.sort((a, b) => b.compatibilityRating - a.compatibilityRating);
+				setProfiles(profileList);
 			})
 			.catch((error) => console.log(error))
 			.finally(() => setLoading(false));
@@ -42,6 +38,12 @@ const Browse = () => {
 				<Rail position="left">
 					<BrowseListSorter profiles={profiles} setProfiles={setProfiles} />
 					<BrowseListFilter
+						setValue={setCompatibility}
+						minValue={0}
+						maxValue={100}
+						name={'Compatibility'}
+					/>
+					<BrowseListFilter
 						setValue={setAges}
 						minValue={18}
 						maxValue={100}
@@ -54,10 +56,10 @@ const Browse = () => {
 						name={'Radius'}
 					/>
 					<BrowseListFilter
-						setValue={setcommonInterests}
+						setValue={setMutualInterests}
 						minValue={0}
 						maxValue={10}
-						name={'Common interests'}
+						name={'Mutual interests'}
 					/>
 					<BrowseListFilter
 						setValue={setFamerate}
@@ -69,14 +71,16 @@ const Browse = () => {
 				<BrowseList
 					profiles={profiles.filter(
 						(p) =>
+							p.compatibilityRating >= compatibility[0] &&
+							p.compatibilityRating <= compatibility[1] &&
 							p.age >= ages[0] &&
 							p.age <= ages[1] &&
 							p.distance >= radius[0] &&
 							p.distance <= radius[1] &&
 							p.fameRating >= famerate[0] &&
 							p.fameRating <= famerate[1] &&
-							p.commonInterests >= commonInterests[0] &&
-							p.commonInterests <= commonInterests[1]
+							p.mutualInterests >= mutualInterests[0] &&
+							p.mutualInterests <= mutualInterests[1] 
 					)}
 					setProfiles={setProfiles}
 				/>

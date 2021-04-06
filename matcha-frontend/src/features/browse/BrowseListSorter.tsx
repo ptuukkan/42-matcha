@@ -8,11 +8,12 @@ interface IProps {
 }
 
 const BrowseListSorter: React.FC<IProps> = ({ profiles, setProfiles }) => {
-	const [activeSort, setActiveSort] = useState(0);
+	const [activeSort, setActiveSort] = useState(5);
 	const [ageDir, setAgeDir] = useState(true);
 	const [disDir, setDisDir] = useState(true);
 	const [intDir, setIntDir] = useState(true);
 	const [famDir, setFamDir] = useState(true);
+	const [comDir, setComDir] = useState(true);
 
 	const sort = (sortBy: string) => {
 		const newProfiles = [...profiles];
@@ -65,16 +66,35 @@ const BrowseListSorter: React.FC<IProps> = ({ profiles, setProfiles }) => {
 				break;
 			case 'interests':
 				dir = intDir;
-				if (activeSort === 3) {
+				if (activeSort === 4) {
 					setIntDir(!intDir);
 					dir = !dir;
 				} else {
-					setActiveSort(3);
+					setActiveSort(4);
 				}
 				if (dir) {
-					newProfiles.sort((a, b) => b.commonInterests - a.commonInterests);
+					newProfiles.sort((a, b) => b.mutualInterests - a.mutualInterests);
 				} else {
-					newProfiles.sort((a, b) => a.commonInterests - b.commonInterests);
+					newProfiles.sort((a, b) => a.mutualInterests - b.mutualInterests);
+				}
+				setProfiles(newProfiles);
+				break;
+			case 'compatibilityRating':
+				dir = comDir;
+				if (activeSort === 5) {
+					setComDir(!comDir);
+					dir = !dir;
+				} else {
+					setActiveSort(5);
+				}
+				if (dir) {
+					newProfiles.sort(
+						(a, b) => b.compatibilityRating - a.compatibilityRating
+					);
+				} else {
+					newProfiles.sort(
+						(a, b) => a.compatibilityRating - b.compatibilityRating
+					);
 				}
 				setProfiles(newProfiles);
 				break;
@@ -87,7 +107,15 @@ const BrowseListSorter: React.FC<IProps> = ({ profiles, setProfiles }) => {
 		<Fragment>
 			<Header size="medium" content="Sort" />
 			<Button
-				size='small'
+				active={activeSort === 5}
+				onClick={() => sort('compatibilityRating')}
+				content="Compatibility"
+				icon={comDir ? 'caret down' : 'caret up'}
+				labelPosition="right"
+			/>
+			<br />
+			<br />
+			<Button
 				active={activeSort === 1}
 				onClick={() => sort('age')}
 				content="Age"
@@ -117,8 +145,7 @@ const BrowseListSorter: React.FC<IProps> = ({ profiles, setProfiles }) => {
 			<br />
 			<br />
 			<Button
-				size='small'
-				active={activeSort === 3}
+				active={activeSort === 4}
 				onClick={() => sort('interests')}
 				content="Mutual Interests"
 				icon={intDir ? 'caret down' : 'caret up'}

@@ -15,6 +15,13 @@ const MultiSelectInput: React.FC<IProps> = ({
 	meta: { touched, modified, error },
 }) => {
 	const [interests, setInterests] = useState(options);
+
+	const renderLabel = (label: any) => ({
+		basic: true,
+		color: "pink",
+		content: label.text,
+	})
+
 	return (
 		<Form.Field error={(touched || modified) && !!error} width={width}>
 			<label>{placeholder}</label>
@@ -28,6 +35,7 @@ const MultiSelectInput: React.FC<IProps> = ({
 				search
 				searchable="true"
 				allowAdditions={allowAdditions}
+				renderLabel={renderLabel}
 				additionLabel={<i style={{ color: 'red' }}>New interest: </i>}
 				onAddItem={(e, { value }: any) =>
 					setInterests(interests.concat({ text: value, value }))

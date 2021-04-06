@@ -6,7 +6,6 @@ import ImageDropzone from './ImageDropzone';
 export interface IProps {
 	setAddImageMode: (value: boolean) => void;
 	addImage: (data: FormData) => void;
-
 }
 
 const ImageUpload: React.FC<IProps> = ({ setAddImageMode, addImage }) => {
@@ -42,19 +41,20 @@ const ImageUpload: React.FC<IProps> = ({ setAddImageMode, addImage }) => {
 								className="img-preview"
 								style={{ minHeight: '200px', overflow: 'hidden' }}
 							/>
-							<Button.Group widths={4} style={{width: "200px"}}>
+							<Button.Group widths={4} style={{ width: '200px' }}>
 								<Button
+									type="button"
 									positive
 									icon="check"
 									onClick={() => {
-										let fd = new FormData()
-										fd.append('image', image!)
-										addImage(fd)
-										setAddImageMode(false)
-									}
-									}
+										let fd = new FormData();
+										fd.append('image', image!);
+										addImage(fd);
+										setAddImageMode(false);
+									}}
 								/>
 								<Button
+									type="button"
 									icon="close"
 									onClick={() => setFiles([])}
 								/>

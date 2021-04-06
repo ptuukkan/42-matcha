@@ -47,16 +47,22 @@ const ProfileVisitLikeButton: React.FC<IProps> = ({ profile, setProfile }) => {
 	if (liked) {
 		return (
 			<Button
-				basic
-				color="pink"
+				color="black"
 				content="Unlike"
+				icon="cancel"
 				onClick={unlike}
 				loading={loading}
 			/>
 		);
 	} else {
 		return (
-			<Button color="pink" content="Like" onClick={like} loading={loading} />
+			<Button
+				color="pink"
+				content="Like"
+				onClick={like}
+				icon="like"
+				loading={loading}
+			/>
 		);
 	}
 };

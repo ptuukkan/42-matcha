@@ -8,7 +8,7 @@ export interface IProfile {
 	gender: Gender;
 	/* gender: Gender; */
 	/* sexualPreference: SexualPreference; */
-	/* 	fameRating: number */ 
+	/* 	fameRating: number */
 	biography: string;
 	/* 	location: ILocation; */
 	interests: string[];
@@ -30,8 +30,9 @@ export interface IPublicProfile extends IProfile {
 	distance: number;
 	connected: boolean;
 	liked: boolean;
-	commonInterests: number,
-	interests:  string[];
+	mutualInterests: number;
+	interests: string[];
+	compatibilityRating: number;
 }
 
 export interface IProfileThumbnail {
