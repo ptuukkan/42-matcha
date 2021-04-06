@@ -10,6 +10,7 @@ const MultiSelectInput: React.FC<IProps> = ({
 	input,
 	width,
 	options,
+	allowAdditions,
 	placeholder,
 	meta: { touched, modified, error },
 }) => {
@@ -26,7 +27,7 @@ const MultiSelectInput: React.FC<IProps> = ({
 				multiple
 				search
 				searchable="true"
-				allowAdditions
+				allowAdditions={allowAdditions}
 				additionLabel={<i style={{ color: 'red' }}>New interest: </i>}
 				onAddItem={(e, { value }: any) =>
 					setInterests(interests.concat({ text: value, value }))

@@ -93,7 +93,7 @@ const ProfileForm: React.FC<IProps> = ({
 							/>
 						</Form.Group>
 						<Form.Group widths={3}>
-							<Field 
+							<Field
 								name="birthDate"
 								component={DateInput}
 								label="Birth Date"
@@ -114,6 +114,7 @@ const ProfileForm: React.FC<IProps> = ({
 						<Form.Group widths="equal">
 							<Field
 								component={MultiSelectInput}
+								allowAdditions={true}
 								placeholder="Interests"
 								name="interests"
 								options={interests}
