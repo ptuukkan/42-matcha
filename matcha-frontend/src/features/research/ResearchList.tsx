@@ -74,7 +74,7 @@ const ResearchList: React.FC<IProps> = ({
 				</Sidebar>
 
 				<Sidebar.Pusher>
-					<Segment basic>
+					<Segment style={{ minHeight: 750 }} basic>
 						<Card.Group itemsPerRow={4}>
 							{/* {profiles.map((profile, i) => (
 								<ResearchListItem profile={profile} key={i} />
