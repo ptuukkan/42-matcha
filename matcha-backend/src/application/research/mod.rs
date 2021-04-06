@@ -54,16 +54,17 @@ pub async fn list(user: &User, params: ResearchFormValues) -> Result<Vec<PublicP
 	let params = ResearchParams::try_from(params)?;
 	let profile_dtos = profile_dtos
 		.into_iter()
-		.filter(|x| filter_profile(&x, &params))
+		.filter(|x| filter_profile(user, &x, &params))
 		.collect();
 	Ok(profile_dtos)
 }
 
-fn filter_profile(profile_dto: &PublicProfileDto, params: &ResearchParams) -> bool {
+fn filter_profile(user: &User, profile_dto: &PublicProfileDto, params: &ResearchParams) -> bool {
 	filter_age(profile_dto, params)
 		&& filter_fame_rating(profile_dto, params)
 		&& filter_distance(profile_dto, params)
 		&& filter_interests(profile_dto, params)
+		&& profile_dto.id != user.profile
 }
 
 fn filter_age(profile_dto: &PublicProfileDto, params: &ResearchParams) -> bool {
@@ -80,10 +81,13 @@ fn filter_distance(profile_dto: &PublicProfileDto, params: &ResearchParams) -> b
 }
 
 fn filter_interests(profile_dto: &PublicProfileDto, params: &ResearchParams) -> bool {
+	if params.interests.is_empty() {
+		return true;
+	}
 	for params_interest in &params.interests {
-		if !profile_dto.interests.contains(params_interest) {
-			return false;
+		if profile_dto.interests.contains(params_interest) {
+			return true;
 		}
 	}
-	true
+	false
 }

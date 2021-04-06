@@ -39,7 +39,7 @@ const ResearchForm: React.FC<IProps> = ({ interests, loadProfiles, searchParams 
 					<Field
 						label="Age"
 						name="age"
-						min={0}
+						min={18}
 						max={100}
 						component={RangeInput}
 					/>
