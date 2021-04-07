@@ -65,6 +65,7 @@ fn filter_profile(user: &User, profile_dto: &PublicProfileDto, params: &Research
 		&& filter_distance(profile_dto, params)
 		&& filter_interests(profile_dto, params)
 		&& profile_dto.id != user.profile
+		&& !profile_dto.blocked
 }
 
 fn filter_age(profile_dto: &PublicProfileDto, params: &ResearchParams) -> bool {

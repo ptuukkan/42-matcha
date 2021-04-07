@@ -6,3 +6,5 @@ pub mod interest;
 pub mod visit;
 pub mod like;
 pub mod location;
+pub mod block;
+pub mod report;

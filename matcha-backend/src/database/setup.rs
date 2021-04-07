@@ -47,9 +47,9 @@ async fn get_arango_dbs(db_base_url: &str) -> Result<Vec<String>, AppError> {
 async fn create_geoindex(db_base_url: &str) -> Result<(), AppError> {
 	let url = db_base_url.to_owned() + "_api/index?collection=locations";
 	let body = json!({
-		"type" : "geo", 
-		"fields" : [ 
-		  "coordinate" 
+		"type" : "geo",
+		"fields" : [
+		  "coordinate"
 		]
 	});
 	let res: ArangoResponse = api::post(&url, &body).await?;
@@ -100,6 +100,16 @@ async fn create_relations_graph(db_url: &str) -> Result<(), AppError> {
 			},
 			{
 				"collection": "likes",
+				"from": ["profiles"],
+				"to": ["profiles"]
+			},
+			{
+				"collection": "blocks",
+				"from": ["profiles"],
+				"to": ["profiles"]
+			},
+			{
+				"collection": "reports",
 				"from": ["profiles"],
 				"to": ["profiles"]
 			}

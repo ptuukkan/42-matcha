@@ -1,8 +1,8 @@
-use crate::models::profile::ProfileWithDistance;
 use crate::application::profile::load_profile_dto;
 use crate::errors::AppError;
 use crate::models::profile::Gender;
 use crate::models::profile::Profile;
+use crate::models::profile::ProfileWithDistance;
 use crate::models::profile::PublicProfileDto;
 use crate::models::profile::SexualPreference;
 use crate::models::user::User;
@@ -17,7 +17,9 @@ pub async fn list(user: &User) -> Result<Vec<PublicProfileDto>, AppError> {
 	let mut profile_dtos: Vec<PublicProfileDto> = vec![];
 	for p in profiles {
 		let pdto = load_profile_dto(&my_profile, p).await?;
-		profile_dtos.push(pdto);
+		if !pdto.blocked {
+			profile_dtos.push(pdto);
+		}
 	}
 	Ok(profile_dtos)
 }

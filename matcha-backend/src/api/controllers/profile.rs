@@ -1,9 +1,10 @@
 use crate::application::profile;
 use crate::models::profile::ProfileFormValues;
+use crate::models::report::ReportFormValues;
 use crate::models::user::User;
+use actix_web::error::Error;
 use actix_web::web::{Json, Path};
 use actix_web::{delete, get, post, put, web, HttpResponse};
-use actix_web::{error::Error};
 
 #[get("/profile")]
 async fn get_my_profile(user: User) -> Result<HttpResponse, Error> {
@@ -15,6 +16,28 @@ async fn get_my_profile(user: User) -> Result<HttpResponse, Error> {
 async fn get_profile(user: User, Path(id): Path<String>) -> Result<HttpResponse, Error> {
 	let profile = profile::get(&user, &id).await?;
 	Ok(HttpResponse::Ok().json(profile))
+}
+
+#[get("/profile/{id}/block")]
+async fn block_profile(user: User, Path(id): Path<String>) -> Result<HttpResponse, Error> {
+	profile::block_profile(&user, &id).await?;
+	Ok(HttpResponse::Ok().finish())
+}
+
+#[delete("/profile/{id}/block")]
+async fn unblock_profile(user: User, Path(id): Path<String>) -> Result<HttpResponse, Error> {
+	profile::unblock_profile(&user, &id).await?;
+	Ok(HttpResponse::Ok().finish())
+}
+
+#[post("/profile/{id}/report")]
+async fn report_profile(
+	user: User,
+	Path(id): Path<String>,
+	reason: Json<ReportFormValues>,
+) -> Result<HttpResponse, Error> {
+	profile::report_profile(&user, &id, reason.into_inner()).await?;
+	Ok(HttpResponse::Ok().finish())
 }
 
 #[get("/profile/{id}/like")]
@@ -66,6 +89,9 @@ pub fn routes(config: &mut web::ServiceConfig) {
 	config
 		.service(get_my_profile)
 		.service(get_profile)
+		.service(block_profile)
+		.service(unblock_profile)
+		.service(report_profile)
 		.service(like_profile)
 		.service(unlike_profile)
 		.service(update_profile)

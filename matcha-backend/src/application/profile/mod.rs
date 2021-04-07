@@ -1,3 +1,6 @@
+use crate::models::report::Report;
+use crate::models::report::ReportFormValues;
+use crate::models::block::Block;
 use crate::errors::AppError;
 use crate::models::image::{Image, ImageDto};
 use crate::models::like::Like;
@@ -90,6 +93,35 @@ pub async fn visit(from: &str, to: &str) -> Result<(), AppError> {
 	}
 }
 
+pub async fn block_profile(user: &User, their_profile_key: &str) -> Result<(), AppError> {
+	if Block::find(&user.profile, their_profile_key).await?.is_some() {
+		Ok(())
+	} else {
+		let block = Block::new(&user.profile, their_profile_key);
+		block.create().await?;
+		Ok(())
+	}
+}
+
+pub async fn unblock_profile(user: &User, their_profile_key: &str) -> Result<(), AppError> {
+	if let Some(block) = Block::find(&user.profile, their_profile_key).await? {
+		block.delete().await?;
+		Ok(())
+	} else {
+		Ok(())
+	}
+}
+
+pub async fn report_profile(user: &User, their_profile_key: &str, reason: ReportFormValues) -> Result<(), AppError> {
+	if Report::find(&user.profile, their_profile_key).await?.is_some() {
+		Ok(())
+	} else {
+		let report = Report::new(&user.profile, their_profile_key, reason);
+		report.create().await?;
+		Ok(())
+	}
+}
+
 pub async fn like(user: &User, profile_key: &str) -> Result<Value, AppError> {
 	if Like::find(&user.profile, profile_key).await?.is_some() {
 		Err(AppError::bad_request("Already liked this profile"))
@@ -111,7 +143,7 @@ pub async fn unlike(user: &User, profile_key: &str) -> Result<(), AppError> {
 		like.delete().await?;
 		Ok(())
 	} else {
-		Err(AppError::bad_request("Like not found"))
+		Ok(())
 	}
 }
 
@@ -158,6 +190,7 @@ pub async fn load_profile_dto(
 		}
 	}
 	profile_dto.compatibility_rating = compatibility_rating(my_profile, &profile_dto)?;
+	profile_dto.blocked = Block::find(&my_profile.key, &key).await?.is_some();
 	Ok(profile_dto)
 }
 
