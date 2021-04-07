@@ -1,4 +1,4 @@
-use crate::application::profile::load_profile_dto;
+use crate::application::profile;
 use crate::errors::AppError;
 use crate::models::profile::Gender;
 use crate::models::profile::Profile;
@@ -16,8 +16,8 @@ pub async fn list(user: &User) -> Result<Vec<PublicProfileDto>, AppError> {
 		.collect();
 	let mut profile_dtos: Vec<PublicProfileDto> = vec![];
 	for p in profiles {
-		let pdto = load_profile_dto(&my_profile, p).await?;
-		if !pdto.blocked {
+		let pdto = profile::utils::load_profile_dto(&my_profile, p).await?;
+		if !pdto.blocked && pdto.compatibility_rating >= 50 {
 			profile_dtos.push(pdto);
 		}
 	}
