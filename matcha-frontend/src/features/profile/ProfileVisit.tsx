@@ -1,11 +1,13 @@
-import { Fragment, useEffect, useState } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import { useParams } from 'react-router';
-import { Header, Item, Label, Loader, Rating } from 'semantic-ui-react';
+import { Button, Header, Item, Label, Loader, Rating } from 'semantic-ui-react';
 import agent from '../../app/api/agent';
 import NotFound from '../../app/layout/NotFound';
 import { IPublicProfile } from '../../app/models/profile';
+import BlockProfile from './BlockProfile';
 import ProfileVisitInterests from './ProfileVisitInterests';
 import ProfileVisitLikeButton from './ProfileVisitLikeButton';
+import ReportProfile from './ReportProfile';
 
 interface IParams {
 	id: string;
@@ -85,6 +87,8 @@ const ProfileVisit = () => {
 					</Item.Content>
 				</Item>
 				<ProfileVisitLikeButton profile={profile!} setProfile={setProfile} />
+				<BlockProfile id={profile.id} blocked={profile.blocked} />
+				<ReportProfile id={profile.id} />
 				{profile!.images.length > 1 && (
 					<Item>
 						{profile!.images

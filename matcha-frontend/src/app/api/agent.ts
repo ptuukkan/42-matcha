@@ -17,6 +17,7 @@ import {
 	IPrivateProfile,
 	IProfileFormValues,
 	IPublicProfile,
+	IReportFormData,
 } from '../models/profile';
 import { IInterestOption } from '../models/interest';
 import { IResearchFormValues } from '../models/research';
@@ -96,6 +97,11 @@ const Profile = {
 	like: (id: string): Promise<ILikeResponse> =>
 		requests.get(`/profile/${id}/like`),
 	unlike: (id: string): Promise<void> => requests.delete(`/profile/${id}/like`),
+	report: (id: string, data: IReportFormData): Promise<void> =>
+		requests.post(`/profile/${id}/report`, data),
+	block: (id: string): Promise<void> => requests.get(`/profile/${id}/block`),
+	unblock: (id: string): Promise<void> =>
+		requests.delete(`/profile/${id}/block`),
 };
 
 const Location = {
