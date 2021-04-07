@@ -48,7 +48,7 @@ pub async fn list(user: &User, params: ResearchFormValues) -> Result<Vec<PublicP
 	let profiles: Vec<ProfileWithDistance> = ProfileWithDistance::get_all(&my_profile.key).await?;
 	let mut profile_dtos: Vec<PublicProfileDto> = vec![];
 	for p in profiles {
-		let pdto = profile::load_profile_dto(&my_profile, p).await?;
+		let pdto = profile::utils::load_profile_dto(&my_profile, p).await?;
 		profile_dtos.push(pdto);
 	}
 	let params = ResearchParams::try_from(params)?;

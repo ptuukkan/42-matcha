@@ -1,5 +1,5 @@
 use crate::application::user;
-use crate::application::{profile, profile::like, profile::visit};
+use crate::application::{profile, profile::like, profile::utils::visit};
 use crate::database::api;
 use crate::database::setup;
 use crate::errors::AppError;
