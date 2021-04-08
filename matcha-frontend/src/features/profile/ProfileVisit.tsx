@@ -1,6 +1,6 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import { useParams } from 'react-router';
-import { Button, Header, Item, Label, Loader, Rating } from 'semantic-ui-react';
+import { Header, Item, Label, Loader, Rating } from 'semantic-ui-react';
 import agent from '../../app/api/agent';
 import NotFound from '../../app/layout/NotFound';
 import { IPublicProfile } from '../../app/models/profile';

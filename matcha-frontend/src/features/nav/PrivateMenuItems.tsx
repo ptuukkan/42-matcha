@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, Label, Icon } from 'semantic-ui-react';
+import { Menu, Icon } from 'semantic-ui-react';
 
 interface IProps {
 	logoutUser: () => void;
@@ -11,13 +11,6 @@ const PrivateMenuItems: React.FC<IProps> = ({ logoutUser }) => {
 		<Fragment>
 			<Menu.Menu position="right">
 				<Menu.Item as={Link} to="/matches" name="matches">
-					<Label
-						circular
-						color="red"
-						size="mini"
-						className="notificationBall"
-						content="12"
-					/>
 					<Icon name="fire"></Icon>
 					Matches
 				</Menu.Item>
@@ -30,13 +23,6 @@ const PrivateMenuItems: React.FC<IProps> = ({ logoutUser }) => {
 					My Profile
 				</Menu.Item>
 				<Menu.Item as={Link} to="/chat" name="chat">
-					<Label
-						circular
-						color="red"
-						size="mini"
-						className="notificationBall"
-						content="2"
-					/>
 					<Icon name="comments" />
 					Chat
 				</Menu.Item>

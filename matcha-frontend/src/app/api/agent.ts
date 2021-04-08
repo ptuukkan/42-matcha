@@ -118,6 +118,10 @@ const Research = {
 		requests.post('/research/list', values),
 };
 
+const Matches = {
+	list: (): Promise<IPublicProfile[]> => requests.get('/matches'),
+};
+
 const Interests = {
 	get: (): Promise<IInterestOption[]> => requests.get('/interests'),
 };
@@ -129,6 +133,7 @@ const agent = {
 	Location,
 	Browse,
 	Research,
+	Matches,
 };
 
 export default agent;

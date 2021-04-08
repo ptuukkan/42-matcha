@@ -5,10 +5,20 @@ import ErrorMessage from '../../app/common/form/ErrorMessage';
 import TextInput from '../../app/common/form/TextInput';
 import { IReportFormData } from '../../app/models/profile';
 import agent from '../../app/api/agent';
+import { Validators } from '@lemoncode/fonk';
+import { createFinalFormValidation } from '@lemoncode/fonk-final-form';
 
 interface IProps {
 	id: string;
 }
+
+const validationSchema = {
+	field: {
+		reason: [Validators.required.validator],
+	},
+};
+
+const formValidation = createFinalFormValidation(validationSchema);
 
 const ReportProfile: React.FC<IProps> = ({ id }) => {
 	const [done, setDone] = useState(false);
@@ -24,9 +34,10 @@ const ReportProfile: React.FC<IProps> = ({ id }) => {
 					<FinalForm
 						onSubmit={(data: IReportFormData) =>
 							agent.Profile.report(id, data)
-								.then()
+								.then(() => setDone(true))
 								.catch((e) => console.log(e))
 						}
+						validate={formValidation.validateForm}
 						render={({
 							handleSubmit,
 							submitting,
@@ -45,7 +56,6 @@ const ReportProfile: React.FC<IProps> = ({ id }) => {
 
 								<Button
 									primary
-									onClick={() => setDone(true)}
 									floated="right"
 									content="Send"
 									loading={submitting}

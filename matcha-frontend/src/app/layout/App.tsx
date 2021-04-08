@@ -19,6 +19,7 @@ import ProfileVisit from '../../features/profile/ProfileVisit';
 import ChangeCredentials from '../../features/user/ChangeCredentials';
 import Browse from '../../features/browse/Browse';
 import Research from '../../features/research/Research';
+import Matches from '../../features/matches/Matches';
 
 const App = () => {
 	const [appLoaded, setAppLoaded] = useState(false);
@@ -56,7 +57,6 @@ const App = () => {
 						<Route path="/verify/:link" component={EmailVerification} />
 						<Route path="/resetpassword/:link" component={ChangePassword} />
 						<Route exact path="/" component={user ? Browse : Landing} />
-						<Route exact path="/research" component={user ? Research : Landing} />
 						<Route
 							render={() => (
 								<Fragment>
@@ -64,6 +64,14 @@ const App = () => {
 										<PrivateRoute
 											path="/profile/:id"
 											component={ProfileVisit}
+										/>
+										<PrivateRoute
+											path="/research"
+											component={Research}
+										/>
+										<PrivateRoute
+											path="/matches"
+											component={Matches}
 										/>
 										<PrivateRoute
 											exact
