@@ -1,7 +1,7 @@
 use crate::models::profile::Profile;
-use std::time::{Duration, Instant};
 use actix::prelude::*;
 use actix_web_actors::ws;
+use std::time::{Duration, Instant};
 
 /// How often heartbeat pings are sent
 const HEARTBEAT_INTERVAL: Duration = Duration::from_secs(5);
@@ -14,14 +14,14 @@ pub struct MyWebSocket {
 	/// Client must send ping at least once per 10 seconds (CLIENT_TIMEOUT),
 	/// otherwise we drop connection.
 	hb: Instant,
-	profile_key: Option<String>,
+	profile_key: String,
 }
 
 impl MyWebSocket {
 	pub fn new() -> Self {
 		Self {
 			hb: Instant::now(),
-			profile_key: None,
+			profile_key: String::new(),
 		}
 	}
 
@@ -50,6 +50,15 @@ impl Actor for MyWebSocket {
 	fn started(&mut self, ctx: &mut Self::Context) {
 		self.hb(ctx);
 	}
+
+	fn stopped(&mut self, ctx: &mut Self::Context) {
+		let key = &self.profile_key;
+		let future = async move {
+			set_offline(key).await;
+		};
+
+		future.into_actor(self).spawn(ctx);
+	}
 }
 
 /// Handler for `ws::Message`
@@ -66,6 +75,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for MyWebSocket {
 				self.hb = Instant::now();
 			}
 			Ok(ws::Message::Text(text)) => {
+				self.profile_key = text.to_owned();
 				let future = async move {
 					set_online(&text).await;
 				};
@@ -84,6 +94,19 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for MyWebSocket {
 
 async fn set_online(profile_key: &str) {
 	let p = Profile::get(profile_key).await;
+	if p.is_err() {
+		return;
+	}
+	let mut profile = p.unwrap();
+	profile.last_seen = Some("online".to_owned());
+	let res = profile.update().await;
+	if res.is_err() {
+		return;
+	}
+}
+
+async fn set_offline(profile_key: &str) {
+	let p = Profile::get(&profile_key).await;
 	if p.is_err() {
 		return;
 	}
