@@ -1,4 +1,5 @@
 export interface IProfile {
+	id: string;
 	firstName: string;
 	lastName: string;
 	/* 	emailAddress: string; */
@@ -25,7 +26,6 @@ export interface IPrivateProfile extends IProfile {
 }
 
 export interface IPublicProfile extends IProfile {
-	id: string;
 	age: number;
 	distance: number;
 	connected: boolean;

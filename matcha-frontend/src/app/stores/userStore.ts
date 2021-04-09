@@ -1,6 +1,11 @@
 import { action, makeObservable, observable, runInAction } from 'mobx';
 import agent from '../api/agent';
-import { ICredentialFormValues, ILoginFormValues, IRegisterFormValues, IUser } from '../models/user';
+import {
+	ICredentialFormValues,
+	ILoginFormValues,
+	IRegisterFormValues,
+	IUser,
+} from '../models/user';
 import { RootStore } from './rootStore';
 import { history } from '../..';
 import { FORM_ERROR } from 'final-form';
@@ -37,6 +42,8 @@ export default class UserStore {
 	logoutUser = () => {
 		this.token = null;
 		this.user = null;
+		this.rootStore.profileStore.profile = null;
+		this.rootStore.profileStore.stopHeartbeat();
 		window.localStorage.removeItem('jwt');
 	};
 
@@ -89,7 +96,7 @@ export default class UserStore {
 	};
 
 	getUser = async () => {
-		let location: ILocation = {latitude: 0, longitude: 0};
+		let location: ILocation = { latitude: 0, longitude: 0 };
 		try {
 			const geoLocation = await getPosition();
 			location.latitude = geoLocation.coords.latitude;
@@ -99,8 +106,8 @@ export default class UserStore {
 			location.latitude = ipLocation.latitude;
 			location.longitude = ipLocation.longitude;
 		}
-		const user = await agent.User.current(location);
 		try {
+			const user = await agent.User.current(location);
 			runInAction(() => {
 				this.user = user;
 			});

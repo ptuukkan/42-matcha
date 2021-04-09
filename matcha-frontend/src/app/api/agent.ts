@@ -9,7 +9,6 @@ import {
 	ICredentialFormValues,
 	IUser,
 } from '../models/user';
-import { history } from '../..';
 import {
 	IImage,
 	ILikeResponse,
@@ -43,11 +42,15 @@ axios.interceptors.response.use(undefined, (error) => {
 	}
 	if (error.response) {
 		const { status, data } = error.response;
-		if (status === 401 && data.message === 'Token expired') {
-			console.log(error.response);
+		if (
+			status === 401 &&
+			(data.message === 'Token expired' || data.message === 'invalid token')
+		) {
 			window.localStorage.removeItem('jwt');
-			history.push('/');
 			toast.error('Your session has expired, please login again');
+			setTimeout(() => {
+				window.location.reload();
+			}, 5000);
 		}
 		if (error.response.data) {
 			throw error.response.data;

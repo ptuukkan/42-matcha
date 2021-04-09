@@ -205,7 +205,7 @@ impl FromRequest for User {
 	fn from_request(req: &HttpRequest, _payload: &mut dev::Payload) -> Self::Future {
 		let key = jwt::decode_from_header(req);
 		if key.is_err() {
-			return Box::pin(async { Err(AppError::bad_request("invalid token")) });
+			return Box::pin(async { Err(AppError::unauthorized("invalid token")) });
 		}
 		let key = key.unwrap();
 		Box::pin(async move {

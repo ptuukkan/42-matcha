@@ -56,11 +56,14 @@ const App = () => {
 						<Route path="/verify/:link" component={EmailVerification} />
 						<Route path="/resetpassword/:link" component={ChangePassword} />
 						<Route exact path="/" component={user ? Browse : Landing} />
-						<Route exact path="/research" component={user ? Research : Landing} />
 						<Route
 							render={() => (
 								<Fragment>
 									<Switch>
+									<PrivateRoute
+											path="/research"
+											component={Research}
+										/>
 										<PrivateRoute
 											path="/profile/:id"
 											component={ProfileVisit}

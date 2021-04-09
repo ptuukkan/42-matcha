@@ -28,6 +28,7 @@ pub struct Profile {
 	pub location_override: bool,
 	pub location: String,
 	pub images: Vec<String>,
+	pub last_seen: Option<String>
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
@@ -160,6 +161,7 @@ impl From<&RegisterFormValues> for Profile {
 			location: String::new(),
 			interests: vec![],
 			images: vec![],
+			last_seen: None,
 		}
 	}
 }
@@ -183,6 +185,7 @@ impl TryFrom<&ProfileSlice> for ProfileThumbnail {
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PrivateProfileDto {
+	pub id: String,
 	first_name: String,
 	last_name: String,
 	birth_date: Option<String>,
@@ -201,6 +204,7 @@ pub struct PrivateProfileDto {
 impl From<Profile> for PrivateProfileDto {
 	fn from(profile: Profile) -> Self {
 		Self {
+			id: profile.key,
 			first_name: profile.first_name,
 			last_name: profile.last_name,
 			birth_date: profile.birth_date,
