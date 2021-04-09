@@ -14,14 +14,14 @@ pub struct MyWebSocket {
 	/// Client must send ping at least once per 10 seconds (CLIENT_TIMEOUT),
 	/// otherwise we drop connection.
 	hb: Instant,
-	profile_key: String,
+	profile_key: Option<String>,
 }
 
 impl MyWebSocket {
 	pub fn new() -> Self {
 		Self {
 			hb: Instant::now(),
-			profile_key: String::new(),
+			profile_key: None,
 		}
 	}
 
@@ -52,12 +52,13 @@ impl Actor for MyWebSocket {
 	}
 
 	fn stopped(&mut self, ctx: &mut Self::Context) {
-		let key = &self.profile_key;
-		let future = async move {
-			set_offline(key).await;
-		};
-
-		future.into_actor(self).spawn(ctx);
+		let op = self.profile_key.to_owned();
+		if let Some(key) = op {
+			let future = async move {
+				set_offline(&key).await;
+			};
+			future.into_actor(self).spawn(ctx);
+		}
 	}
 }
 
@@ -75,11 +76,10 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for MyWebSocket {
 				self.hb = Instant::now();
 			}
 			Ok(ws::Message::Text(text)) => {
-				self.profile_key = text.to_owned();
+				self.profile_key = Some(text.to_owned());
 				let future = async move {
 					set_online(&text).await;
 				};
-
 				future.into_actor(self).spawn(ctx);
 			}
 			Ok(ws::Message::Binary(bin)) => ctx.binary(bin),
