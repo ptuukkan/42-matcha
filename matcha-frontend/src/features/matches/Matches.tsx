@@ -1,39 +1,26 @@
-import React from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import {
-	Container,
-	Card,
-	Image,
-	Label,
-	Button,
-} from 'semantic-ui-react';
-import { IProfile } from '../../app/models/profile';
+import { Container, Card, Image, Label, Button } from 'semantic-ui-react';
+import agent from '../../app/api/agent';
+import { IPublicProfile } from '../../app/models/profile';
 
-interface IProps {
-	profiles: IProfile[];
-}
-
-const Matches: React.FC<IProps> = ({ profiles }) => {
+const Matches = () => {
+	const [profiles, setProfiles] = useState<IPublicProfile[]>([]);
+	useEffect(() => {
+		agent.Matches.list()
+			.then((p) => setProfiles(p))
+			.catch(e => console.log(e))
+	}, []);
 	return (
 		<Container>
-			{/* <Card.Group itemsPerRow={1}>
-				{profiles.map((profile) => (
-					<Card key={profile.location.latitude - Date.now()}>
-						<Label
-							color={
-								Math.abs(Math.floor(profile.location.latitude)) <
-								40
-									? 'red'
-									: 'green'
-							}
-							floating
-						>
-							{Math.abs(Math.floor(profile.location.latitude)) < 40
-								? 'Offline'
-								: 'Online'}
+			<Card.Group itemsPerRow={2}>
+				{profiles!.sort().map((profile) => (
+					<Card key={profile.id} as={Link} to={`/profile/${profile.id}`}>
+						<Label color={profile.fameRating > 5 ? 'grey' : 'pink'} floating>
+							{profile.fameRating > 5 ? 'Offline' : 'Online'}
 						</Label>
 						<Image
-							src={`https://robohash.org/${profile.firstName}`}
+							src={profile.images.find((i) => i.isMain)?.url}
 							wrapped
 							ui={false}
 						/>
@@ -41,12 +28,21 @@ const Matches: React.FC<IProps> = ({ profiles }) => {
 							<Card.Header as="h5">
 								{profile.firstName} {profile.lastName}
 							</Card.Header>
-							Distance: {Math.floor(Math.random() * 80)} km
+							Distance: {profile.distance} km
 						</Card.Content>
-						<Button color="red" icon="heart" content="Start Chat" as={Link} to={'/chat'}/>
+						{profile.fameRating < 5 && (
+							<Button
+								color="pink"
+								icon="heart"
+								size="huge"
+								content="Start Chat"
+								as={Link}
+								to={'/chat'}
+							/>
+						)}
 					</Card>
 				))}
-			</Card.Group> */}
+			</Card.Group>
 		</Container>
 	);
 };

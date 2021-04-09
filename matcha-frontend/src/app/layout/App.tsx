@@ -19,6 +19,7 @@ import ProfileVisit from '../../features/profile/ProfileVisit';
 import ChangeCredentials from '../../features/user/ChangeCredentials';
 import Browse from '../../features/browse/Browse';
 import Research from '../../features/research/Research';
+import Matches from '../../features/matches/Matches';
 
 const App = () => {
 	const [appLoaded, setAppLoaded] = useState(false);
@@ -67,6 +68,14 @@ const App = () => {
 										<PrivateRoute
 											path="/profile/:id"
 											component={ProfileVisit}
+										/>
+										<PrivateRoute
+											path="/research"
+											component={Research}
+										/>
+										<PrivateRoute
+											path="/matches"
+											component={Matches}
 										/>
 										<PrivateRoute
 											exact

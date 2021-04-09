@@ -25,6 +25,10 @@ export interface IPrivateProfile extends IProfile {
 	birthDate?: Date;
 }
 
+export interface IReportFormData {
+	reason: string;
+}
+
 export interface IPublicProfile extends IProfile {
 	age: number;
 	distance: number;
@@ -33,6 +37,7 @@ export interface IPublicProfile extends IProfile {
 	mutualInterests: number;
 	interests: string[];
 	compatibilityRating: number;
+	blocked: boolean;
 }
 
 export interface IProfileThumbnail {
