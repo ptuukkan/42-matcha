@@ -1,74 +1,56 @@
-import { action, makeObservable, observable } from "mobx";
-import { RootStore } from "./rootStore";
+import { makeAutoObservable, observable } from 'mobx';
+import { RootStore } from './rootStore';
+
+interface IModalProps {
+	open: boolean;
+	size: 'mini' | 'tiny' | 'small' | 'large' | 'fullscreen';
+	body: any;
+}
 
 export default class ModalStore {
 	rootStore: RootStore;
-	registerOpen = false;
-	forgetOpen = false;
-	registerFinishOpen = false;
-	loginOpen = false;
-	successOpen = false;
 
+	modal: IModalProps = {
+		open: false,
+		size: 'mini',
+		body: null,
+	};
+
+	subModal: IModalProps = {
+		open: false,
+		body: null,
+		size: 'mini',
+	};
 
 	constructor(rootStore: RootStore) {
 		this.rootStore = rootStore;
-		makeObservable(this, {
-			registerOpen: observable,
-			registerFinishOpen: observable,
-			loginOpen: observable,
-			forgetOpen: observable,
-			successOpen: observable,
-			openRegister: action,
-			closeRegister: action,
-			openForget: action,
-			closeForget: action,
-			openSuccess: action,
-			closeSuccess: action,
-			openRegisterFinish: action,
-			closeRegisterFinish: action,
-			openLogin: action,
-			closeLogin: action,
+		makeAutoObservable(this, {
+			modal: observable.shallow,
+			subModal: observable.shallow,
 		});
 	}
 
-	openRegister = () => {
-		this.registerOpen = true;
-	}
+	openModal = (
+		content: any,
+		size?: 'mini' | 'tiny' | 'small' | 'large' | 'fullscreen'
+	) => {
+		this.modal.open = true;
+		this.modal.body = content;
+		this.modal.size = size ?? 'mini';
+	};
 
-	closeRegister = () => {
-		this.registerOpen = false;
-	}
+	closeModal = () => {
+		this.modal.open = false;
+		this.modal.body = null;
+	};
 
-	openForget = () => {
-		this.forgetOpen = true;
-	}
+	openSubModal = (content: any) => {
+		this.subModal.open = true;
+		this.subModal.body = content;
+	};
 
-	closeForget = () => {
-		this.forgetOpen = false;
-	}
-
-	openSuccess = () => {
-		this.successOpen = true;
-	}
-
-	closeSuccess = () => {
-		this.successOpen = false;
-	}
-
-	openRegisterFinish = () => {
-		this.registerFinishOpen = true;
-	}
-
-	closeRegisterFinish = () => {
-		this.registerFinishOpen = false;
-		this.registerOpen = false;
-	}
-
-	openLogin = () => {
-		this.loginOpen = true;
-	}
-
-	closeLogin = () => {
-		this.loginOpen = false;
-	}
+	closeSubModal = () => {
+		this.subModal.open = false;
+		this.subModal.body = null;
+	};
 }

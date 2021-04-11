@@ -1,7 +1,7 @@
 use super::api;
-use actix_web::Error;
+use crate::errors::AppError;
 use serde::Deserialize;
-use std::collections::HashMap;
+use serde_json::json;
 use std::env;
 
 #[derive(Deserialize, Debug)]
@@ -12,70 +12,121 @@ struct DbList {
 }
 
 #[derive(Deserialize)]
-struct ArangoDbCreateResponse {
-	result: bool,
-}
-
-#[derive(Deserialize, Debug)]
-struct ArangoCollectionCreateResponse {
+struct ArangoResponse {
 	error: bool,
-	code: i32,
 }
 
-pub async fn arango_setup() {
-	let db_base_url: String = env::var("DB_BASE_URL").expect("Missing env variable DB_BASE_URL");
-	let db_url: String = env::var("DB_URL").expect("Missing env variable DB_URL");
-	let db_name: String = env::var("DB_NAME").expect("Missing env variable DB_NAME");
-	let db_list: DbList = get_arango_dbs(&db_base_url)
-		.await
-		.expect("Getting DB List failed");
+pub async fn arango_setup() -> Result<(), AppError> {
+	let db_base_url: String = env::var("DB_BASE_URL")?;
+	let db_url: String = env::var("DB_URL")?;
+	let db_name: String = env::var("DB_NAME")?;
+	let db_list = get_arango_dbs(&db_base_url).await?;
 
-	if !db_list.result.contains(&db_name) {
-		let db_result = create_arango_db(&db_name, &db_base_url)
-			.await
-			.expect("Database creation failed");
-		if !db_result.result {
-			panic!("Database creation failed");
-		}
-		create_arango_collection("users", "2", &db_url)
-			.await
-			.expect("Collection creation failed");
+	if db_list.contains(&db_name) {
+		return Ok(());
 	}
+	create_arango_db(&db_name, &db_base_url).await?;
+	create_relations_graph(&db_url).await?;
+	create_arango_collection("users", "2", &db_url).await?;
+	create_arango_collection("images", "2", &db_url).await?;
+	create_arango_collection("interests", "2", &db_url).await?;
+	create_arango_collection("locations", "2", &db_url).await?;
+	create_geoindex(&db_url).await?;
+	Ok(())
 }
 
-async fn get_arango_dbs(db_base_url: &str) -> Result<DbList, Error> {
+async fn get_arango_dbs(db_base_url: &str) -> Result<Vec<String>, AppError> {
 	let url = db_base_url.to_owned() + "_api/database";
 	let res = api::get::<DbList>(&url).await?;
-	Ok(res)
+	if res.error {
+		return Err(AppError::internal("Getting DB List failed"));
+	}
+	Ok(res.result)
 }
 
-async fn create_arango_db(
-	db_name: &str,
-	db_base_url: &str,
-) -> Result<ArangoDbCreateResponse, Error> {
+async fn create_geoindex(db_base_url: &str) -> Result<(), AppError> {
+	let url = db_base_url.to_owned() + "_api/index?collection=locations";
+	let body = json!({
+		"type" : "geo",
+		"fields" : [
+		  "coordinate"
+		]
+	});
+	let res: ArangoResponse = api::post(&url, &body).await?;
+	if res.error {
+		return Err(AppError::internal("Locations collection creation failed"));
+	}
+	Ok(())
+}
+
+async fn create_arango_db(db_name: &str, db_base_url: &str) -> Result<(), AppError> {
 	let url = db_base_url.to_owned() + "_api/database";
-	let mut map = HashMap::new();
-	map.insert("name", db_name);
+	let body = json!({ "name": db_name });
 
-	let res = api::post::<HashMap<&str, &str>, ArangoDbCreateResponse>(&url, &map).await?;
-	Ok(res)
+	let res: ArangoResponse = api::post(&url, &body).await?;
+	if res.error {
+		return Err(AppError::internal("DB creation failed"));
+	}
+	Ok(())
 }
 
-async fn create_arango_collection(
-	collection_name: &str,
-	collection_type: &str,
-	db_url: &str,
-) -> Result<ArangoCollectionCreateResponse, Error> {
+async fn create_arango_collection(cname: &str, ctype: &str, db_url: &str) -> Result<(), AppError> {
 	let url = db_url.to_owned() + "_api/collection";
-	let mut map = HashMap::new();
-	let name = collection_name.to_owned();
-	let r#type = collection_type.to_owned();
-	map.insert("name", &name);
-	map.insert("type", &r#type);
+	let body = json!({
+		"name": cname,
+		"type": ctype,
+	});
 
-	let res = api::post::<HashMap<&str, &std::string::String>, ArangoCollectionCreateResponse>(
-		&url, &map,
-	)
-	.await?;
-	Ok(res)
+	let res: ArangoResponse = api::post(&url, &body).await?;
+
+	if res.error {
+		return Err(AppError::internal(&format!(
+			"Failed to create collection: {}",
+			cname
+		)));
+	}
+	Ok(())
+}
+
+async fn create_relations_graph(db_url: &str) -> Result<(), AppError> {
+	let url = format!("{}_api/gharial", db_url);
+	let body = json!({
+		"name": "relations",
+		"edgeDefinitions": [
+			{
+				"collection": "visits",
+				"from": ["profiles"],
+				"to": ["profiles"]
+			},
+			{
+				"collection": "likes",
+				"from": ["profiles"],
+				"to": ["profiles"]
+			},
+			{
+				"collection": "blocks",
+				"from": ["profiles"],
+				"to": ["profiles"]
+			},
+			{
+				"collection": "reports",
+				"from": ["profiles"],
+				"to": ["profiles"]
+			}
+		]
+	});
+
+	let res: ArangoResponse = api::post(&url, &body).await?;
+
+	if res.error {
+		return Err(AppError::internal("Failed to create graph"));
+	}
+
+	Ok(())
+}
+
+pub async fn reset_db() -> Result<(), AppError> {
+	let url = env::var("DB_BASE_URL")? + "_api/database/matcha";
+	api::delete(&url).await?;
+	Ok(())
 }

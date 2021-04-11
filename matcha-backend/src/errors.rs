@@ -20,6 +20,9 @@ pub enum AppError {
 
 	#[display(fmt = "bad request error")]
 	BadRequestError(BadRequestError),
+
+	#[display(fmt = "not found error")]
+	NotFoundError(NotFoundError),
 }
 
 #[derive(Serialize, Debug)]
@@ -28,6 +31,7 @@ pub enum AppErrorType {
 	InternalError,
 	UnauthorizedError,
 	BadRequestError,
+	NotFoundError,
 }
 
 #[derive(Serialize, Debug)]
@@ -56,6 +60,12 @@ pub struct BadRequestError {
 
 #[derive(Serialize, Debug)]
 pub struct UnauthorizedError {
+	error_type: AppErrorType,
+	message: String,
+}
+
+#[derive(Serialize, Debug)]
+pub struct NotFoundError {
 	error_type: AppErrorType,
 	message: String,
 }
@@ -93,12 +103,20 @@ impl AppError {
 		AppError::UnauthorizedError(UnauthorizedError::from(text))
 	}
 
-	pub fn internal(cursor_response: CursorResponse) -> AppError {
+	pub fn cursor(cursor_response: CursorResponse) -> AppError {
 		AppError::InternalError(InternalError::from(cursor_response))
+	}
+
+	pub fn internal(text: &str) -> AppError {
+		AppError::InternalError(InternalError::from(text))
 	}
 
 	pub fn bad_request(text: &str) -> AppError {
 		AppError::BadRequestError(BadRequestError::from(text))
+	}
+
+	pub fn not_found(text: &str) -> AppError {
+		AppError::NotFoundError(NotFoundError::from(text))
 	}
 }
 
@@ -109,6 +127,7 @@ impl ResponseError for AppError {
 			AppError::InternalError(_) => StatusCode::INTERNAL_SERVER_ERROR,
 			AppError::UnauthorizedError(_) => StatusCode::UNAUTHORIZED,
 			AppError::BadRequestError(_) => StatusCode::BAD_REQUEST,
+			AppError::NotFoundError(_) => StatusCode::NOT_FOUND,
 		}
 	}
 
@@ -124,6 +143,9 @@ impl ResponseError for AppError {
 				.set_header(header::CONTENT_TYPE, "application/json")
 				.json(e),
 			AppError::BadRequestError(e) => HttpResponseBuilder::new(self.status_code())
+				.set_header(header::CONTENT_TYPE, "application/json")
+				.json(e),
+			AppError::NotFoundError(e) => HttpResponseBuilder::new(self.status_code())
 				.set_header(header::CONTENT_TYPE, "application/json")
 				.json(e),
 		}
@@ -152,6 +174,24 @@ impl From<&str> for BadRequestError {
 	fn from(text: &str) -> Self {
 		Self {
 			error_type: AppErrorType::BadRequestError,
+			message: text.to_owned(),
+		}
+	}
+}
+
+impl From<&str> for NotFoundError {
+	fn from(text: &str) -> Self {
+		Self {
+			error_type: AppErrorType::NotFoundError,
+			message: text.to_owned(),
+		}
+	}
+}
+
+impl From<&str> for UnauthorizedError {
+	fn from(text: &str) -> Self {
+		Self {
+			error_type: AppErrorType::UnauthorizedError,
 			message: text.to_owned(),
 		}
 	}
@@ -211,8 +251,10 @@ impl From<lettre::sendmail::error::Error> for AppError {
 impl From<jsonwebtoken::errors::Error> for AppError {
 	fn from(from_error: jsonwebtoken::errors::Error) -> Self {
 		match from_error.kind() {
-			jsonwebtoken::errors::ErrorKind::ExpiredSignature => Self::unauthorized("Token expired"),
-			_ => Self::InternalError(InternalError::from(from_error.to_string()))
+			jsonwebtoken::errors::ErrorKind::ExpiredSignature => {
+				Self::unauthorized("Token expired")
+			}
+			_ => Self::InternalError(InternalError::from(from_error.to_string())),
 		}
 	}
 }
@@ -229,14 +271,27 @@ impl From<actix_web::http::header::ToStrError> for AppError {
 	}
 }
 
-
-impl From<&str> for UnauthorizedError {
-	fn from(text: &str) -> Self {
-		Self {
-			error_type: AppErrorType::UnauthorizedError,
-			message: text.to_owned(),
-		}
+impl From<awmp::Error> for AppError {
+	fn from(from_error: awmp::Error) -> Self {
+		Self::InternalError(InternalError::from(from_error.to_string()))
 	}
 }
 
+impl From<actix_web::client::JsonPayloadError> for AppError {
+	fn from(from_error: actix_web::client::JsonPayloadError) -> Self {
+		Self::InternalError(InternalError::from(from_error.to_string()))
+	}
+}
+
+impl From<std::io::Error> for AppError {
+	fn from(from_error: std::io::Error) -> Self {
+		Self::InternalError(InternalError::from(from_error.to_string()))
+	}
+}
+
+impl From<chrono::ParseError> for AppError {
+	fn from(from_error: chrono::ParseError) -> Self {
+		Self::InternalError(InternalError::from(from_error.to_string()))
+	}
+}
 

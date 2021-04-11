@@ -1,36 +1,30 @@
-import React, { Fragment, useContext, useEffect, useState } from 'react';
+import { Fragment, useContext, useEffect, useState } from 'react';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import Navigation from '../../features/nav/Navigation';
 import { Container, Dimmer, Loader } from 'semantic-ui-react';
-import Profiles from '../../testProfiles1.json';
 import Chat from '../../features/chat/Chat';
-import Profile from '../../features/profile/Profile';
-import Browse from '../../features/browse/Browse';
-import Research from '../../features/research/Research';
-import Matches from '../../features/matches/Matches';
 import Footer from '../../features/nav/Footer';
-import Login from '../../features/user/Login';
-import Register from '../../features/user/Register';
 import Landing from '../../features/home/Landing';
 import { RootStoreContext } from '../stores/rootStore';
 import { observer } from 'mobx-react-lite';
 import NotFound from './NotFound';
 import EmailVerification from '../../features/user/EmailVerification';
-import LandingNavigation from '../../features/home/LandingNavigation';
 import ChangePassword from '../../features/user/ChangePassword';
 import { ToastContainer } from 'react-toastify';
-
+import ProfilePage from '../../features/profile/ProfilePage';
+import ModalContainer from '../common/modals/ModalContainer';
+import PrivateRoute from './PrivateRoute';
+import SubModalContainer from '../common/modals/SubModalContainer';
+import ProfileVisit from '../../features/profile/ProfileVisit';
+import ChangeCredentials from '../../features/user/ChangeCredentials';
+import Browse from '../../features/browse/Browse';
+import Research from '../../features/research/Research';
+import Matches from '../../features/matches/Matches';
 
 const App = () => {
-	const [profile, setProfile] = useState(Profiles.profiles[0]);
 	const [appLoaded, setAppLoaded] = useState(false);
 	const rootStore = useContext(RootStoreContext);
 	const { token, getUser, logoutUser, user } = rootStore.userStore;
-
-	const getRandomUser = () => {
-		let i = Math.floor(Math.random() * Profiles.profiles.length);
-		setProfile(Profiles.profiles[i]);
-	};
 
 	useEffect(() => {
 		if (token) {
@@ -42,10 +36,6 @@ const App = () => {
 		}
 	}, [getUser, token, setAppLoaded, logoutUser]);
 
-	const logout = () => {
-		logoutUser();
-	};
-
 	if (!appLoaded)
 		return (
 			<Dimmer active inverted>
@@ -53,52 +43,57 @@ const App = () => {
 			</Dimmer>
 		);
 
-	return user === null ? (
+	return (
 		<div
 			style={{ display: 'flex', minHeight: '100vh', flexDirection: 'column' }}
 		>
 			<Container className="main_container">
+				<ToastContainer style={{ marginTop: '5%' }} position="top-right" />
 				<Router>
-					<LandingNavigation />
+					<ModalContainer />
+					<SubModalContainer />
+					<Navigation />
 					<Switch>
 						<Route path="/verify/:link" component={EmailVerification} />
+						<Route path="/resetpassword/:link" component={ChangePassword} />
+						<Route exact path="/" component={user ? Browse : Landing} />
 						<Route
-							exact
-							path="/resetpassword/:link"
-							component={ChangePassword}
+							render={() => (
+								<Fragment>
+									<Switch>
+									<PrivateRoute
+											path="/research"
+											component={Research}
+										/>
+										<PrivateRoute
+											path="/profile/:id"
+											component={ProfileVisit}
+										/>
+										<PrivateRoute
+											path="/research"
+											component={Research}
+										/>
+										<PrivateRoute
+											path="/matches"
+											component={Matches}
+										/>
+										<PrivateRoute
+											exact
+											path="/profile"
+											component={ProfilePage}
+										/>
+										<PrivateRoute
+											exact
+											path="/credentials"
+											component={ChangeCredentials}
+										/>
+										<PrivateRoute exact path="/chat" component={Chat} />
+										<PrivateRoute component={NotFound} />
+									</Switch>
+								</Fragment>
+							)}
 						/>
-						<Route component={Landing} />
 					</Switch>
-				</Router>
-			<ToastContainer style={{ marginTop: '5%' }} position="top-right" />
-			</Container>
-			<Footer />
-		</div>
-	) : (
-		<div
-			style={{ display: 'flex', minHeight: '100vh', flexDirection: 'column' }}
-		>
-			<Container className="main_container">
-				<Router>
-					<Fragment>
-						<Navigation logout={logout} />
-						<Switch>
-							<Route exact path="/">
-								<Browse getProfile={getRandomUser} profile={profile} />
-							</Route>
-							<Route exact path="/chat" component={Chat} />
-							<Route exact path="/profile" component={Profile} />
-							<Route exact path="/matches">
-								<Matches profiles={Profiles.profiles} />
-							</Route>
-							<Route exact path="/research">
-								<Research profiles={Profiles.profiles} />
-							</Route>
-							<Route exact path="/register" component={Register} />
-							<Route exact path="/login" component={Login} />
-							<Route component={NotFound} />
-						</Switch>
-					</Fragment>
 				</Router>
 			</Container>
 			<Footer />

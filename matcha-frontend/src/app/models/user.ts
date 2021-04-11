@@ -1,10 +1,9 @@
 export interface IUser {
-	firstName: string;
-	lastName: string;
 	emailAddress: string;
-	username: string;
 	token: string;
+	profileComplete: boolean
 }
+
 
 export interface IRegisterFormValues {
 	emailAddress: string,
@@ -16,6 +15,11 @@ export interface IRegisterFormValues {
 }
 
 export interface ILoginFormValues {
+	username: string,
+	password: string
+}
+
+export interface ICredentialFormValues {
 	username: string,
 	password: string
 }

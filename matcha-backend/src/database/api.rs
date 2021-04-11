@@ -1,5 +1,5 @@
+use crate::errors::AppError;
 use actix_web::client::Client;
-use actix_web::Error;
 use serde::{de, Deserialize, Serialize};
 use std::collections::HashMap;
 use std::env;
@@ -10,7 +10,35 @@ struct Jwt {
 	token: String,
 }
 
-pub async fn get_arango_jwt() -> Result<String, Error> {
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ArangoEdgeResponse {
+	pub error: bool,
+}
+
+#[allow(dead_code)]
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct ArangoResponseError {
+	code: Option<i32>,
+	error: bool,
+	error_message: String,
+	error_num: i32,
+}
+
+#[derive(Deserialize)]
+#[serde(untagged)]
+enum ArangoResponse<T> {
+	Success(T),
+	Error(ArangoResponseError),
+}
+
+#[derive(Deserialize)]
+pub struct ArangoCollectionCount {
+	pub count: usize,
+}
+
+pub async fn get_arango_jwt() -> Result<String, AppError> {
 	let jwt: String;
 
 	match env::var("DB_JWT") {
@@ -21,17 +49,11 @@ pub async fn get_arango_jwt() -> Result<String, Error> {
 	Ok(jwt)
 }
 
-async fn arango_login() -> Result<String, Error> {
-	let db_base_url: String = env::var("DB_BASE_URL").expect("Missing env variable DB_BASE_URL");
+async fn arango_login() -> Result<String, AppError> {
+	let db_base_url: String = env::var("DB_BASE_URL")?;
 	let mut map = HashMap::new();
-	map.insert(
-		"username",
-		env::var("DB_USER").expect("DB_USER must be set"),
-	);
-	map.insert(
-		"password",
-		env::var("DB_PASSWORD").expect("DB_PASSWORD must be set"),
-	);
+	map.insert("username", env::var("DB_USER")?);
+	map.insert("password", env::var("DB_PASSWORD")?);
 	let url = db_base_url.to_owned() + "_open/auth";
 
 	let client = Client::default();
@@ -44,8 +66,11 @@ async fn arango_login() -> Result<String, Error> {
 	Ok(response.token)
 }
 
-pub async fn post<I: Serialize, O: de::DeserializeOwned>(url: &str, data: &I) -> Result<O, Error> {
-	let jwt = get_arango_jwt().await.expect("DB Login failed");
+pub async fn post<I: Serialize, O: de::DeserializeOwned>(
+	url: &str,
+	data: &I,
+) -> Result<O, AppError> {
+	let jwt = get_arango_jwt().await?;
 	let client = Client::default();
 	let response = client
 		.post(url)
@@ -57,21 +82,27 @@ pub async fn post<I: Serialize, O: de::DeserializeOwned>(url: &str, data: &I) ->
 	Ok(response)
 }
 
-pub async fn get<O: de::DeserializeOwned>(url: &str) -> Result<O, Error> {
-	let jwt = get_arango_jwt().await.expect("DB Login failed");
+pub async fn get<O: de::DeserializeOwned>(url: &str) -> Result<O, AppError> {
+	let jwt = get_arango_jwt().await?;
 	let client = Client::default();
 	let res = client
 		.get(url)
 		.set_header("Authorization", "bearer ".to_owned() + &jwt)
 		.send()
 		.await?
-		.json::<O>()
+		.json::<ArangoResponse<O>>()
 		.await?;
-	Ok(res)
+	match res {
+		ArangoResponse::Success(x) => Ok(x),
+		ArangoResponse::Error(e) => match e.code {
+			Some(404) => Err(AppError::not_found(&e.error_message)),
+			_ => Err(AppError::internal(&e.error_message)),
+		},
+	}
 }
 
-pub async fn patch<I: Serialize>(url: &str, data: &I) -> Result<(), Error> {
-	let jwt = get_arango_jwt().await.expect("DB Login failed");
+pub async fn patch<I: Serialize>(url: &str, data: &I) -> Result<(), AppError> {
+	let jwt = get_arango_jwt().await?;
 	let client = Client::default();
 	client
 		.patch(url)
@@ -81,9 +112,8 @@ pub async fn patch<I: Serialize>(url: &str, data: &I) -> Result<(), Error> {
 	Ok(())
 }
 
-#[allow(dead_code)]
-pub async fn delete(url: &str) -> Result<(), Error> {
-	let jwt = get_arango_jwt().await.expect("DB Login failed");
+pub async fn delete(url: &str) -> Result<(), AppError> {
+	let jwt = get_arango_jwt().await?;
 	let client = Client::default();
 	client
 		.delete(url)
@@ -91,4 +121,27 @@ pub async fn delete(url: &str) -> Result<(), Error> {
 		.send()
 		.await?;
 	Ok(())
+}
+
+pub async fn put<I: Serialize, O: de::DeserializeOwned>(
+	url: &str,
+	data: &I,
+) -> Result<Vec<Option<O>>, AppError> {
+	let jwt = get_arango_jwt().await?;
+	let client = Client::default();
+	let response = client
+		.put(url)
+		.set_header("Authorization", "bearer ".to_owned() + &jwt)
+		.send_json(data)
+		.await?
+		.json::<Vec<ArangoResponse<O>>>()
+		.await?;
+	let result: Vec<Option<O>> = response
+		.into_iter()
+		.map(|x| match x {
+			ArangoResponse::Success(a) => Some(a),
+			ArangoResponse::Error(_) => None,
+		})
+		.collect();
+	Ok(result)
 }
