@@ -32,7 +32,7 @@ export default class ProfileStore {
 			runInAction(() => {
 				this.profile = profile;
 			});
-			this.startHeartbeat();
+			//this.startHeartbeat();
 		} catch (error) {
 			console.log(error);
 		}

@@ -7,15 +7,19 @@ mod api;
 #[cfg(test)]
 mod tests;
 
+use std::sync::Arc;
+use core::sync::atomic::AtomicUsize;
 use actix_web::Error;
 use actix_cors::Cors;
 use actix_web::middleware::Logger;
 use actix_web::{get, App, HttpResponse, HttpServer, Responder};
 use database::seed_data;
+use application::chat;
 use dotenv::dotenv;
 use log::info;
 use actix_files::Files;
 use std::fs;
+use actix::Actor;
 
 #[get("/")]
 async fn hello() -> impl Responder {
@@ -34,9 +38,15 @@ async fn main() -> std::io::Result<()> {
 	dotenv().ok();
 	env_logger::init();
 	database::setup::arango_setup().await.expect("DB setup failed");
-	fs::create_dir_all("images")?;
-	let server = HttpServer::new(|| {
-		App::new()
+	    // App state
+
+    // Start chat server actor
+    let server = chat::ChatServer::new().start();
+
+		fs::create_dir_all("images")?;
+		let server = HttpServer::new(move || {
+			App::new()
+			.data(server.clone())
 			.wrap(Logger::new("%a \"%r\" %s"))
 			.wrap(Cors::permissive())
 			.service(seed)
@@ -45,10 +55,11 @@ async fn main() -> std::io::Result<()> {
 			.configure(api::controllers::profile::routes)
 			.configure(api::controllers::browse::routes)
 			.configure(api::controllers::research::routes)
+			.configure(api::controllers::chat::routes)
 			.configure(api::controllers::heartbeat::routes)
 			.configure(api::controllers::matches::routes)
-	})
-	.bind("127.0.0.1:8080")?;
+		})
+		.bind("127.0.0.1:8080")?;
 	info!("Starting server");
 	server.run().await
 }

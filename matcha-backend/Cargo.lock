@@ -1462,6 +1462,7 @@ dependencies = [
  "lettre_email",
  "log",
  "nanoid",
+ "rand 0.7.3",
  "regex",
  "serde",
  "serde_json",
