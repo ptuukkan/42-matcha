@@ -1,10 +1,11 @@
 use super::server::ChatServer;
+use crate::application::profile;
 use actix::prelude::*;
 use actix_web_actors::ws;
+use serde::{Deserialize, Serialize};
 use std::time::{Duration, Instant};
 
 const HEARTBEAT_INTERVAL: Duration = Duration::from_secs(5);
-
 const CLIENT_TIMEOUT: Duration = Duration::from_secs(10);
 
 #[derive(Message)]
@@ -36,13 +37,31 @@ pub struct WsChatSession {
 	pub hb: Instant,
 	pub name: Option<String>,
 	pub addr: Addr<ChatServer>,
+	pub profile_key: Option<String>,
+}
+
+#[derive(Serialize, Deserialize)]
+#[serde(tag = "type")]
+pub enum WsMessage {
+	WsChatMessage(WsChatMessage),
+	WsOnlineMessage(WsOnlineMessage),
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct WsChatMessage {
+	pub message: String,
+}
+
+#[derive(Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct WsOnlineMessage {
+	pub profile_key: String,
 }
 
 impl Actor for WsChatSession {
 	type Context = ws::WebsocketContext<Self>;
 
 	fn started(&mut self, ctx: &mut Self::Context) {
-		// we'll start heartbeat process on session start.
 		self.hb(ctx);
 		let addr = ctx.address();
 		self.addr
@@ -60,9 +79,14 @@ impl Actor for WsChatSession {
 			})
 			.wait(ctx);
 	}
-	fn stopping(&mut self, _: &mut Self::Context) -> Running {
-		println!("stopped");
+
+	fn stopping(&mut self, _ctx: &mut Self::Context) -> Running {
 		self.addr.do_send(Disconnect { id: self.id });
+		if let Some(key) = self.profile_key.to_owned() {
+			actix_web::rt::spawn(async move {
+				let _ = profile::utils::set_offline(&key).await;
+			});
+		}
 		Running::Stop
 	}
 }
@@ -95,38 +119,14 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsChatSession {
 				self.hb = Instant::now();
 			}
 			ws::Message::Text(text) => {
-				let m = text.trim();
-
-				if m.starts_with('/') {
-					let v: Vec<&str> = m.splitn(2, ' ').collect();
-					match v[0] {
-						"/name" => {
-							if v.len() == 2 {
-								self.name = Some(v[1].to_owned());
-							} else {
-								ctx.text("!!! name is required");
-							}
-						}
-						_ => ctx.text(format!("!!! unknown command: {:?}", m)),
-					}
-				} else {
-					let msg = if let Some(ref name) = self.name {
-						format!("{}: {}", name, m)
-					} else {
-						m.to_owned()
-					};
-					self.addr.do_send(ClientMessage { id: self.id, msg })
-				}
+				self.handle_message(text.trim());
 			}
-			ws::Message::Binary(_) => println!("Unexpected binary"),
 			ws::Message::Close(reason) => {
 				ctx.close(reason);
 				ctx.stop();
 			}
-			ws::Message::Continuation(_) => {
-				ctx.stop();
-			}
 			ws::Message::Nop => (),
+			_ => ctx.stop(),
 		}
 	}
 }
@@ -142,5 +142,27 @@ impl WsChatSession {
 			}
 			ctx.ping(b"");
 		});
+	}
+
+	fn handle_message(&mut self, message: &str) {
+		if let Ok(ws_message) = serde_json::from_str::<WsMessage>(message) {
+			match ws_message {
+				WsMessage::WsOnlineMessage(m) => {
+					self.profile_key = Some(m.profile_key.to_owned());
+					actix_web::rt::spawn(async move {
+						let _ = profile::utils::set_online(&m.profile_key).await;
+					});
+
+					// let future = async move {
+					// 	set_online(&text).await;
+					// };
+					// future.into_actor(self).spawn(ctx);
+				}
+				WsMessage::WsChatMessage(m) => self.addr.do_send(ClientMessage {
+					id: self.id,
+					msg: m.message,
+				}),
+			}
+		}
 	}
 }

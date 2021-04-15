@@ -43,7 +43,7 @@ export default class UserStore {
 		this.token = null;
 		this.user = null;
 		this.rootStore.profileStore.profile = null;
-		this.rootStore.profileStore.stopHeartbeat();
+		this.rootStore.chatStore.leaveChat();
 		window.localStorage.removeItem('jwt');
 	};
 

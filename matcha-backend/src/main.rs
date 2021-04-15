@@ -56,7 +56,6 @@ async fn main() -> std::io::Result<()> {
 			.configure(api::controllers::browse::routes)
 			.configure(api::controllers::research::routes)
 			.configure(api::controllers::chat::routes)
-			.configure(api::controllers::heartbeat::routes)
 			.configure(api::controllers::matches::routes)
 	})
 	.bind("127.0.0.1:8080")?;

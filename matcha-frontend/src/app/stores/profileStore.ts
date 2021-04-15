@@ -12,7 +12,6 @@ import { RootStore } from './rootStore';
 export default class ProfileStore {
 	rootStore: RootStore;
 	profile: IPrivateProfile | null = null;
-	webSocket: WebSocket | null = null;
 
 	constructor(rootStore: RootStore) {
 		this.rootStore = rootStore;
@@ -21,8 +20,6 @@ export default class ProfileStore {
 			getProfile: action,
 			removeImage: action,
 			updateProfile: action,
-			startHeartbeat: action,
-			stopHeartbeat: action,
 		});
 	}
 
@@ -32,7 +29,6 @@ export default class ProfileStore {
 			runInAction(() => {
 				this.profile = profile;
 			});
-			//this.startHeartbeat();
 		} catch (error) {
 			console.log(error);
 		}
@@ -90,23 +86,6 @@ export default class ProfileStore {
 			runInAction(() => this.profile?.images.push(image));
 		} catch (error) {
 			console.log(error);
-		}
-	};
-
-	startHeartbeat = () => {
-		if (!this.webSocket) {
-			this.webSocket = new WebSocket('ws://localhost:8080/ws/heartbeat');
-			this.webSocket.onopen = (event) => {
-				console.log('WebSocket is open now.');
-				this.webSocket!.send(this.profile!.id);
-			};
-		}
-	};
-
-	stopHeartbeat = () => {
-		if (this.webSocket) {
-			this.webSocket.close();
-			this.webSocket = null;
 		}
 	};
 }

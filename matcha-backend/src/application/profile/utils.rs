@@ -1,3 +1,4 @@
+use chrono::Utc;
 use crate::errors::AppError;
 use crate::models::block::Block;
 use crate::models::image::{Image, ImageDto};
@@ -90,3 +91,18 @@ fn compatibility_rating(
 		Ok(rating as u8)
 	}
 }
+
+pub async fn set_online(profile_key: &str) -> Result<(), AppError> {
+	let mut profile = Profile::get(profile_key).await?;
+	profile.last_seen = Some("online".to_owned());
+	profile.update().await?;
+	Ok(())
+}
+
+pub async fn set_offline(profile_key: &str) -> Result<(), AppError> {
+	let mut profile = Profile::get(&profile_key).await?;
+	profile.last_seen = Some(format!("{}", Utc::now().format("%Y-%m-%d %H:%M:%S")));
+	profile.update().await?;
+	Ok(())
+}
+

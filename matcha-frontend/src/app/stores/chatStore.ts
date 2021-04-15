@@ -1,6 +1,6 @@
 import { makeAutoObservable, runInAction } from 'mobx';
 import agent from '../api/agent';
-import { IChat } from '../models/chat';
+import { IChat, WsOnlineMessage } from '../models/chat';
 import { RootStore } from './rootStore';
 
 export default class ChatStore {
@@ -18,6 +18,10 @@ export default class ChatStore {
 	joinChat = () => {
 		if (!this.webSocket) {
 			this.webSocket = new WebSocket('ws://localhost:8080/ws/chat');
+			this.webSocket.addEventListener('open', () => {
+				const m = new WsOnlineMessage(this.rootStore.profileStore.profile!.id);
+				this.sendMessage(JSON.stringify(m));
+			});
 			this.webSocket.addEventListener('message', (event) => {
 				console.log('Message from server ', event.data);
 				this.recieveMessage(event.data);
@@ -39,6 +43,13 @@ export default class ChatStore {
 			runInAction(() => (this.chats = chats));
 		} catch (error) {
 			console.log(error);
+		}
+	};
+
+	leaveChat = () => {
+		if (this.webSocket) {
+			this.webSocket.close();
+			this.webSocket = null;
 		}
 	};
 }

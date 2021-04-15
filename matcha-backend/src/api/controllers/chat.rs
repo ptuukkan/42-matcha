@@ -19,6 +19,7 @@ async fn chat_route(
 			hb: Instant::now(),
 			name: None,
 			addr: srv.get_ref().clone(),
+			profile_key: None,
 		},
 		&req,
 		stream,

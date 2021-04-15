@@ -1,17 +1,25 @@
 import { observer } from 'mobx-react-lite';
 import React, { Fragment, useContext, useEffect, useState } from 'react';
 import { Dimmer, Loader, Tab } from 'semantic-ui-react';
+import { WsChatMessage } from '../../app/models/chat';
 import { RootStoreContext } from '../../app/stores/rootStore';
 import ChatPane from './ChatPane';
 
 const Chat = () => {
 	const [loading, setLoading] = useState(false);
 	const rootStore = useContext(RootStoreContext);
-	const { messages, sendMessage, joinChat, loadChats, chats } = rootStore.chatStore;
+	const {
+		messages,
+		sendMessage,
+		joinChat,
+		loadChats,
+		chats,
+	} = rootStore.chatStore;
 	const [message, setMessage] = useState('');
 
 	const send = () => {
-		sendMessage(message);
+		const m = new WsChatMessage(message);
+		sendMessage(JSON.stringify(m));
 		setMessage('');
 	};
 
@@ -19,8 +27,7 @@ const Chat = () => {
 		setLoading(true);
 		joinChat();
 		loadChats().finally(() => setLoading(false));
-	},[]);
-
+	}, []);
 
 	if (loading)
 		return (
@@ -29,14 +36,16 @@ const Chat = () => {
 			</Dimmer>
 		);
 
-/* 	const panes = [
+	/* 	const panes = [
 		{ menuItem: 'Tab 1', render: () => <Tab.Pane>Tab 1 Content</Tab.Pane> },
 		{ menuItem: 'Tab 2', render: () => <Tab.Pane>Tab 2 Content</Tab.Pane> },
 		{ menuItem: 'Tab 3', render: () => <Tab.Pane>Tab 3 Content</Tab.Pane> },
 	  ]
  */
-	const panes = chats.map((chat, i ) => ({ menuItem: i.toString(), render: () => <ChatPane messages={chat.messages}/>}))
-	
+	const panes = chats.map((chat, i) => ({
+		menuItem: i.toString(),
+		render: () => <ChatPane messages={chat.messages} />,
+	}));
 
 	return (
 		<Fragment>
