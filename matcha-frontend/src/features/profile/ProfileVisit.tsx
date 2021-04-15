@@ -58,6 +58,7 @@ const ProfileVisit = () => {
 							)}
 						</Item.Header>
 						<Item.Meta>
+							<Item>Last seen: {profile!.lastSeen}</Item>
 							<Item>Gender: {profile!.gender}</Item>
 							<Item>Sexual Preference: {profile!.sexualPreference}</Item>
 						</Item.Meta>

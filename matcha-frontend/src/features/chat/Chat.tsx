@@ -11,7 +11,6 @@ const Chat = () => {
 	const {
 		messages,
 		sendMessage,
-		joinChat,
 		loadChats,
 		chats,
 	} = rootStore.chatStore;
@@ -25,7 +24,6 @@ const Chat = () => {
 
 	useEffect(() => {
 		setLoading(true);
-		joinChat();
 		loadChats().finally(() => setLoading(false));
 	}, []);
 
@@ -36,12 +34,6 @@ const Chat = () => {
 			</Dimmer>
 		);
 
-	/* 	const panes = [
-		{ menuItem: 'Tab 1', render: () => <Tab.Pane>Tab 1 Content</Tab.Pane> },
-		{ menuItem: 'Tab 2', render: () => <Tab.Pane>Tab 2 Content</Tab.Pane> },
-		{ menuItem: 'Tab 3', render: () => <Tab.Pane>Tab 3 Content</Tab.Pane> },
-	  ]
- */
 	const panes = chats.map((chat, i) => ({
 		menuItem: i.toString(),
 		render: () => <ChatPane messages={chat.messages} />,

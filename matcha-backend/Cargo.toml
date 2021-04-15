@@ -30,6 +30,7 @@ regex = "1.4.5"
 serde_json = "1.0"
 serde_with_macros = "1.4.1"
 chrono = "0.4"
+chrono-humanize = "0.1.2"
 rand = "0.7"
 
 [dev-dependencies]

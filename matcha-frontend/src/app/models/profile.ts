@@ -2,16 +2,9 @@ export interface IProfile {
 	id: string;
 	firstName: string;
 	lastName: string;
-	/* 	emailAddress: string; */
-	/* 	birthday: string; */
-	/* birthday: Date; */
 	sexualPreference: SexualPreference;
 	gender: Gender;
-	/* gender: Gender; */
-	/* sexualPreference: SexualPreference; */
-	/* 	fameRating: number */
 	biography: string;
-	/* 	location: ILocation; */
 	interests: string[];
 	images: IImage[];
 	fameRating: number;
@@ -37,6 +30,7 @@ export interface IPublicProfile extends IProfile {
 	mutualInterests: number;
 	interests: string[];
 	compatibilityRating: number;
+	lastSeen: string,
 	blocked: boolean;
 }
 

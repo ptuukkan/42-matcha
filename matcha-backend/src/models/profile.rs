@@ -6,8 +6,10 @@ use crate::models::image::{Image, ImageDto};
 use crate::models::location::Location;
 use crate::models::location::LocationDto;
 use crate::models::user::RegisterFormValues;
+
+use chrono_humanize::{Accuracy, HumanTime, Tense};
 use serde::{Deserialize, Serialize};
-use chrono::{naive::NaiveDate, Utc, Datelike};
+use chrono::{naive::NaiveDate, Utc, Datelike, DateTime};
 use serde_with_macros::skip_serializing_none;
 use std::convert::TryFrom;
 use std::env;
@@ -28,7 +30,7 @@ pub struct Profile {
 	pub location_override: bool,
 	pub location: String,
 	pub images: Vec<String>,
-	pub last_seen: Option<String>
+	pub last_seen: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
@@ -161,7 +163,7 @@ impl From<&RegisterFormValues> for Profile {
 			location: String::new(),
 			interests: vec![],
 			images: vec![],
-			last_seen: None,
+			last_seen: String::from("Never"),
 		}
 	}
 }
@@ -233,6 +235,7 @@ pub struct PublicProfileDto {
 	sexual_preference: SexualPreference,
 	biography: Option<String>,
 	pub interests: Vec<String>,
+	pub last_seen: String,
 	pub distance: i32,
 	pub fame_rating: usize,
 	pub images: Vec<ImageDto>,
@@ -248,8 +251,15 @@ impl TryFrom<Profile> for PublicProfileDto {
 
 	fn try_from(profile: Profile) -> Result<Self, Self::Error> {
 		let age = profile.age()?;
-
+		let last_seen;
+		if let Ok(last_seen_date) = DateTime::parse_from_str(&profile.last_seen, "%Y-%m-%d %H:%M:%S %z") {
+			last_seen = HumanTime::from(last_seen_date).to_text_en(Accuracy::Rough, Tense::Past);
+		} else {
+			last_seen = profile.last_seen;
+		}
+		
 		Ok(Self {
+			last_seen,
 			id: profile.key,
 			first_name: profile.first_name,
 			last_name: profile.last_name,

@@ -94,14 +94,14 @@ fn compatibility_rating(
 
 pub async fn set_online(profile_key: &str) -> Result<(), AppError> {
 	let mut profile = Profile::get(profile_key).await?;
-	profile.last_seen = Some("online".to_owned());
+	profile.last_seen = "online".to_owned();
 	profile.update().await?;
 	Ok(())
 }
 
 pub async fn set_offline(profile_key: &str) -> Result<(), AppError> {
 	let mut profile = Profile::get(&profile_key).await?;
-	profile.last_seen = Some(format!("{}", Utc::now().format("%Y-%m-%d %H:%M:%S")));
+	profile.last_seen = format!("{}", Utc::now().format("%Y-%m-%d %H:%M:%S %z"));
 	profile.update().await?;
 	Ok(())
 }

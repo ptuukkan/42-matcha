@@ -29,6 +29,7 @@ export default class ProfileStore {
 			runInAction(() => {
 				this.profile = profile;
 			});
+			this.rootStore.chatStore.joinChat();
 		} catch (error) {
 			console.log(error);
 		}

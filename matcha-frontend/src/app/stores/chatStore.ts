@@ -20,6 +20,7 @@ export default class ChatStore {
 			this.webSocket = new WebSocket('ws://localhost:8080/ws/chat');
 			this.webSocket.addEventListener('open', () => {
 				const m = new WsOnlineMessage(this.rootStore.profileStore.profile!.id);
+				console.dir(m)
 				this.sendMessage(JSON.stringify(m));
 			});
 			this.webSocket.addEventListener('message', (event) => {
