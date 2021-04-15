@@ -7,4 +7,6 @@ pub mod visit;
 pub mod like;
 pub mod location;
 pub mod block;
+pub mod chat_connection;
+pub mod chat;
 pub mod report;

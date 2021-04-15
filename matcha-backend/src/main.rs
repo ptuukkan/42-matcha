@@ -1,25 +1,23 @@
+mod api;
 mod application;
 mod database;
 mod errors;
-mod models;
 mod infrastructure;
-mod api;
+mod models;
 #[cfg(test)]
 mod tests;
 
-use std::sync::Arc;
-use core::sync::atomic::AtomicUsize;
-use actix_web::Error;
+use actix::Actor;
 use actix_cors::Cors;
+use actix_files::Files;
 use actix_web::middleware::Logger;
+use actix_web::Error;
 use actix_web::{get, App, HttpResponse, HttpServer, Responder};
-use database::seed_data;
 use application::chat;
+use database::seed_data;
 use dotenv::dotenv;
 use log::info;
-use actix_files::Files;
 use std::fs;
-use actix::Actor;
 
 #[get("/")]
 async fn hello() -> impl Responder {
@@ -37,15 +35,17 @@ async fn seed() -> Result<HttpResponse, Error> {
 async fn main() -> std::io::Result<()> {
 	dotenv().ok();
 	env_logger::init();
-	database::setup::arango_setup().await.expect("DB setup failed");
-	    // App state
+	database::setup::arango_setup()
+		.await
+		.expect("DB setup failed");
+	// App state
 
-    // Start chat server actor
-    let server = chat::ChatServer::new().start();
+	// Start chat server actor
+	let server = chat::server::ChatServer::new().start();
 
-		fs::create_dir_all("images")?;
-		let server = HttpServer::new(move || {
-			App::new()
+	fs::create_dir_all("images")?;
+	let server = HttpServer::new(move || {
+		App::new()
 			.data(server.clone())
 			.wrap(Logger::new("%a \"%r\" %s"))
 			.wrap(Cors::permissive())
@@ -58,8 +58,8 @@ async fn main() -> std::io::Result<()> {
 			.configure(api::controllers::chat::routes)
 			.configure(api::controllers::heartbeat::routes)
 			.configure(api::controllers::matches::routes)
-		})
-		.bind("127.0.0.1:8080")?;
+	})
+	.bind("127.0.0.1:8080")?;
 	info!("Starting server");
 	server.run().await
 }

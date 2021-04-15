@@ -30,7 +30,7 @@ pub async fn arango_setup() -> Result<(), AppError> {
 	create_arango_collection("users", "2", &db_url).await?;
 	create_arango_collection("images", "2", &db_url).await?;
 	create_arango_collection("interests", "2", &db_url).await?;
-	create_arango_collection("locations", "2", &db_url).await?;
+	create_arango_collection("locations", "2", &db_url).await?; 
 	create_geoindex(&db_url).await?;
 	Ok(())
 }
@@ -112,6 +112,11 @@ async fn create_relations_graph(db_url: &str) -> Result<(), AppError> {
 				"collection": "reports",
 				"from": ["profiles"],
 				"to": ["profiles"]
+			},
+			{
+				"collection": "chatConnections",
+				"from": ["profiles"],
+				"to": ["chats"]
 			}
 		]
 	});

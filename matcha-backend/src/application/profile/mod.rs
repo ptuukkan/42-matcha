@@ -9,6 +9,7 @@ use crate::models::profile::{
 use crate::models::report::{Report, ReportFormValues};
 use crate::models::user::User;
 use crate::models::visit::Visit;
+use crate::application::chat;
 use chrono::naive::NaiveDate;
 use serde_json::{json, Value};
 use std::convert::TryFrom;
@@ -131,6 +132,7 @@ pub async fn like(user: &User, profile_key: &str) -> Result<Value, AppError> {
 		let res: Value;
 		if Like::find(profile_key, &user.profile).await?.is_some() {
 			res = json!({"connected": true});
+			chat::create(profile_key, &user.profile).await?;
 		} else {
 			res = json!({"connected": false});
 		}

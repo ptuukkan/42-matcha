@@ -20,6 +20,7 @@ import {
 } from '../models/profile';
 import { IInterestOption } from '../models/interest';
 import { IResearchFormValues } from '../models/research';
+import { IChat } from '../models/chat';
 
 axios.defaults.baseURL = process.env.REACT_APP_API_URL;
 
@@ -69,6 +70,10 @@ const requests = {
 	post: (url: string, body: {}) => axios.post(url, body).then(responseBody),
 	put: (url: string, body: {}) => axios.put(url, body).then(responseBody),
 };
+
+const Chat = {
+	getAll: (): Promise<IChat[]> => requests.get('/chat') 
+}
 
 const User = {
 	register: (user: IRegisterFormValues): Promise<void> =>
@@ -137,6 +142,7 @@ const agent = {
 	Browse,
 	Research,
 	Matches,
+	Chat,
 };
 
 export default agent;
