@@ -293,7 +293,7 @@ pub struct ProfileSlice {
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ProfileThumbnail {
-	id: String,
+	pub id: String,
 	first_name: String,
 	image: ImageDto,
 }

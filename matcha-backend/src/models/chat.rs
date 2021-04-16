@@ -82,9 +82,9 @@ impl Chat {
 		Ok(vertices)
 	}
 
-	pub async fn find_inbound(chat_key: &str) -> Result<Vec<ProfileThumbnail>, AppError> {
+	pub async fn get_participants(chat_key: &str) -> Result<Vec<ProfileThumbnail>, AppError> {
 		let query = format!(
-			"for v in 1..1 inbound 'chats/{}' chatConnections return v",
+			"for v in 1..1 inbound 'chats/{}' chatConnections RETURN MERGE(v, {{ images: DOCUMENT('images', v.images)}})",
 			chat_key
 		);
 		let vertices = CursorRequest::from(query)
@@ -100,14 +100,12 @@ impl Chat {
 	}
 }
 
-/* 
-impl From<Chat> for ChatDto {
-	fn from(chat: Chat) -> Self {
+
+impl ChatDto {
+	pub fn new(profile_thumbnail: ProfileThumbnail, messages: Vec<Message>) -> Self {
 		Self {
-			profile_thumbnail:
-/* 			value: interest.key.to_owned(),
-			text: interest.key, */
+			profile_thumbnail: profile_thumbnail,
+			messages: messages,
 		}
 	}
 }
- */
