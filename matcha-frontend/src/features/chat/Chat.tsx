@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite';
 import React, { Fragment, useContext, useEffect, useState } from 'react';
-import { Dimmer, Loader, Tab, Image, Button } from 'semantic-ui-react';
+import { Dimmer, Loader, Tab } from 'semantic-ui-react';
 import { WsChatMessage } from '../../app/models/chat';
 import { RootStoreContext } from '../../app/stores/rootStore';
 import ChatPane from './ChatPane';
@@ -8,12 +8,7 @@ import ChatPane from './ChatPane';
 const Chat = () => {
 	const [loading, setLoading] = useState(false);
 	const rootStore = useContext(RootStoreContext);
-	const {
-		messages,
-		sendMessage,
-		loadChats,
-		chats,
-	} = rootStore.chatStore;
+	const { messages, sendMessage, loadChats, chats } = rootStore.chatStore;
 	const [message, setMessage] = useState('');
 
 	const send = () => {
@@ -25,7 +20,7 @@ const Chat = () => {
 	useEffect(() => {
 		setLoading(true);
 		loadChats().finally(() => setLoading(false));
-	}, []);
+	}, [loadChats]);
 
 	if (loading)
 		return (
@@ -36,7 +31,11 @@ const Chat = () => {
 
 	const panes = chats.map((chat, i) => ({
 		menuItem: chat.participant.firstName,
-		render: () =><div><ChatPane chat={chat} /></div>,
+		render: () => (
+			<div>
+				<ChatPane chat={chat} />
+			</div>
+		),
 	}));
 
 	return (
@@ -49,7 +48,7 @@ const Chat = () => {
 			<button type="button" onClick={send}>
 				Send message
 			</button>
-
+			{messages}
 			<Tab
 				menu={{ fluid: true, vertical: true }}
 				menuPosition="left"
