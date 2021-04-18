@@ -3,7 +3,6 @@ use crate::models::chat::Chat;
 use crate::models::chat::ChatDto;
 use crate::models::chat_connection::ChatConnection;
 use crate::models::profile::Profile;
-use crate::models::profile::ProfileThumbnail;
 use crate::models::user::User;
 
 pub mod client;
@@ -24,15 +23,16 @@ pub async fn get_all(user: User) -> Result<Vec<ChatDto>, AppError> {
 	let my_profile = Profile::get(&user.profile).await?;
 	let mut chat_dtos: Vec<ChatDto> = vec![];
 	for chat in chats {
-		let images = Chat::get_participants(&chat.key).await?;
-		let mut image: Vec<ProfileThumbnail> = images
+		if let Some(participant) = Chat::get_participants(&chat.key)
+			.await?
 			.into_iter()
-			.filter(|x| x.id != my_profile.key)
-			.collect();
-		
-		//println!("{:#?}", chat.messages);
-		let tempc_dto = ChatDto::new(image.pop().unwrap(), chat.messages);
-		chat_dtos.push(tempc_dto);
+			.find(|x| x.id != my_profile.key)
+		{
+			chat_dtos.push(ChatDto {
+				participant,
+				messages: chat.messages,
+			});
+		}
 	}
 	Ok(chat_dtos)
 }

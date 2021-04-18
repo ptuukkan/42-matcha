@@ -1,17 +1,25 @@
-import { Tab } from 'semantic-ui-react'
-import { IMessage } from '../../app/models/chat'
+import React from 'react';
+import { Tab, Image, Button, GridRow } from 'semantic-ui-react';
+import { IChat } from '../../app/models/chat';
 
 interface IProps {
-	messages: IMessage[]
+	chat: IChat;
 }
 
-const ChatPane:React.FC<IProps> = ({messages}) => {
+const ChatPane: React.FC<IProps> = ({ chat }) => {
 	return (
-		<Tab.Pane>
-			{messages.map((m, i)=> <p key={i}>{m.timestamp} {m.from} {m.message}</p>)}
+		<Tab.Pane style={{ minHeight: 250 }}>
+			<GridRow>
+				<Image src={chat.participant.image.url} avatar />
+				<span>{chat.participant.firstName}</span>
+			</GridRow>
+
+			{chat.messages.map((m, i) => (
+				<p key={i}>{m}</p>
+			))}
+			<Button floated="right" color="pink" icon="send" content="Send" />
 		</Tab.Pane>
-	)
-}
+	);
+};
 
-export default ChatPane
-
+export default ChatPane;

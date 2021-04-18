@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite';
 import React, { Fragment, useContext, useEffect, useState } from 'react';
-import { Dimmer, Loader, Tab } from 'semantic-ui-react';
+import { Dimmer, Loader, Tab, Image, Button } from 'semantic-ui-react';
 import { WsChatMessage } from '../../app/models/chat';
 import { RootStoreContext } from '../../app/stores/rootStore';
 import ChatPane from './ChatPane';
@@ -35,8 +35,8 @@ const Chat = () => {
 		);
 
 	const panes = chats.map((chat, i) => ({
-		menuItem: i.toString(),
-		render: () => <ChatPane messages={chat.messages} />,
+		menuItem: chat.participant.firstName,
+		render: () =><div><ChatPane chat={chat} /></div>,
 	}));
 
 	return (
@@ -49,9 +49,7 @@ const Chat = () => {
 			<button type="button" onClick={send}>
 				Send message
 			</button>
-			{messages.map((m, i) => (
-				<p key={i}>{m}</p>
-			))}
+
 			<Tab
 				menu={{ fluid: true, vertical: true }}
 				menuPosition="left"

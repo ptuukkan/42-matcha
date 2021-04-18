@@ -42,6 +42,7 @@ export default class ChatStore {
 		try {
 			const chats = await agent.Chat.getAll();
 			runInAction(() => (this.chats = chats));
+			console.log(chats)
 		} catch (error) {
 			console.log(error);
 		}
