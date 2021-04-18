@@ -40,14 +40,14 @@ const Chat = () => {
 
 	return (
 		<Fragment>
-			<input
+{/* 			<input
 				type="text"
 				onChange={(event) => setMessage(event.target.value)}
 				value={message}
 			></input>
 			<button type="button" onClick={send}>
 				Send message
-			</button>
+			</button> */}
 			{messages}
 			<Tab
 				menu={{ fluid: true, vertical: true }}
