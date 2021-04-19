@@ -1,30 +1,25 @@
 import { IProfileThumbnail } from "./profile";
 
 export interface IChat {
+	chatId: string,
 	messages: IMessage[];
 	participant: IProfileThumbnail;
 }
 
 export interface IMessage {
 	from: string;
-	timestamp: Date;
+	timestamp: string;
 	message: string;
 }
 
-export class WsOnlineMessage {
-	type: string = 'WsOnlineMessage';
-	profileKey: string;
-
-	constructor(profileKey: string) {
-		this.profileKey = profileKey;
-	}
+export interface IWsOnlineMessage {
+	profileId: string;
 }
 
-export class WsChatMessage {
-	type: string = 'WsChatMessage';
+export interface IWsChatMessage {
+	chatId: string,
 	message: string;
-
-	constructor(message: string) {
-		this.message = message;
-	}
+	to: string,
+	from: string,
+	timestamp: number,
 }

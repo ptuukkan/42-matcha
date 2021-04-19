@@ -41,21 +41,26 @@ pub struct WsChatSession {
 }
 
 #[derive(Serialize, Deserialize)]
-#[serde(tag = "type")]
+#[serde(untagged)]
 pub enum WsMessage {
 	WsChatMessage(WsChatMessage),
 	WsOnlineMessage(WsOnlineMessage),
 }
 
 #[derive(Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct WsChatMessage {
+	pub chat_id: String,
 	pub message: String,
+	pub to: String,
+	pub from: String,
+	pub timestamp: i64,
 }
 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct WsOnlineMessage {
-	pub profile_key: String,
+	pub profile_id: String,
 }
 
 impl Actor for WsChatSession {
@@ -148,9 +153,9 @@ impl WsChatSession {
 		if let Ok(ws_message) = serde_json::from_str::<WsMessage>(message) {
 			match ws_message {
 				WsMessage::WsOnlineMessage(m) => {
-					self.profile_key = Some(m.profile_key.to_owned());
+					self.profile_key = Some(m.profile_id.to_owned());
 					actix_web::rt::spawn(async move {
-						let _ = profile::utils::set_online(&m.profile_key).await;
+						let _ = profile::utils::set_online(&m.profile_id).await;
 					});
 
 					// let future = async move {

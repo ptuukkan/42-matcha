@@ -1,3 +1,5 @@
+import { observer } from 'mobx-react-lite';
+import { useContext, useState } from 'react';
 import {
 	Tab,
 	Image,
@@ -7,20 +9,37 @@ import {
 	Divider,
 	Message,
 } from 'semantic-ui-react';
-import { IChat } from '../../app/models/chat';
+import { IChat, IWsChatMessage } from '../../app/models/chat';
+import { RootStoreContext } from '../../app/stores/rootStore';
 
 interface IProps {
 	chat: IChat;
 }
-const temp_messages = [
+/* const temp_messages = [
 	{ participant: 'Guest', message: 'Hi! 🙂', time: '20:30' },
 	{ participant: 'You', message: 'Hello!', time: '20:35' },
 	{ participant: 'Guest', message: 'What are you doing?', time: '21:30' },
 	{ participant: 'You', message: 'Drinking!', time: '23:56' },
 	{ participant: 'Guest', message: '😳', time: '23:58' },
-];
+]; */
 
 const ChatPane: React.FC<IProps> = ({ chat }) => {
+	const rootStore = useContext(RootStoreContext);
+	const [message, setMessage] = useState('');
+	const { sendChatMessage } = rootStore.chatStore;
+	const { profile } = rootStore.profileStore;
+
+	const send = () => {
+		const wsMessage: IWsChatMessage = {
+			chatId: chat.chatId,
+			message: message,
+			to: chat.participant.id,
+			from: profile!.id,
+			timestamp: Date.now(),
+		};
+		sendChatMessage(wsMessage);
+		setMessage('');
+	};
 
 	return (
 		<Tab.Pane style={{ minHeight: 250 }}>
@@ -30,30 +49,31 @@ const ChatPane: React.FC<IProps> = ({ chat }) => {
 			</GridRow>
 			<Divider />
 			<Container style={{ minHeight: 160 }}>
-				{temp_messages.map((m) =>
-					m.participant === 'You' ? (
-						<Message  style={{ textAlign: 'right' }}>
+				{chat.messages.map((m, i) =>
+					m.from !== chat.participant.id ? (
+						<Message key={i} style={{ textAlign: 'right' }}>
 							<Message.Header>{m.message}</Message.Header>
-							<p>{m.time}</p>
+							<p>{m.timestamp}</p>
 						</Message>
 					) : (
-						<Message >
+						<Message key={i}>
 							<Message.Header>{m.message}</Message.Header>
-							<p>{m.time}</p>
+							<p>{m.timestamp}</p>
 						</Message>
 					)
 				)}
 			</Container>
-			{chat.messages.map((m, i) => (
-				<p key={i}>{m}</p>
-			))}
 			<Input
 				style={{ padding: 10 }}
+				value={message}
 				action={{
 					color: 'pink',
 					icon: 'send',
 					content: 'Send',
+					disabled: message === '',
+					onClick: () => send(),
 				}}
+				onChange={(event) => setMessage(event.target.value)}
 				placeholder="Message..."
 				fluid
 			/>
@@ -61,4 +81,4 @@ const ChatPane: React.FC<IProps> = ({ chat }) => {
 	);
 };
 
-export default ChatPane;
+export default observer(ChatPane);

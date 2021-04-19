@@ -31,6 +31,7 @@ pub async fn get_all(user: User) -> Result<Vec<ChatDto>, AppError> {
 			chat_dtos.push(ChatDto {
 				participant,
 				messages: chat.messages,
+				chat_id: chat.key,
 			});
 		}
 	}

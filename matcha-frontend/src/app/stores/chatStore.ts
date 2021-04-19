@@ -1,6 +1,7 @@
 import { makeAutoObservable, runInAction } from 'mobx';
 import agent from '../api/agent';
-import { IChat, WsOnlineMessage } from '../models/chat';
+import format from 'date-fns/format';
+import { IChat, IWsChatMessage, IWsOnlineMessage } from '../models/chat';
 import { RootStore } from './rootStore';
 
 export default class ChatStore {
@@ -19,8 +20,9 @@ export default class ChatStore {
 		if (!this.webSocket) {
 			this.webSocket = new WebSocket('ws://localhost:8080/ws/chat');
 			this.webSocket.addEventListener('open', () => {
-				const m = new WsOnlineMessage(this.rootStore.profileStore.profile!.id);
-				console.dir(m)
+				const m: IWsOnlineMessage = {
+					profileId: this.rootStore.profileStore.profile!.id
+				}
 				this.sendMessage(JSON.stringify(m));
 			});
 			this.webSocket.addEventListener('message', (event) => {
@@ -42,7 +44,6 @@ export default class ChatStore {
 		try {
 			const chats = await agent.Chat.getAll();
 			runInAction(() => (this.chats = chats));
-			console.log(chats)
 		} catch (error) {
 			console.log(error);
 		}
@@ -53,5 +54,24 @@ export default class ChatStore {
 			this.webSocket.close();
 			this.webSocket = null;
 		}
+	};
+
+	sendChatMessage = (message: IWsChatMessage) => {
+		let chat = this.chats.find((c) => c.chatId === message.chatId);
+		let time = new Date(message.timestamp);
+		chat!.messages.push({
+			from: message.from,
+			timestamp: format(time, 'HH:mm'),
+			message: message.message,
+		});
+
+		this.chats = this.chats.map((c) => {
+			if (c.chatId === chat!.chatId) {
+				return chat!;
+			} else {
+				return c;
+			}
+		});
+		this.sendMessage(JSON.stringify(message));
 	};
 }

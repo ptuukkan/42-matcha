@@ -22,6 +22,7 @@ pub struct Chat {
 pub struct ChatDto {
 	pub participant: ProfileThumbnail,
 	pub messages: Vec<Message>,
+	pub chat_id: String,
 }
 
 #[derive(Serialize, Deserialize, Debug, Validate)]

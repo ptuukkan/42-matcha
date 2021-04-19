@@ -1,21 +1,13 @@
 import { observer } from 'mobx-react-lite';
-import React, { Fragment, useContext, useEffect, useState } from 'react';
+import { Fragment, useContext, useEffect, useState } from 'react';
 import { Dimmer, Loader, Tab } from 'semantic-ui-react';
-import { WsChatMessage } from '../../app/models/chat';
 import { RootStoreContext } from '../../app/stores/rootStore';
 import ChatPane from './ChatPane';
 
 const Chat = () => {
 	const [loading, setLoading] = useState(false);
 	const rootStore = useContext(RootStoreContext);
-	const { messages, sendMessage, loadChats, chats } = rootStore.chatStore;
-	const [message, setMessage] = useState('');
-
-	const send = () => {
-		const m = new WsChatMessage(message);
-		sendMessage(JSON.stringify(m));
-		setMessage('');
-	};
+	const { loadChats, chats } = rootStore.chatStore;
 
 	useEffect(() => {
 		setLoading(true);
@@ -40,15 +32,6 @@ const Chat = () => {
 
 	return (
 		<Fragment>
-{/* 			<input
-				type="text"
-				onChange={(event) => setMessage(event.target.value)}
-				value={message}
-			></input>
-			<button type="button" onClick={send}>
-				Send message
-			</button> */}
-			{messages}
 			<Tab
 				menu={{ fluid: true, vertical: true }}
 				menuPosition="left"
