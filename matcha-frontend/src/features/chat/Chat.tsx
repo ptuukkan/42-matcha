@@ -8,12 +8,7 @@ import ChatPane from './ChatPane';
 const Chat = () => {
 	const [loading, setLoading] = useState(false);
 	const rootStore = useContext(RootStoreContext);
-	const {
-		messages,
-		sendMessage,
-		loadChats,
-		chats,
-	} = rootStore.chatStore;
+	const { messages, sendMessage, loadChats, chats } = rootStore.chatStore;
 	const [message, setMessage] = useState('');
 
 	const send = () => {
@@ -25,7 +20,7 @@ const Chat = () => {
 	useEffect(() => {
 		setLoading(true);
 		loadChats().finally(() => setLoading(false));
-	}, []);
+	}, [loadChats]);
 
 	if (loading)
 		return (
@@ -35,23 +30,25 @@ const Chat = () => {
 		);
 
 	const panes = chats.map((chat, i) => ({
-		menuItem: i.toString(),
-		render: () => <ChatPane messages={chat.messages} />,
+		menuItem: chat.participant.firstName,
+		render: () => (
+			<div>
+				<ChatPane chat={chat} />
+			</div>
+		),
 	}));
 
 	return (
 		<Fragment>
-			<input
+{/* 			<input
 				type="text"
 				onChange={(event) => setMessage(event.target.value)}
 				value={message}
 			></input>
 			<button type="button" onClick={send}>
 				Send message
-			</button>
-			{messages.map((m, i) => (
-				<p key={i}>{m}</p>
-			))}
+			</button> */}
+			{messages}
 			<Tab
 				menu={{ fluid: true, vertical: true }}
 				menuPosition="left"

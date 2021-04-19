@@ -1,5 +1,8 @@
+import { IProfileThumbnail } from "./profile";
+
 export interface IChat {
 	messages: IMessage[];
+	participant: IProfileThumbnail;
 }
 
 export interface IMessage {

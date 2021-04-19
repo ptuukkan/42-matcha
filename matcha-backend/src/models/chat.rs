@@ -20,7 +20,7 @@ pub struct Chat {
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ChatDto {
-	pub profile_thumbnail: ProfileThumbnail,
+	pub participant: ProfileThumbnail,
 	pub messages: Vec<Message>,
 }
 
@@ -97,15 +97,5 @@ impl Chat {
 			.filter_map(|x| ProfileThumbnail::try_from(x).ok())
 			.collect();
 		Ok(vertices)
-	}
-}
-
-
-impl ChatDto {
-	pub fn new(profile_thumbnail: ProfileThumbnail, messages: Vec<Message>) -> Self {
-		Self {
-			profile_thumbnail: profile_thumbnail,
-			messages: messages,
-		}
 	}
 }
