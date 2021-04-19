@@ -1,15 +1,17 @@
+use crate::application::chat;
+use crate::application::notification;
 use crate::errors::AppError;
 use crate::models::block::Block;
 use crate::models::image::ImageDto;
 use crate::models::like::Like;
 use crate::models::location::{Location, LocationDto};
+use crate::models::notification::NotificationType;
 use crate::models::profile::{
 	PrivateProfileDto, Profile, ProfileFormValues, ProfileWithDistance, PublicProfileDto,
 };
 use crate::models::report::{Report, ReportFormValues};
 use crate::models::user::User;
 use crate::models::visit::Visit;
-use crate::application::chat;
 use chrono::naive::NaiveDate;
 use serde_json::{json, Value};
 use std::convert::TryFrom;
@@ -133,8 +135,10 @@ pub async fn like(user: &User, profile_key: &str) -> Result<Value, AppError> {
 		if Like::find(profile_key, &user.profile).await?.is_some() {
 			res = json!({"connected": true});
 			chat::create(profile_key, &user.profile).await?;
+			notification::create(NotificationType::LikeBack, profile_key, &user.profile).await?;
 		} else {
 			res = json!({"connected": false});
+			notification::create(NotificationType::Like, profile_key, &user.profile).await?;
 		}
 		Ok(res)
 	}
@@ -142,6 +146,9 @@ pub async fn like(user: &User, profile_key: &str) -> Result<Value, AppError> {
 
 pub async fn unlike(user: &User, profile_key: &str) -> Result<(), AppError> {
 	if let Some(like) = Like::find(&user.profile, profile_key).await? {
+		if Like::find(profile_key, &user.profile).await?.is_some() {
+			notification::create(NotificationType::Unlike, profile_key, &user.profile).await?;
+		}
 		like.delete().await?;
 		Ok(())
 	} else {

@@ -1,18 +1,30 @@
-import { useContext } from 'react';
-import { List, Image } from 'semantic-ui-react';
+import React, { useContext, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { List, Image, Grid } from 'semantic-ui-react';
 import { RootStoreContext } from '../../app/stores/rootStore';
 
 const NotificationsList = () => {
 	const rootStore = useContext(RootStoreContext);
-	const { notifications } = rootStore.profileStore;
+	const { notifications, readNotifications } = rootStore.profileStore;
+
+	useEffect(() => {
+		setTimeout(() => {
+			readNotifications();
+		}, 5000);
+	});
 
 	return (
-		<List>
+		<List
+			divided
+			verticalAlign="middle"
+			relaxed
+			style={{ maxHeight: '50vh', overflow: 'scroll', overflowX: 'hidden' }}
+		>
 			{notifications.map((notification) => (
 				<List.Item key={notification.id}>
 					<Image avatar src={notification.profile.image.url} />
 					<List.Content>
-						<List.Header as="a" href={`/profile/${notification.profile.id}`}>
+						<List.Header as={Link} to={`/profile/${notification.profile.id}`}>
 							{notification.profile.firstName}
 						</List.Header>
 						<List.Description>

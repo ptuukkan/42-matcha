@@ -4,19 +4,17 @@ use crate::models::notification::{
 };
 use crate::models::profile::{ProfileSlice, ProfileThumbnail};
 use crate::models::user::User;
+use std::cmp::Reverse;
 use std::convert::TryFrom;
 
 pub async fn get_all(user: User) -> Result<Vec<NotificationDto>, AppError> {
-	let notifications = Notification::get_profile_notifications(&user.profile).await?;
+	let mut notifications = Notification::get_profile_notifications(&user.profile).await?;
+	notifications.sort_by_key(|x| Reverse(x.timestamp));
 	let mut notification_dtos = Vec::<NotificationDto>::new();
 	for notification in notifications {
 		if let Some(profile_slice) = ProfileSlice::get(&notification.source_profile).await? {
 			let profile_thumbnail = ProfileThumbnail::try_from(&profile_slice)?;
 			let mut notification_dto = NotificationDto::from(notification);
-			notification_dto.message = format!(
-				"{} {}",
-				&profile_thumbnail.first_name, &notification_dto.message
-			);
 			notification_dto.profile = Some(profile_thumbnail);
 			notification_dtos.push(notification_dto);
 		}

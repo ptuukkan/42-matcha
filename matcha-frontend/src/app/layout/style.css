@@ -14,8 +14,8 @@ body {
 
 .notificationBall {
 	position: absolute;
-	left: 30px;
-	top: 1px;
+	left: 33px;
+	top: -1px;
 }
 
 .navi {

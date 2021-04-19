@@ -117,10 +117,15 @@ export default class ProfileStore {
 			},
 			[]
 		);
-		try {
-			await agent.Notification.read(unreadNotifications);
-		} catch (error) {
-			console.log(error);
+		if (unreadNotifications.length > 0) {
+			try {
+				await agent.Notification.read(unreadNotifications);
+				runInAction(() => {
+					this.notifications = this.notifications.map(n => ({...n, read: true}))
+				})
+			} catch (error) {
+				console.log(error);
+			}
 		}
 	};
 }

@@ -278,7 +278,7 @@ pub struct ProfileSlice {
 impl ProfileSlice {
 	pub async fn get(profile_key: &str) -> Result<Option<Self>, AppError> {
 		let query = format!(
-			"FOR p IN profiles FILTER p._key == '{}' RETURN MERGE(p, {{ images: DOCUMENT('images', p.images) }} ",
+			"FOR p IN profiles FILTER p._key == '{}' RETURN MERGE(p, {{ images: DOCUMENT('images', p.images) }} )",
 			profile_key
 		);
 		let mut profiles = CursorRequest::from(query)

@@ -52,18 +52,9 @@ impl Notification {
 		Ok(db_url + "_api/document/notifications/")
 	}
 
-	fn key_url(&self) -> Result<String, AppError> {
-		Ok(format!("{}{}", &Self::url()?, self.key))
-	}
-
 	pub async fn create(&mut self) -> Result<(), AppError> {
 		let res = api::post::<Self, CreateResponse>(&Self::url()?, &self).await?;
 		self.key = res.key;
-		Ok(())
-	}
-
-	pub async fn update(&self) -> Result<(), AppError> {
-		api::patch(&self.key_url()?, &self).await?;
 		Ok(())
 	}
 
@@ -72,20 +63,9 @@ impl Notification {
 		Ok(())
 	}
 
-	pub async fn get(key: &str) -> Result<Self, AppError> {
-		let url = format!("{}{}", Self::url()?, key);
-		let user = api::get::<Self>(&url).await?;
-		Ok(user)
-	}
-
-	pub async fn delete(&self) -> Result<(), AppError> {
-		api::delete(&self.key_url()?).await?;
-		Ok(())
-	}
-
 	pub async fn get_profile_notifications(profile_key: &str) -> Result<Vec<Self>, AppError> {
 		let query = format!(
-			"FOR n IN notifications filter n.target_profile == '{}' return n",
+			"FOR n IN notifications FILTER n.targetProfile == '{}' RETURN n",
 			profile_key
 		);
 		let notifications = CursorRequest::from(query)
