@@ -21,6 +21,7 @@ import {
 import { IInterestOption } from '../models/interest';
 import { IResearchFormValues } from '../models/research';
 import { IChat } from '../models/chat';
+import { INotification } from '../models/notification';
 
 axios.defaults.baseURL = process.env.REACT_APP_API_URL;
 
@@ -72,8 +73,8 @@ const requests = {
 };
 
 const Chat = {
-	getAll: (): Promise<IChat[]> => requests.get('/chat') 
-}
+	getAll: (): Promise<IChat[]> => requests.get('/chat'),
+};
 
 const User = {
 	register: (user: IRegisterFormValues): Promise<void> =>
@@ -134,6 +135,12 @@ const Interests = {
 	get: (): Promise<IInterestOption[]> => requests.get('/interests'),
 };
 
+const Notification = {
+	list: (): Promise<INotification[]> => requests.get('/notification'),
+	read: (notifications: string[]): Promise<void> =>
+		requests.post('/notification', notifications),
+};
+
 const agent = {
 	User,
 	Profile,
@@ -143,6 +150,7 @@ const agent = {
 	Research,
 	Matches,
 	Chat,
+	Notification,
 };
 
 export default agent;

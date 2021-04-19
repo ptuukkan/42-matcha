@@ -20,6 +20,7 @@ import ChangeCredentials from '../../features/user/ChangeCredentials';
 import Browse from '../../features/browse/Browse';
 import Research from '../../features/research/Research';
 import Matches from '../../features/matches/Matches';
+import NotificationsList from '../../features/notifications/NotificationsList';
 
 const App = () => {
 	const [appLoaded, setAppLoaded] = useState(false);
@@ -88,6 +89,7 @@ const App = () => {
 											component={ChangeCredentials}
 										/>
 										<PrivateRoute exact path="/chat" component={Chat} />
+										<PrivateRoute path="/notifications" component={NotificationsList} />
 										<PrivateRoute component={NotFound} />
 									</Switch>
 								</Fragment>

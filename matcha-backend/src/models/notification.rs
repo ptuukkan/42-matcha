@@ -101,7 +101,7 @@ impl Notification {
 #[serde(rename_all = "camelCase")]
 pub struct NotificationDto {
 	pub id: String,
-	pub sent: String,
+	pub sent_at: String,
 	pub profile: Option<ProfileThumbnail>,
 	pub message: String,
 	pub read: bool,
@@ -125,7 +125,7 @@ impl From<Notification> for NotificationDto {
 		};
 		NotificationDto {
 			id: notification.key,
-			sent: sent.humanize(),
+			sent_at: sent.humanize(),
 			message,
 			read: notification.read,
 			profile: None,

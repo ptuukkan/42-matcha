@@ -26,6 +26,10 @@ const PrivateMenuItems: React.FC<IProps> = ({ logoutUser }) => {
 					<Icon name="comments" />
 					Chat
 				</Menu.Item>
+				<Menu.Item as={Link} to="/notifications" name="notifications">
+					<Icon name="bell" />
+					Notifications
+				</Menu.Item>
 				<Menu.Item as={Link} to="/" name="logout" onClick={logoutUser}>
 					<Icon name="times" />
 					Logout
