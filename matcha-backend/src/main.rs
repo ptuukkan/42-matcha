@@ -57,6 +57,7 @@ async fn main() -> std::io::Result<()> {
 			.configure(api::controllers::research::routes)
 			.configure(api::controllers::chat::routes)
 			.configure(api::controllers::matches::routes)
+			.configure(api::controllers::notification::routes)
 	})
 	.bind("127.0.0.1:8080")?;
 	info!("Starting server");

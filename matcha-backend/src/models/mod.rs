@@ -10,3 +10,4 @@ pub mod block;
 pub mod chat_connection;
 pub mod chat;
 pub mod report;
+pub mod notification;

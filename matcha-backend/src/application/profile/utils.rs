@@ -6,8 +6,11 @@ use crate::models::like::Like;
 use crate::models::profile::{Profile, ProfileWithDistance, PublicProfileDto};
 use crate::models::visit::Visit;
 use std::convert::TryFrom;
+use crate::application::notification;
+use crate::models::notification::NotificationType;
 
 pub async fn visit(from: &str, to: &str) -> Result<(), AppError> {
+	notification::create(NotificationType::Visit, to, from).await?;
 	if Visit::find(from, to).await?.is_some() {
 		Ok(())
 	} else {

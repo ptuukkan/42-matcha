@@ -4,3 +4,4 @@ pub mod browse;
 pub mod research;
 pub mod chat;
 pub mod matches;
+pub mod notification;

@@ -7,9 +7,9 @@ use crate::models::location::Location;
 use crate::models::location::LocationDto;
 use crate::models::user::RegisterFormValues;
 
+use chrono::{naive::NaiveDate, DateTime, Datelike, Utc};
 use chrono_humanize::{Accuracy, HumanTime, Tense};
 use serde::{Deserialize, Serialize};
-use chrono::{naive::NaiveDate, Utc, Datelike, DateTime};
 use serde_with_macros::skip_serializing_none;
 use std::convert::TryFrom;
 use std::env;
@@ -168,22 +168,6 @@ impl From<&RegisterFormValues> for Profile {
 	}
 }
 
-impl TryFrom<&ProfileSlice> for ProfileThumbnail {
-	type Error = AppError;
-
-	fn try_from(pv: &ProfileSlice) -> Result<Self, Self::Error> {
-		if let Some(main_image) = pv.images.iter().find(|x| x.is_main) {
-			Ok(Self {
-				id: pv.key.to_owned(),
-				first_name: pv.first_name.to_owned(),
-				image: ImageDto::try_from(main_image)?,
-			})
-		} else {
-			Err(AppError::internal("Main image not found"))
-		}
-	}
-}
-
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PrivateProfileDto {
@@ -252,12 +236,13 @@ impl TryFrom<Profile> for PublicProfileDto {
 	fn try_from(profile: Profile) -> Result<Self, Self::Error> {
 		let age = profile.age()?;
 		let last_seen;
-		if let Ok(last_seen_date) = DateTime::parse_from_str(&profile.last_seen, "%Y-%m-%d %H:%M:%S %z") {
+		if let Ok(last_seen_date) =
+			DateTime::parse_from_str(&profile.last_seen, "%Y-%m-%d %H:%M:%S %z")
+		{
 			last_seen = HumanTime::from(last_seen_date).to_text_en(Accuracy::Rough, Tense::Past);
 		} else {
 			last_seen = profile.last_seen;
 		}
-		
 		Ok(Self {
 			last_seen,
 			id: profile.key,
@@ -290,12 +275,53 @@ pub struct ProfileSlice {
 	pub images: Vec<Image>,
 }
 
+impl ProfileSlice {
+	pub async fn get(profile_key: &str) -> Result<Option<Self>, AppError> {
+		let query = format!(
+			"FOR p IN profiles FILTER p._key == '{}' RETURN MERGE(p, {{ images: DOCUMENT('images', p.images) }} ",
+			profile_key
+		);
+		let mut profiles = CursorRequest::from(query)
+			.send()
+			.await?
+			.extract_all::<Self>()
+			.await?;
+		if let Some(profile) = profiles.pop() {
+			Ok(Some(profile))
+		} else {
+			Ok(None)
+		}
+	}
+}
+
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ProfileThumbnail {
 	pub id: String,
-	first_name: String,
+	pub first_name: String,
 	image: ImageDto,
+}
+
+impl TryFrom<&ProfileSlice> for ProfileThumbnail {
+	type Error = AppError;
+
+	fn try_from(pv: &ProfileSlice) -> Result<Self, Self::Error> {
+		if let Some(main_image) = pv.images.iter().find(|x| x.is_main) {
+			Ok(Self {
+				id: pv.key.to_owned(),
+				first_name: pv.first_name.to_owned(),
+				image: ImageDto::try_from(main_image)?,
+			})
+		} else if let Some(image) = pv.images.get(0) {
+			Ok(Self {
+				id: pv.key.to_owned(),
+				first_name: pv.first_name.to_owned(),
+				image: ImageDto::try_from(image)?,
+			})
+		} else {
+			Err(AppError::internal("image not found"))
+		}
+	}
 }
 
 #[derive(Debug, Serialize, Deserialize)]
