@@ -13,7 +13,9 @@ const Notifications = () => {
 	} = rootStore.profileStore;
 
 	useEffect(() => {
-		readNotifications();
+		setTimeout(() => {
+			readNotifications();
+		}, 5000);
 	});
 
 	return (
