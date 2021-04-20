@@ -1,8 +1,9 @@
+use crate::chat::client::WsChatMessage;
 use crate::errors::AppError;
 use crate::models::chat::Chat;
 use crate::models::chat::ChatDto;
+use crate::models::chat::Message;
 use crate::models::chat_connection::ChatConnection;
-use crate::models::profile::Profile;
 use crate::models::user::User;
 
 pub mod client;
@@ -20,14 +21,14 @@ pub async fn create(profile_a: &str, profile_b: &str) -> Result<(), AppError> {
 
 pub async fn get_all(user: User) -> Result<Vec<ChatDto>, AppError> {
 	let chats = Chat::find_outbound(&user.profile).await?;
-	let my_profile = Profile::get(&user.profile).await?;
 	let mut chat_dtos: Vec<ChatDto> = vec![];
-	for chat in chats {
+	for mut chat in chats {
 		if let Some(participant) = Chat::get_participants(&chat.key)
 			.await?
 			.into_iter()
-			.find(|x| x.id != my_profile.key)
+			.find(|x| x.id != user.profile)
 		{
+			chat.messages.sort_by_key(|x| x.timestamp);
 			chat_dtos.push(ChatDto {
 				participant,
 				messages: chat.messages,
@@ -36,4 +37,11 @@ pub async fn get_all(user: User) -> Result<Vec<ChatDto>, AppError> {
 		}
 	}
 	Ok(chat_dtos)
+}
+
+pub async fn message(message: WsChatMessage) -> Result<(), AppError> {
+	let mut chat = Chat::get(&message.chat_id).await?;
+	chat.messages.push(Message::from(message));
+	chat.update().await?;
+	Ok(())
 }

@@ -1,5 +1,5 @@
-use crate::chat::client::WsChatSession;
-use crate::chat::server::ChatServer;
+use crate::chat::client::WsSession;
+use crate::chat::server::WsServer;
 use crate::models::user::User;
 use crate::application::chat;
 use actix::*;
@@ -11,13 +11,11 @@ use std::time::Instant;
 async fn chat_route(
 	req: HttpRequest,
 	stream: web::Payload,
-	srv: web::Data<Addr<ChatServer>>,
+	srv: web::Data<Addr<WsServer>>,
 ) -> Result<HttpResponse, Error> {
 	ws::start(
-		WsChatSession {
-			id: 0,
+		WsSession {
 			hb: Instant::now(),
-			name: None,
 			addr: srv.get_ref().clone(),
 			profile_key: None,
 		},

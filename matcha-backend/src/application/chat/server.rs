@@ -1,62 +1,57 @@
+use crate::chat::client::{JoinMessage, LeaveMessage, WsChatMessage, WsSession};
+use crate::chat;
+use crate::application::profile;
 use actix::prelude::*;
-use rand::{self, rngs::ThreadRng, Rng};
-use std::collections::{HashMap};
-use super::client::{Message, Connect, Disconnect, ClientMessage};
+use std::collections::HashMap;
 
-pub struct ChatServer {
-	sessions: HashMap<usize, Recipient<Message>>,
-	rng: ThreadRng,
+pub struct WsServer {
+	sessions: HashMap<String, Addr<WsSession>>,
 }
 
-impl ChatServer {
-	pub fn new() -> ChatServer {
-		// default room
-
-		ChatServer {
+impl WsServer {
+	pub fn new() -> Self {
+		Self {
 			sessions: HashMap::new(),
-			rng: rand::thread_rng(),
-		}
-	}
-	fn send_message(&self, message: &str) {
-		for session in &self.sessions {
-			let _ = session.1.do_send(Message(message.to_owned()));
 		}
 	}
 }
 
-
-impl Actor for ChatServer {
-
+impl Actor for WsServer {
 	type Context = Context<Self>;
 }
 
-impl Handler<Connect> for ChatServer {
-	type Result = usize;
-
-	fn handle(&mut self, msg: Connect, _: &mut Context<Self>) -> Self::Result {
-		println!("Someone joined");
-
-		self.send_message("Someone joined");
-		let id = self.rng.gen::<usize>();
-		self.sessions.insert(id, msg.addr);
-		id
-	}
-}
-
-impl Handler<Disconnect> for ChatServer {
+impl Handler<JoinMessage> for WsServer {
 	type Result = ();
 
-	fn handle(&mut self, msg: Disconnect, _: &mut Context<Self>) {
-		println!("Someone disconnected");
-		self.sessions.remove(&msg.id);
+	fn handle(&mut self, msg: JoinMessage, _ctx: &mut Context<Self>) {
+		let key = msg.profile_key;
+		self.sessions.insert(key.to_owned(), msg.addr);
+		actix_web::rt::spawn(async move {
+			let _ = profile::utils::set_online(&key).await;
+		});
 	}
 }
 
-impl Handler<ClientMessage> for ChatServer {
+impl Handler<LeaveMessage> for WsServer {
 	type Result = ();
 
-	fn handle(&mut self, msg: ClientMessage, _: &mut Context<Self>) {
-		self.send_message(msg.msg.as_str());
+	fn handle(&mut self, msg: LeaveMessage, _ctx: &mut Context<Self>) {
+		self.sessions.remove(&msg.profile_key);
+		actix_web::rt::spawn(async move {
+			let _ = profile::utils::set_offline(&msg.profile_key).await;
+		});
 	}
 }
 
+impl Handler<WsChatMessage> for WsServer {
+	type Result = ();
+
+	fn handle(&mut self, msg: WsChatMessage, _ctx: &mut Context<Self>) {
+		if let Some(recipient) = self.sessions.get(&msg.to) {
+			recipient.do_send(msg.to_owned());
+		}
+		actix_web::rt::spawn(async move {
+			let _ = chat::message(msg).await;
+		});
+	}
+}

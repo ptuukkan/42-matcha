@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import {
 	Tab,
 	Image,
@@ -8,26 +8,22 @@ import {
 	Container,
 	Divider,
 	Message,
+	Ref,
 } from 'semantic-ui-react';
 import { IChat, IWsChatMessage } from '../../app/models/chat';
 import { RootStoreContext } from '../../app/stores/rootStore';
+import format from 'date-fns/format';
 
 interface IProps {
 	chat: IChat;
 }
-/* const temp_messages = [
-	{ participant: 'Guest', message: 'Hi! 🙂', time: '20:30' },
-	{ participant: 'You', message: 'Hello!', time: '20:35' },
-	{ participant: 'Guest', message: 'What are you doing?', time: '21:30' },
-	{ participant: 'You', message: 'Drinking!', time: '23:56' },
-	{ participant: 'Guest', message: '😳', time: '23:58' },
-]; */
 
 const ChatPane: React.FC<IProps> = ({ chat }) => {
 	const rootStore = useContext(RootStoreContext);
 	const [message, setMessage] = useState('');
-	const { sendChatMessage } = rootStore.chatStore;
+	const { sendChatMessage, unreadMessages, readMessages } = rootStore.chatStore;
 	const { profile } = rootStore.profileStore;
+	const messageContainer = useRef<HTMLDivElement>(null);
 
 	const send = () => {
 		const wsMessage: IWsChatMessage = {
@@ -41,28 +37,54 @@ const ChatPane: React.FC<IProps> = ({ chat }) => {
 		setMessage('');
 	};
 
+	useEffect(() => {
+		if (unreadMessages.includes(chat.chatId)) {
+			readMessages(chat.chatId);
+		}
+		if (messageContainer.current) {
+			messageContainer.current.scrollTo({
+				top: messageContainer.current.scrollHeight,
+			});
+		}
+	});
+
 	return (
-		<Tab.Pane style={{ minHeight: 250 }}>
+		<Tab.Pane>
 			<GridRow>
-				<Image src={chat.participant.image.url} avatar />
+				<Image
+					avatar
+					src={chat.participant.image.url}
+					style={{ marginRight: 10 }}
+				/>
 				<span>{chat.participant.firstName}</span>
 			</GridRow>
 			<Divider />
-			<Container style={{ minHeight: 160 }}>
-				{chat.messages.map((m, i) =>
-					m.from !== chat.participant.id ? (
-						<Message key={i} style={{ textAlign: 'right' }}>
-							<Message.Header>{m.message}</Message.Header>
-							<p>{m.timestamp}</p>
-						</Message>
-					) : (
-						<Message key={i}>
-							<Message.Header>{m.message}</Message.Header>
-							<p>{m.timestamp}</p>
-						</Message>
-					)
-				)}
-			</Container>
+			<Ref innerRef={messageContainer}>
+				<Container
+					style={{
+						height: '50vh',
+						overflow: 'auto',
+						padding: 10,
+
+					}}
+				>
+					{chat.messages.map((m, i) =>
+						m.from !== chat.participant.id ? (
+							<Message key={i} style={{ textAlign: 'right' }}>
+								<Message.Header>{format(m.timestamp, 'HH:mm')}</Message.Header>
+								<Message.Content>{m.message}</Message.Content>
+							</Message>
+						) : (
+							<Message key={i}>
+								<Message.Header>{format(m.timestamp, 'HH:mm')}</Message.Header>
+								<Message.Content>{m.message}</Message.Content>
+							</Message>
+						)
+					)}
+				</Container>
+
+			</Ref>
+
 			<Input
 				style={{ padding: 10 }}
 				value={message}

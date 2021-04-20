@@ -9,9 +9,12 @@ interface IProps {
 const BrowseListItemInterests: React.FC<IProps> = ({ interests }) => {
 	const rootStore = useContext(RootStoreContext);
 	const { profile } = rootStore.profileStore;
-	const mutualInterests = interests.filter((i) =>
-		profile!.interests.includes(i)
-	);
+
+	let mutualInterests: string[] = [];
+
+	if (profile) {
+		mutualInterests = interests.filter((i) => profile.interests.includes(i));
+	}
 
 	if (mutualInterests.length === 0) return <Fragment></Fragment>;
 

@@ -8,7 +8,7 @@ export interface IChat {
 
 export interface IMessage {
 	from: string;
-	timestamp: string;
+	timestamp: number;
 	message: string;
 }
 

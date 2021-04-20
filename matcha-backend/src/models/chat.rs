@@ -1,3 +1,4 @@
+use crate::chat::client::WsChatMessage;
 use crate::database::api;
 use crate::database::cursor::CursorRequest;
 use crate::errors::AppError;
@@ -27,9 +28,7 @@ pub struct ChatDto {
 
 #[derive(Serialize, Deserialize, Debug, Validate)]
 pub struct Message {
-	#[serde(skip_serializing)]
-	#[serde(rename = "_key")]
-	pub timestamp: String,
+	pub timestamp: i64,
 	pub from: String,
 	pub message: String,
 }
@@ -79,7 +78,6 @@ impl Chat {
 			.await?
 			.extract_all::<Self>()
 			.await?;
-		println!("{:#?}", vertices);
 		Ok(vertices)
 	}
 
@@ -98,5 +96,15 @@ impl Chat {
 			.filter_map(|x| ProfileThumbnail::try_from(x).ok())
 			.collect();
 		Ok(vertices)
+	}
+}
+
+impl From<WsChatMessage> for Message {
+	fn from(ws_message: WsChatMessage) -> Self {
+		Self {
+			timestamp: ws_message.timestamp,
+			from: ws_message.from,
+			message: ws_message.message,
+		}
 	}
 }

@@ -41,7 +41,7 @@ async fn main() -> std::io::Result<()> {
 	// App state
 
 	// Start chat server actor
-	let server = chat::server::ChatServer::new().start();
+	let server = chat::server::WsServer::new().start();
 
 	fs::create_dir_all("images")?;
 	let server = HttpServer::new(move || {
