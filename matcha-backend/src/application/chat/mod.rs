@@ -5,6 +5,8 @@ use crate::models::chat::ChatDto;
 use crate::models::chat::Message;
 use crate::models::chat_connection::ChatConnection;
 use crate::models::user::User;
+use crate::models::notification::NotificationType;
+use crate::application::notification;
 
 pub mod client;
 pub mod server;
@@ -41,7 +43,8 @@ pub async fn get_all(user: User) -> Result<Vec<ChatDto>, AppError> {
 
 pub async fn message(message: WsChatMessage) -> Result<(), AppError> {
 	let mut chat = Chat::get(&message.chat_id).await?;
-	chat.messages.push(Message::from(message));
+	chat.messages.push(Message::from(message.to_owned()));
 	chat.update().await?;
+	notification::create(NotificationType::Message, &message.to, &message.from).await?;
 	Ok(())
 }

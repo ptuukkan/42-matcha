@@ -82,9 +82,7 @@ const ChatPane: React.FC<IProps> = ({ chat }) => {
 						)
 					)}
 				</Container>
-
 			</Ref>
-
 			<Input
 				style={{ padding: 10 }}
 				value={message}

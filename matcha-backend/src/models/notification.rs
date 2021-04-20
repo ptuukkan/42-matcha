@@ -3,8 +3,7 @@ use crate::database::cursor::CursorRequest;
 use crate::errors::AppError;
 use crate::models::base::CreateResponse;
 use crate::models::profile::ProfileThumbnail;
-use chrono::{DateTime, NaiveDateTime, Utc};
-use chrono_humanize::Humanize;
+use chrono::Utc;
 use serde::{Deserialize, Serialize};
 use std::env;
 
@@ -40,7 +39,7 @@ impl Notification {
 		Self {
 			key: String::new(),
 			notification_type,
-			timestamp: Utc::now().timestamp(),
+			timestamp: Utc::now().timestamp_millis(),
 			target_profile: target_profile.to_owned(),
 			source_profile: source_profile.to_owned(),
 			read: false,
@@ -86,7 +85,7 @@ impl Notification {
 #[serde(rename_all = "camelCase")]
 pub struct NotificationDto {
 	pub id: String,
-	pub sent_at: String,
+	pub timestamp: i64,
 	pub profile: Option<ProfileThumbnail>,
 	pub message: String,
 	pub read: bool,
@@ -94,11 +93,6 @@ pub struct NotificationDto {
 
 impl From<Notification> for NotificationDto {
 	fn from(notification: Notification) -> Self {
-		let sent = DateTime::<Utc>::from_utc(
-			NaiveDateTime::from_timestamp(notification.timestamp, 0),
-			Utc,
-		);
-
 		let message = match notification.notification_type {
 			NotificationType::Like => "liked you".to_owned(),
 			NotificationType::LikeBack => "liked you back".to_owned(),
@@ -110,7 +104,7 @@ impl From<Notification> for NotificationDto {
 		};
 		NotificationDto {
 			id: notification.key,
-			sent_at: sent.humanize(),
+			timestamp: notification.timestamp,
 			message,
 			read: notification.read,
 			profile: None,

@@ -2,7 +2,7 @@ import { IProfileThumbnail } from './profile';
 
 export interface INotification {
 	id: string;
-	sentAt: string;
+	timestamp: number;
 	profile: IProfileThumbnail;
 	message: string;
 	read: boolean;

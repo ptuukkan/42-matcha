@@ -2,6 +2,7 @@ import React, { Fragment } from 'react';
 import { Link } from 'react-router-dom';
 import { List, Label, Image, Button } from 'semantic-ui-react';
 import { INotification } from '../../app/models/notification';
+import formatDistance from 'date-fns/formatDistance';
 
 interface IProps {
 	notifications: INotification[];
@@ -34,7 +35,11 @@ const NotificationsList: React.FC<IProps> = ({
 							)}
 						</List.Header>
 						<List.Description>
-							{`${notification.message} ${notification.sentAt}`}
+							{`${notification.message} ${formatDistance(
+								notification.timestamp,
+								Date.now(),
+								{ addSuffix: true }
+							)}`}
 						</List.Description>
 					</List.Content>
 				</List.Item>

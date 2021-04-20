@@ -26,8 +26,7 @@ pub struct LeaveMessage {
 	pub profile_key: String,
 }
 
-#[derive(Serialize, Deserialize, Message)]
-#[rtype(result = "()")]
+#[derive(Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum WsMessage {
 	WsChatMessage(WsChatMessage),
