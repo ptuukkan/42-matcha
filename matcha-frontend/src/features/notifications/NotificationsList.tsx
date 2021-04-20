@@ -1,31 +1,38 @@
-import React, { useContext, useEffect } from 'react';
+import { observer } from 'mobx-react-lite';
+import React, { Fragment } from 'react';
 import { Link } from 'react-router-dom';
-import { List, Image, Grid, Label } from 'semantic-ui-react';
-import { RootStoreContext } from '../../app/stores/rootStore';
+import { List, Label, Image, Button } from 'semantic-ui-react';
+import { INotification } from '../../app/models/notification';
 
-const NotificationsList = () => {
-	const rootStore = useContext(RootStoreContext);
-	const { notifications, readNotifications } = rootStore.profileStore;
+interface IProps {
+	notifications: INotification[];
+	clearNotifications: () => Promise<void>;
+}
 
-	useEffect(() => {
-			readNotifications();
-	});
-
+const NotificationsList: React.FC<IProps> = ({
+	notifications,
+	clearNotifications,
+}) => {
 	return (
-		<List
-			divided
-			verticalAlign="middle"
-			relaxed
-			style={{ maxHeight: '50vh', overflow: 'scroll', overflowX: 'hidden' }}
-		>
+		<Fragment>
+			<List.Item>
+				<List.Content floated="right">
+					<List.Description>
+						<Button basic color="pink" compact onClick={clearNotifications}>
+							Clear notifications
+						</Button>
+					</List.Description>
+				</List.Content>
+			</List.Item>
 			{notifications.map((notification) => (
 				<List.Item key={notification.id}>
 					<Image avatar src={notification.profile.image.url} />
 					<List.Content>
-
 						<List.Header as={Link} to={`/profile/${notification.profile.id}`}>
 							{notification.profile.firstName}
-							<Label color='pink' content="New" compact />
+							{!notification.read && (
+								<Label color="pink" content="New" style={{ padding: 3 }} />
+							)}
 						</List.Header>
 						<List.Description>
 							{`${notification.message} ${notification.sentAt}`}
@@ -33,7 +40,7 @@ const NotificationsList = () => {
 					</List.Content>
 				</List.Item>
 			))}
-		</List>
+		</Fragment>
 	);
 };
 

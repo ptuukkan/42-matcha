@@ -3,7 +3,7 @@ import React, { Fragment, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { Menu, Icon, Label, Popup } from 'semantic-ui-react';
 import { RootStoreContext } from '../../app/stores/rootStore';
-import NotificationsList from '../notifications/NotificationsList';
+import Notifications from '../notifications/Notifications';
 
 interface IProps {
 	logoutUser: () => void;
@@ -11,7 +11,7 @@ interface IProps {
 
 const PrivateMenuItems: React.FC<IProps> = ({ logoutUser }) => {
 	const rootStore = useContext(RootStoreContext);
-	const { unreadNotifications } = rootStore.profileStore;
+	const { unreadNotificationsCount } = rootStore.profileStore;
 
 	return (
 		<Fragment>
@@ -35,20 +35,20 @@ const PrivateMenuItems: React.FC<IProps> = ({ logoutUser }) => {
 				<Popup
 					trigger={
 						<Menu.Item name="notifications">
-							{unreadNotifications > 0 && (
+							{unreadNotificationsCount > 0 && (
 								<Label
 									circular
 									color="red"
 									size="mini"
 									className="notificationBall"
-									content={unreadNotifications}
+									content={unreadNotificationsCount}
 								/>
 							)}
 							<Icon name="bell" />
 							Notifications
 						</Menu.Item>
 					}
-					content={NotificationsList}
+					content={Notifications}
 					position="bottom right"
 					on="click"
 					pinned

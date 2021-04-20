@@ -97,29 +97,27 @@ export default class ProfileStore {
 		}
 	};
 
-	get unreadNotifications() {
-		return this.notifications.reduce(
-			(count: number, notification: INotification) => {
-				if (!notification.read) return count + 1;
-				return count;
-			},
-			0
-		);
+	get unreadNotificationsCount() {
+		return this.unreadNotifications.length;
 	}
 
-	readNotifications = async () => {
-		const unreadNotifications = this.notifications.reduce(
-			(un: string[], notification: INotification) => {
+	get unreadNotifications() {
+		return this.notifications.reduce(
+			(un: INotification[], notification: INotification) => {
 				if (!notification.read) {
-					un.push(notification.id);
+					un.push(notification);
 				}
 				return un;
 			},
 			[]
 		);
+	}
+
+	readNotifications = async () => {
+		const unreadNotifications = this.unreadNotifications.map(n => n.id);
 		if (unreadNotifications.length > 0) {
 			try {
-				await agent.Notification.read(unreadNotifications);
+				// await agent.Notification.read(unreadNotifications);
 				runInAction(() => {
 					this.notifications = this.notifications.map(n => ({...n, read: true}))
 				})
@@ -128,4 +126,8 @@ export default class ProfileStore {
 			}
 		}
 	};
+
+	clearNotifications = async () => {
+		this.notifications = this.notifications.filter(n => !n.read);
+	}
 }
