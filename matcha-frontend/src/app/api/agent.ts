@@ -139,6 +139,8 @@ const Notification = {
 	list: (): Promise<INotification[]> => requests.get('/notification'),
 	read: (notifications: string[]): Promise<void> =>
 		requests.post('/notification', notifications),
+	clear: (notifications: string[]): Promise<void> =>
+	requests.post('/notification/clear', notifications),
 };
 
 const agent = {

@@ -21,7 +21,7 @@ const Notifications = () => {
 			divided
 			verticalAlign="middle"
 			relaxed
-			style={{ maxHeight: '50vh', overflow: 'auto' }}
+			style={{ maxHeight: '50vh', overflow: 'auto', minWidth: 250 }}
 		>
 			{notifications.length > 0 ? (
 				<NotificationsList
@@ -37,4 +37,4 @@ const Notifications = () => {
 	);
 };
 
-export default Notifications;
+export default observer(Notifications);

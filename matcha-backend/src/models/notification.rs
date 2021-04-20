@@ -63,6 +63,11 @@ impl Notification {
 		Ok(())
 	}
 
+	pub async fn delete_many(notifications: Vec<String>) -> Result<(), AppError> {
+		api::delete_many(&Self::url()?, &notifications).await?;
+		Ok(())
+	}
+
 	pub async fn get_profile_notifications(profile_key: &str) -> Result<Vec<Self>, AppError> {
 		let query = format!(
 			"FOR n IN notifications FILTER n.targetProfile == '{}' RETURN n",

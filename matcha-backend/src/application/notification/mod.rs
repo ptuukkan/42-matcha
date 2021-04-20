@@ -40,3 +40,9 @@ pub async fn read(notifications: Vec<String>) -> Result<(), AppError> {
 	Notification::update_many(notification_slices).await?;
 	Ok(())
 }
+
+
+pub async fn clear(notifications: Vec<String>) -> Result<(), AppError> {
+	Notification::delete_many(notifications).await?;
+	Ok(())
+}

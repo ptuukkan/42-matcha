@@ -48,12 +48,12 @@ const PrivateMenuItems: React.FC<IProps> = ({ logoutUser }) => {
 							Notifications
 						</Menu.Item>
 					}
-					content={Notifications}
 					position="bottom right"
 					on="click"
 					pinned
-				/>
-
+				>
+					<Notifications />
+				</Popup>
 				<Menu.Item as={Link} to="/" name="logout" onClick={logoutUser}>
 					<Icon name="times" />
 					Logout

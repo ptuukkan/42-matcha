@@ -102,25 +102,20 @@ export default class ProfileStore {
 	}
 
 	get unreadNotifications() {
-		return this.notifications.reduce(
-			(un: INotification[], notification: INotification) => {
-				if (!notification.read) {
-					un.push(notification);
-				}
-				return un;
-			},
-			[]
-		);
+		return this.notifications.filter((n) => !n.read);
 	}
 
 	readNotifications = async () => {
-		const unreadNotifications = this.unreadNotifications.map(n => n.id);
+		const unreadNotifications = this.unreadNotifications.map((n) => n.id);
 		if (unreadNotifications.length > 0) {
 			try {
 				// await agent.Notification.read(unreadNotifications);
 				runInAction(() => {
-					this.notifications = this.notifications.map(n => ({...n, read: true}))
-				})
+					this.notifications = this.notifications.map((n) => ({
+						...n,
+						read: true,
+					}));
+				});
 			} catch (error) {
 				console.log(error);
 			}
@@ -128,6 +123,18 @@ export default class ProfileStore {
 	};
 
 	clearNotifications = async () => {
-		this.notifications = this.notifications.filter(n => !n.read);
-	}
+		const readNotifications = this.notifications
+			.filter((n) => n.read)
+			.map((n) => n.id);
+		if (readNotifications.length > 0) {
+			try {
+				await agent.Notification.clear(readNotifications);
+				runInAction(() => {
+					this.notifications = this.notifications.filter((n) => !n.read);
+				});
+			} catch (error) {
+				console.log(error);
+			}
+		}
+	};
 }

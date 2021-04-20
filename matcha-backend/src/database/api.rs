@@ -123,6 +123,17 @@ pub async fn delete(url: &str) -> Result<(), AppError> {
 	Ok(())
 }
 
+pub async fn delete_many<I: Serialize>(url: &str, data: &I) -> Result<(), AppError> {
+	let jwt = get_arango_jwt().await?;
+	let client = Client::default();
+	client
+		.delete(url)
+		.set_header("Authorization", "bearer ".to_owned() + &jwt)
+		.send_json(data)
+		.await?;
+	Ok(())
+}
+
 pub async fn put<I: Serialize, O: de::DeserializeOwned>(
 	url: &str,
 	data: &I,
