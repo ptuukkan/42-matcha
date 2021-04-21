@@ -23,7 +23,7 @@ const Notifications = () => {
 			divided
 			verticalAlign="middle"
 			relaxed
-			style={{ maxHeight: '50vh', overflow: 'auto', minWidth: 250 }}
+			style={{ maxHeight: '50vh', overflow: 'auto', minWidth: 300 }}
 		>
 			{notifications.length > 0 ? (
 				<NotificationsList
