@@ -52,7 +52,7 @@ const App: React.FC<RouteComponentProps> = ({ location }) => {
 		<div
 			style={{ display: 'flex', minHeight: '100vh', flexDirection: 'column' }}
 		>
-			<Container className="main_container">
+			<Container className="main_container" style={{paddinTop: 90, paddingBottom: 90}}>
 				<ToastContainer style={{ marginTop: '5%' }} position="top-right" />
 				<ModalContainer />
 				<SubModalContainer />

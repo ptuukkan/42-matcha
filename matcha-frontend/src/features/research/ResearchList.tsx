@@ -44,6 +44,7 @@ const ResearchList: React.FC<IProps> = ({
 					vertical
 					visible={showSideBar}
 					width="wide"
+					style={{padding: 40}}
 				>
 					<BrowseListSorter profiles={profiles} setProfiles={setProfiles} />
 					<Header>Filter</Header>
