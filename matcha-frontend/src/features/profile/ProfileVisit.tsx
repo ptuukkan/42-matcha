@@ -52,9 +52,9 @@ const ProfileVisit = () => {
 						<Item.Header>
 							{profile!.firstName} {profile!.lastName}
 							{profile!.connected && (
-								<Label color="teal" horizontal style={{ float: 'right' }}>
-									Connected
-								</Label>
+									<Label color="pink" horizontal style={{marginLeft: 10}}>
+										Matched
+									</Label>
 							)}
 						</Item.Header>
 						<Item.Meta>

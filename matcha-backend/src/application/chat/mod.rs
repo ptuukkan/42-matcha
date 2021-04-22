@@ -1,12 +1,14 @@
+use crate::application::notification;
 use crate::chat::client::WsChatMessage;
+use crate::chat::server::WsServer;
 use crate::errors::AppError;
 use crate::models::chat::Chat;
 use crate::models::chat::ChatDto;
 use crate::models::chat::Message;
 use crate::models::chat_connection::ChatConnection;
-use crate::models::user::User;
 use crate::models::notification::NotificationType;
-use crate::application::notification;
+use crate::models::user::User;
+use actix::Addr;
 
 pub mod client;
 pub mod server;
@@ -41,10 +43,26 @@ pub async fn get_all(user: User) -> Result<Vec<ChatDto>, AppError> {
 	Ok(chat_dtos)
 }
 
-pub async fn message(message: WsChatMessage) -> Result<(), AppError> {
+pub async fn message(message: WsChatMessage, ws_srv: Addr<WsServer>) -> Result<(), AppError> {
 	let mut chat = Chat::get(&message.chat_id).await?;
 	chat.messages.push(Message::from(message.to_owned()));
 	chat.update().await?;
-	notification::create(NotificationType::Message, &message.to, &message.from).await?;
+	notification::create(NotificationType::Message, &message.to, &message.from, ws_srv).await?;
+	Ok(())
+}
+
+pub async fn delete(profile_a: &str, profile_b: &str) -> Result<(), AppError> {
+	let chats = Chat::find_outbound(profile_a).await?;
+	for chat in chats {
+		if let Some(participant) = Chat::get_participants(&chat.key)
+		.await?
+		.into_iter()
+		.find(|x| x.id != profile_a) {
+			if participant.id == *profile_b {
+				chat.delete().await?;
+				return Ok(());
+			}
+		}
+	}
 	Ok(())
 }

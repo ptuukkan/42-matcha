@@ -1,3 +1,5 @@
+use crate::WsServer;
+use actix::Addr;
 use crate::application::user;
 use crate::application::{profile, profile::like, profile::utils::visit};
 use crate::database::api;
@@ -12,7 +14,7 @@ use serde_json::json;
 use serde_json::Value;
 use std::env;
 
-pub async fn seed_data() -> Result<(), AppError> {
+pub async fn seed_data(ws_srv: Addr<WsServer>) -> Result<(), AppError> {
 	setup::reset_db().await?;
 	setup::arango_setup().await?;
 
@@ -160,84 +162,84 @@ pub async fn seed_data() -> Result<(), AppError> {
 	let profile = create_image(profile, "scully2").await?;
 	let scully = create_image(profile, "scully3").await?;
 
-	visit(&jake.key, &rosa.key).await?;
-	visit(&jake.key, &amy.key).await?;
-	visit(&jake.key, &charles.key).await?;
-	visit(&jake.key, &terry.key).await?;
-	visit(&jake.key, &holt.key).await?;
-	like(&jake_user, &amy.key).await?;
-	like(&jake_user, &holt.key).await?;
-	like(&jake_user, &charles.key).await?;
+	visit(&jake.key, &rosa.key, ws_srv.clone()).await?;
+	visit(&jake.key, &amy.key, ws_srv.clone()).await?;
+	visit(&jake.key, &charles.key, ws_srv.clone()).await?;
+	visit(&jake.key, &terry.key, ws_srv.clone()).await?;
+	visit(&jake.key, &holt.key, ws_srv.clone()).await?;
+	like(&jake_user, &amy.key, ws_srv.clone()).await?;
+	like(&jake_user, &holt.key, ws_srv.clone()).await?;
+	like(&jake_user, &charles.key, ws_srv.clone()).await?;
 
-	visit(&rosa.key, &amy.key).await?;
-	visit(&rosa.key, &gina.key).await?;
-	visit(&rosa.key, &jake.key).await?;
-	like(&rosa_user, &gina.key).await?;
-	like(&rosa_user, &terry.key).await?;
-	like(&rosa_user, &amy.key).await?;
+	visit(&rosa.key, &amy.key, ws_srv.clone()).await?;
+	visit(&rosa.key, &gina.key, ws_srv.clone()).await?;
+	visit(&rosa.key, &jake.key, ws_srv.clone()).await?;
+	like(&rosa_user, &gina.key, ws_srv.clone()).await?;
+	like(&rosa_user, &terry.key, ws_srv.clone()).await?;
+	like(&rosa_user, &amy.key, ws_srv.clone()).await?;
 
-	visit(&amy.key, &gina.key).await?;
-	visit(&amy.key, &rosa.key).await?;
-	visit(&amy.key, &holt.key).await?;
-	visit(&amy.key, &jake.key).await?;
-	like(&amy_user, &rosa.key).await?;
-	like(&amy_user, &holt.key).await?;
-	like(&amy_user, &gina.key).await?;
-	like(&amy_user, &jake.key).await?;
+	visit(&amy.key, &gina.key, ws_srv.clone()).await?;
+	visit(&amy.key, &rosa.key, ws_srv.clone()).await?;
+	visit(&amy.key, &holt.key, ws_srv.clone()).await?;
+	visit(&amy.key, &jake.key, ws_srv.clone()).await?;
+	like(&amy_user, &rosa.key, ws_srv.clone()).await?;
+	like(&amy_user, &holt.key, ws_srv.clone()).await?;
+	like(&amy_user, &gina.key, ws_srv.clone()).await?;
+	like(&amy_user, &jake.key, ws_srv.clone()).await?;
 
-	visit(&charles.key, &gina.key).await?;
-	visit(&charles.key, &terry.key).await?;
-	visit(&charles.key, &jake.key).await?;
-	like(&charles_user, &amy.key).await?;
-	like(&charles_user, &jake.key).await?;
-	like(&charles_user, &terry.key).await?;
-	like(&charles_user, &holt.key).await?;
+	visit(&charles.key, &gina.key, ws_srv.clone()).await?;
+	visit(&charles.key, &terry.key, ws_srv.clone()).await?;
+	visit(&charles.key, &jake.key, ws_srv.clone()).await?;
+	like(&charles_user, &amy.key, ws_srv.clone()).await?;
+	like(&charles_user, &jake.key, ws_srv.clone()).await?;
+	like(&charles_user, &terry.key, ws_srv.clone()).await?;
+	like(&charles_user, &holt.key, ws_srv.clone()).await?;
 
-	visit(&terry.key, &jake.key).await?;
-	visit(&terry.key, &holt.key).await?;
-	visit(&terry.key, &amy.key).await?;
-	visit(&terry.key, &scully.key).await?;
-	like(&terry_user, &rosa.key).await?;
-	like(&terry_user, &amy.key).await?;
-	like(&terry_user, &jake.key).await?;
-	like(&terry_user, &scully.key).await?;
-	like(&terry_user, &holt.key).await?;
+	visit(&terry.key, &jake.key, ws_srv.clone()).await?;
+	visit(&terry.key, &holt.key, ws_srv.clone()).await?;
+	visit(&terry.key, &amy.key, ws_srv.clone()).await?;
+	visit(&terry.key, &scully.key, ws_srv.clone()).await?;
+	like(&terry_user, &rosa.key, ws_srv.clone()).await?;
+	like(&terry_user, &amy.key, ws_srv.clone()).await?;
+	like(&terry_user, &jake.key, ws_srv.clone()).await?;
+	like(&terry_user, &scully.key, ws_srv.clone()).await?;
+	like(&terry_user, &holt.key, ws_srv.clone()).await?;
 
-	visit(&gina.key, &jake.key).await?;
-	visit(&gina.key, &holt.key).await?;
-	visit(&gina.key, &amy.key).await?;
-	visit(&gina.key, &rosa.key).await?;
-	visit(&gina.key, &terry.key).await?;
-	like(&gina_user, &rosa.key).await?;
-	like(&gina_user, &amy.key).await?;
-	like(&gina_user, &terry.key).await?;
+	visit(&gina.key, &jake.key, ws_srv.clone()).await?;
+	visit(&gina.key, &holt.key, ws_srv.clone()).await?;
+	visit(&gina.key, &amy.key, ws_srv.clone()).await?;
+	visit(&gina.key, &rosa.key, ws_srv.clone()).await?;
+	visit(&gina.key, &terry.key, ws_srv.clone()).await?;
+	like(&gina_user, &rosa.key, ws_srv.clone()).await?;
+	like(&gina_user, &amy.key, ws_srv.clone()).await?;
+	like(&gina_user, &terry.key, ws_srv.clone()).await?;
 
-	visit(&holt.key, &amy.key).await?;
-	visit(&holt.key, &terry.key).await?;
-	visit(&holt.key, &scully.key).await?;
-	visit(&holt.key, &hitchcock.key).await?;
-	like(&holt_user, &terry.key).await?;
-	like(&holt_user, &jake.key).await?;
-	like(&holt_user, &amy.key).await?;
-	like(&holt_user, &hitchcock.key).await?;
-	like(&holt_user, &scully.key).await?;
+	visit(&holt.key, &amy.key, ws_srv.clone()).await?;
+	visit(&holt.key, &terry.key, ws_srv.clone()).await?;
+	visit(&holt.key, &scully.key, ws_srv.clone()).await?;
+	visit(&holt.key, &hitchcock.key, ws_srv.clone()).await?;
+	like(&holt_user, &terry.key, ws_srv.clone()).await?;
+	like(&holt_user, &jake.key, ws_srv.clone()).await?;
+	like(&holt_user, &amy.key, ws_srv.clone()).await?;
+	like(&holt_user, &hitchcock.key, ws_srv.clone()).await?;
+	like(&holt_user, &scully.key, ws_srv.clone()).await?;
 
-	visit(&scully.key, &terry.key).await?;
-	visit(&scully.key, &jake.key).await?;
-	visit(&scully.key, &holt.key).await?;
-	visit(&scully.key, &amy.key).await?;
-	visit(&scully.key, &hitchcock.key).await?;
-	like(&scully_user, &terry.key).await?;
-	like(&scully_user, &hitchcock.key).await?;
-	like(&scully_user, &jake.key).await?;
+	visit(&scully.key, &terry.key, ws_srv.clone()).await?;
+	visit(&scully.key, &jake.key, ws_srv.clone()).await?;
+	visit(&scully.key, &holt.key, ws_srv.clone()).await?;
+	visit(&scully.key, &amy.key, ws_srv.clone()).await?;
+	visit(&scully.key, &hitchcock.key, ws_srv.clone()).await?;
+	like(&scully_user, &terry.key, ws_srv.clone()).await?;
+	like(&scully_user, &hitchcock.key, ws_srv.clone()).await?;
+	like(&scully_user, &jake.key, ws_srv.clone()).await?;
 
-	visit(&hitchcock.key, &terry.key).await?;
-	visit(&hitchcock.key, &gina.key).await?;
-	visit(&hitchcock.key, &charles.key).await?;
-	visit(&hitchcock.key, &scully.key).await?;
-	like(&hitchcock_user, &scully.key).await?;
-	like(&hitchcock_user, &rosa.key).await?;
-	like(&hitchcock_user, &gina.key).await?;
+	visit(&hitchcock.key, &terry.key, ws_srv.clone()).await?;
+	visit(&hitchcock.key, &gina.key, ws_srv.clone()).await?;
+	visit(&hitchcock.key, &charles.key, ws_srv.clone()).await?;
+	visit(&hitchcock.key, &scully.key, ws_srv.clone()).await?;
+	like(&hitchcock_user, &scully.key, ws_srv.clone()).await?;
+	like(&hitchcock_user, &rosa.key, ws_srv.clone()).await?;
+	like(&hitchcock_user, &gina.key, ws_srv.clone()).await?;
 
 	Ok(())
 }

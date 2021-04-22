@@ -1,5 +1,6 @@
 import { FORM_ERROR } from 'final-form';
 import { makeAutoObservable, runInAction } from 'mobx';
+import { toast } from 'react-toastify';
 import agent from '../api/agent';
 import { INotification } from '../models/notification';
 import {
@@ -102,19 +103,21 @@ export default class ProfileStore {
 	}
 
 	get unreadNotifications() {
-		return this.notifications.filter((n) => !n.read);
+		return this.notifications.filter((n) => !n.read).map((n) => n.id);
 	}
 
-	readNotifications = async () => {
-		const unreadNotifications = this.unreadNotifications.map((n) => n.id);
-		if (unreadNotifications.length > 0) {
+	readNotifications = async (notifications: string[]) => {
+		if (notifications.length > 0) {
 			try {
-				// await agent.Notification.read(unreadNotifications);
+				await agent.Notification.read(notifications);
 				runInAction(() => {
-					this.notifications = this.notifications.map((n) => ({
-						...n,
-						read: true,
-					}));
+					this.notifications = this.notifications.map((n) => {
+						if (notifications.includes(n.id)) {
+							return { ...n, read: true };
+						} else {
+							return n;
+						}
+					});
 				});
 			} catch (error) {
 				console.log(error);
@@ -136,5 +139,10 @@ export default class ProfileStore {
 				console.log(error);
 			}
 		}
+	};
+
+	addNotification = (notification: INotification) => {
+		this.notifications.unshift(notification);
+		toast.info(notification.toast);
 	};
 }

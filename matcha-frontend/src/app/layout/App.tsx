@@ -1,5 +1,10 @@
 import { Fragment, useContext, useEffect, useState } from 'react';
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import {
+	Switch,
+	Route,
+	RouteComponentProps,
+	withRouter,
+} from 'react-router-dom';
 import Navigation from '../../features/nav/Navigation';
 import { Container, Dimmer, Loader } from 'semantic-ui-react';
 import Chat from '../../features/chat/Chat';
@@ -21,7 +26,7 @@ import Browse from '../../features/browse/Browse';
 import Research from '../../features/research/Research';
 import Matches from '../../features/matches/Matches';
 
-const App = () => {
+const App: React.FC<RouteComponentProps> = ({ location }) => {
 	const [appLoaded, setAppLoaded] = useState(false);
 	const rootStore = useContext(RootStoreContext);
 	const { token, getUser, logoutUser, user } = rootStore.userStore;
@@ -49,56 +54,42 @@ const App = () => {
 		>
 			<Container className="main_container">
 				<ToastContainer style={{ marginTop: '5%' }} position="top-right" />
-				<Router>
-					<ModalContainer />
-					<SubModalContainer />
-					<Navigation />
-					<Switch>
-						<Route path="/verify/:link" component={EmailVerification} />
-						<Route path="/resetpassword/:link" component={ChangePassword} />
-						<Route exact path="/" component={user ? Browse : Landing} />
-						<Route
-							render={() => (
-								<Fragment>
-									<Switch>
+				<ModalContainer />
+				<SubModalContainer />
+				<Navigation />
+				<Switch>
+					<Route path="/verify/:link" component={EmailVerification} />
+					<Route path="/resetpassword/:link" component={ChangePassword} />
+					<Route exact path="/" component={user ? Browse : Landing} />
+					<Route
+						render={() => (
+							<Fragment>
+								<Switch>
+									<PrivateRoute path="/research" component={Research} />
 									<PrivateRoute
-											path="/research"
-											component={Research}
-										/>
-										<PrivateRoute
-											path="/profile/:id"
-											component={ProfileVisit}
-										/>
-										<PrivateRoute
-											path="/research"
-											component={Research}
-										/>
-										<PrivateRoute
-											path="/matches"
-											component={Matches}
-										/>
-										<PrivateRoute
-											exact
-											path="/profile"
-											component={ProfilePage}
-										/>
-										<PrivateRoute
-											exact
-											path="/credentials"
-											component={ChangeCredentials}
-										/>
-										<PrivateRoute exact path="/chat" component={Chat} />
-										<PrivateRoute component={NotFound} />
-									</Switch>
-								</Fragment>
-							)}
-						/>
-					</Switch>
-				</Router>
+										key={location.key}
+										path="/profile/:id"
+										component={ProfileVisit}
+									/>
+									<PrivateRoute path="/research" component={Research} />
+									<PrivateRoute path="/matches" component={Matches} />
+									<PrivateRoute exact path="/profile" component={ProfilePage} />
+									<PrivateRoute
+										exact
+										path="/credentials"
+										component={ChangeCredentials}
+									/>
+									<PrivateRoute exact path="/chat" component={Chat} />
+									<PrivateRoute component={NotFound} />
+								</Switch>
+							</Fragment>
+						)}
+					/>
+				</Switch>
 			</Container>
 			<Footer />
 		</div>
 	);
 };
 
-export default observer(App);
+export default withRouter(observer(App));

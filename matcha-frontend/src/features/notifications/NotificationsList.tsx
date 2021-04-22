@@ -26,10 +26,10 @@ const NotificationsList: React.FC<IProps> = ({
 			</List.Item>
 			{notifications.map((notification) => (
 				<List.Item key={notification.id}>
-					<Image avatar src={notification.profile.image.url} />
+					<Image avatar src={notification.sourceProfile.image.url} />
 					<List.Content>
-						<List.Header as={Link} to={`/profile/${notification.profile.id}`}>
-							{notification.profile.firstName}
+						<List.Header as={Link} to={`/profile/${notification.sourceProfile.id}`}>
+							{notification.sourceProfile.firstName}
 							{!notification.read && (
 								<Label color="pink" content="New" style={{ padding: 3 }} />
 							)}

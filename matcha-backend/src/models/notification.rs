@@ -3,6 +3,7 @@ use crate::database::cursor::CursorRequest;
 use crate::errors::AppError;
 use crate::models::base::CreateResponse;
 use crate::models::profile::ProfileThumbnail;
+use actix::Message;
 use chrono::Utc;
 use serde::{Deserialize, Serialize};
 use std::env;
@@ -81,13 +82,16 @@ impl Notification {
 	}
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Message, Clone)]
+#[rtype(result = "()")]
 #[serde(rename_all = "camelCase")]
 pub struct NotificationDto {
 	pub id: String,
 	pub timestamp: i64,
-	pub profile: Option<ProfileThumbnail>,
+	pub source_profile: Option<ProfileThumbnail>,
+	pub target_profile: String,
 	pub message: String,
+	pub toast: String,
 	pub read: bool,
 }
 
@@ -98,16 +102,27 @@ impl From<Notification> for NotificationDto {
 			NotificationType::LikeBack => "liked you back".to_owned(),
 			NotificationType::Message => "messaged you".to_owned(),
 			NotificationType::Unlike => {
-				"unliked you. You are no longer matched and cannot chat with them".to_owned()
+				"unliked you".to_owned()
 			}
 			NotificationType::Visit => "checked you out".to_owned(),
+		};
+		let toast = match notification.notification_type {
+			NotificationType::Like => "Somebody just liked you".to_owned(),
+			NotificationType::LikeBack => "Somebody just liked you back".to_owned(),
+			NotificationType::Message => "Somebody just messaged you".to_owned(),
+			NotificationType::Unlike => {
+				"Somebody just unliked you".to_owned()
+			}
+			NotificationType::Visit => "Somebody just checked you out".to_owned(),
 		};
 		NotificationDto {
 			id: notification.key,
 			timestamp: notification.timestamp,
 			message,
+			toast,
 			read: notification.read,
-			profile: None,
+			source_profile: None,
+			target_profile: notification.target_profile,
 		}
 	}
 }

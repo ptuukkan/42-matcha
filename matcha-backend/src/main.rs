@@ -7,12 +7,14 @@ mod models;
 #[cfg(test)]
 mod tests;
 
+use crate::chat::server::WsServer;
+use actix::Addr;
 use actix::Actor;
 use actix_cors::Cors;
 use actix_files::Files;
 use actix_web::middleware::Logger;
 use actix_web::Error;
-use actix_web::{get, App, HttpResponse, HttpServer, Responder};
+use actix_web::{get, web, App, HttpResponse, HttpServer, Responder};
 use application::chat;
 use database::seed_data;
 use dotenv::dotenv;
@@ -26,8 +28,8 @@ async fn hello() -> impl Responder {
 }
 
 #[get("/seed")]
-async fn seed() -> Result<HttpResponse, Error> {
-	seed_data::seed_data().await?;
+async fn seed(ws_srv: web::Data<Addr<WsServer>>) -> Result<HttpResponse, Error> {
+	seed_data::seed_data(ws_srv.get_ref().clone()).await?;
 	Ok(HttpResponse::Ok().body("Success"))
 }
 

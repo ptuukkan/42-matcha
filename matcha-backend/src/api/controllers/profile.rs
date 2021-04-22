@@ -1,7 +1,9 @@
 use crate::application::profile;
+use crate::chat::server::WsServer;
 use crate::models::profile::ProfileFormValues;
 use crate::models::report::ReportFormValues;
 use crate::models::user::User;
+use actix::Addr;
 use actix_web::error::Error;
 use actix_web::web::{Json, Path};
 use actix_web::{delete, get, post, put, web, HttpResponse};
@@ -13,8 +15,12 @@ async fn get_my_profile(user: User) -> Result<HttpResponse, Error> {
 }
 
 #[get("/profile/{id}")]
-async fn get_profile(user: User, Path(id): Path<String>) -> Result<HttpResponse, Error> {
-	let profile = profile::get(&user, &id).await?;
+async fn get_profile(
+	user: User,
+	Path(id): Path<String>,
+	ws_srv: web::Data<Addr<WsServer>>,
+) -> Result<HttpResponse, Error> {
+	let profile = profile::get(&user, &id, ws_srv.get_ref().clone()).await?;
 	Ok(HttpResponse::Ok().json(profile))
 }
 
@@ -41,14 +47,22 @@ async fn report_profile(
 }
 
 #[get("/profile/{id}/like")]
-async fn like_profile(user: User, Path(id): Path<String>) -> Result<HttpResponse, Error> {
-	let res = profile::like(&user, &id).await?;
+async fn like_profile(
+	user: User,
+	Path(id): Path<String>,
+	ws_srv: web::Data<Addr<WsServer>>,
+) -> Result<HttpResponse, Error> {
+	let res = profile::like(&user, &id, ws_srv.get_ref().clone()).await?;
 	Ok(HttpResponse::Ok().json(&res))
 }
 
 #[delete("/profile/{id}/like")]
-async fn unlike_profile(user: User, Path(id): Path<String>) -> Result<HttpResponse, Error> {
-	profile::unlike(&user, &id).await?;
+async fn unlike_profile(
+	user: User,
+	Path(id): Path<String>,
+	ws_srv: web::Data<Addr<WsServer>>,
+) -> Result<HttpResponse, Error> {
+	profile::unlike(&user, &id, ws_srv.get_ref().clone()).await?;
 	Ok(HttpResponse::Ok().finish())
 }
 

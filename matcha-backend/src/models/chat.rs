@@ -50,6 +50,14 @@ impl Chat {
 		Ok(format!("{}{}", &Self::url()?, self.key))
 	}
 
+	fn vertex_key_url(&self) -> Result<String, AppError> {
+		let db_url: String = env::var("DB_URL")?;
+		Ok(format!(
+			"{}_api/gharial/relations/vertex/chats/{}",
+			db_url, self.key
+		))
+	}
+
 	pub async fn get(key: &str) -> Result<Self, AppError> {
 		let url = format!("{}{}", Self::url()?, key);
 		let location = api::get::<Self>(&url).await?;
@@ -64,6 +72,11 @@ impl Chat {
 	pub async fn create(&mut self) -> Result<(), AppError> {
 		let res = api::post::<Self, CreateResponse>(&Self::url()?, &self).await?;
 		self.key = res.key;
+		Ok(())
+	}
+
+	pub async fn delete(&self) -> Result<(), AppError> {
+		api::delete(&self.vertex_key_url()?).await?;
 		Ok(())
 	}
 

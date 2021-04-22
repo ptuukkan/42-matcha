@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite';
-import { useContext, useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import {
 	Tab,
 	Image,
@@ -9,10 +9,12 @@ import {
 	Divider,
 	Message,
 	Ref,
+	Header,
 } from 'semantic-ui-react';
 import { IChat, IWsChatMessage } from '../../app/models/chat';
 import { RootStoreContext } from '../../app/stores/rootStore';
 import format from 'date-fns/format';
+import { Link } from 'react-router-dom';
 
 interface IProps {
 	chat: IChat;
@@ -56,7 +58,9 @@ const ChatPane: React.FC<IProps> = ({ chat }) => {
 					src={chat.participant.image.url}
 					style={{ marginRight: 10 }}
 				/>
-				<span>{chat.participant.firstName}</span>
+				<Header as={Link} to={`/profile/${chat.participant.id}`}>
+					{chat.participant.firstName}
+				</Header>
 			</GridRow>
 			<Divider />
 			<Ref innerRef={messageContainer}>
@@ -65,7 +69,6 @@ const ChatPane: React.FC<IProps> = ({ chat }) => {
 						height: '50vh',
 						overflow: 'auto',
 						padding: 10,
-
 					}}
 				>
 					{chat.messages.map((m, i) =>

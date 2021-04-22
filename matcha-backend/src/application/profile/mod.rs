@@ -1,5 +1,6 @@
 use crate::application::chat;
 use crate::application::notification;
+use crate::chat::server::WsServer;
 use crate::errors::AppError;
 use crate::models::block::Block;
 use crate::models::image::ImageDto;
@@ -12,6 +13,7 @@ use crate::models::profile::{
 use crate::models::report::{Report, ReportFormValues};
 use crate::models::user::User;
 use crate::models::visit::Visit;
+use actix::Addr;
 use chrono::naive::NaiveDate;
 use serde_json::{json, Value};
 use std::convert::TryFrom;
@@ -60,7 +62,6 @@ pub async fn update(user: &User, mut values: ProfileFormValues) -> Result<(), Ap
 	}
 	if let Some(birth_date) = values.birth_date {
 		let split: Vec<&str> = birth_date.split('T').collect();
-		NaiveDate::parse_from_str(split[0], "%Y-%m-%d")?;
 		if NaiveDate::parse_from_str(split[0], "%Y-%m-%d").is_ok() {
 			values.birth_date = Some(split[0].to_owned());
 		} else {
@@ -71,13 +72,13 @@ pub async fn update(user: &User, mut values: ProfileFormValues) -> Result<(), Ap
 	Ok(())
 }
 
-pub async fn get(user: &User, profile_key: &str) -> Result<PublicProfileDto, AppError> {
+pub async fn get(user: &User, profile_key: &str, ws_srv: Addr<WsServer>) -> Result<PublicProfileDto, AppError> {
 	let their_profile = ProfileWithDistance::get(&user.profile, profile_key).await?;
 	// if !profile.is_complete() {
 	// 	return Err(AppError::not_found("Profile not found"));
 	// }
 	if user.profile != their_profile.profile.key {
-		utils::visit(&user.profile, profile_key).await?;
+		utils::visit(&user.profile, profile_key, ws_srv).await?;
 	}
 
 	let my_profile = Profile::get(&user.profile).await?;
@@ -125,7 +126,11 @@ pub async fn report_profile(
 	}
 }
 
-pub async fn like(user: &User, profile_key: &str) -> Result<Value, AppError> {
+pub async fn like(
+	user: &User,
+	profile_key: &str,
+	ws_srv: Addr<WsServer>,
+) -> Result<Value, AppError> {
 	if Like::find(&user.profile, profile_key).await?.is_some() {
 		Err(AppError::bad_request("Already liked this profile"))
 	} else {
@@ -135,19 +140,32 @@ pub async fn like(user: &User, profile_key: &str) -> Result<Value, AppError> {
 		if Like::find(profile_key, &user.profile).await?.is_some() {
 			res = json!({"connected": true});
 			chat::create(profile_key, &user.profile).await?;
-			notification::create(NotificationType::LikeBack, profile_key, &user.profile).await?;
+			notification::create(
+				NotificationType::LikeBack,
+				profile_key,
+				&user.profile,
+				ws_srv,
+			)
+			.await?;
 		} else {
 			res = json!({"connected": false});
-			notification::create(NotificationType::Like, profile_key, &user.profile).await?;
+			notification::create(NotificationType::Like, profile_key, &user.profile, ws_srv)
+				.await?;
 		}
 		Ok(res)
 	}
 }
 
-pub async fn unlike(user: &User, profile_key: &str) -> Result<(), AppError> {
+pub async fn unlike(
+	user: &User,
+	profile_key: &str,
+	ws_srv: Addr<WsServer>,
+) -> Result<(), AppError> {
 	if let Some(like) = Like::find(&user.profile, profile_key).await? {
 		if Like::find(profile_key, &user.profile).await?.is_some() {
-			notification::create(NotificationType::Unlike, profile_key, &user.profile).await?;
+			chat::delete(&user.profile, profile_key).await?;
+			notification::create(NotificationType::Unlike, profile_key, &user.profile, ws_srv)
+				.await?;
 		}
 		like.delete().await?;
 		Ok(())

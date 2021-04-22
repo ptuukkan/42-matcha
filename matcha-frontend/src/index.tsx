@@ -8,9 +8,15 @@ import App from './app/layout/App';
 import { createBrowserHistory } from 'history';
 import dateFnsLocalizer from 'react-widgets-date-fns';
 import 'rc-slider/assets/index.css';
+import { Router } from 'react-router-dom';
 
 dateFnsLocalizer();
 
 export const history = createBrowserHistory();
 
-ReactDOM.render(<App />, document.getElementById('root'));
+ReactDOM.render(
+	<Router history={history}>
+		<App />
+	</Router>,
+	document.getElementById('root')
+);

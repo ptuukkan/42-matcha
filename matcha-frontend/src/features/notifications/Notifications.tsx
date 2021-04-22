@@ -10,11 +10,12 @@ const Notifications = () => {
 		notifications,
 		readNotifications,
 		clearNotifications,
+		unreadNotifications
 	} = rootStore.profileStore;
 
 	useEffect(() => {
 		setTimeout(() => {
-			readNotifications();
+			readNotifications(unreadNotifications);
 		}, 5000);
 	});
 

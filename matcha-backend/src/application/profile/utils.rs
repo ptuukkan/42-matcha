@@ -1,3 +1,5 @@
+use crate::application::profile::WsServer;
+use actix::Addr;
 use chrono::Utc;
 use crate::errors::AppError;
 use crate::models::block::Block;
@@ -9,8 +11,8 @@ use std::convert::TryFrom;
 use crate::application::notification;
 use crate::models::notification::NotificationType;
 
-pub async fn visit(from: &str, to: &str) -> Result<(), AppError> {
-	notification::create(NotificationType::Visit, to, from).await?;
+pub async fn visit(from: &str, to: &str, ws_srv: Addr<WsServer>) -> Result<(), AppError> {
+	notification::create(NotificationType::Visit, to, from, ws_srv).await?;
 	if Visit::find(from, to).await?.is_some() {
 		Ok(())
 	} else {

@@ -11,12 +11,12 @@ use std::time::Instant;
 async fn chat_route(
 	req: HttpRequest,
 	stream: web::Payload,
-	srv: web::Data<Addr<WsServer>>,
+	ws_srv: web::Data<Addr<WsServer>>,
 ) -> Result<HttpResponse, Error> {
 	ws::start(
 		WsSession {
 			hb: Instant::now(),
-			addr: srv.get_ref().clone(),
+			ws_srv: ws_srv.get_ref().clone(),
 			profile_key: None,
 		},
 		&req,

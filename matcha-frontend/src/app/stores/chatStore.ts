@@ -1,7 +1,7 @@
 import { makeAutoObservable, runInAction } from 'mobx';
-import { toast } from 'react-toastify';
 import agent from '../api/agent';
 import { IChat, IWsChatMessage, IWsOnlineMessage } from '../models/chat';
+import { INotification } from '../models/notification';
 import { RootStore } from './rootStore';
 
 export default class ChatStore {
@@ -26,8 +26,7 @@ export default class ChatStore {
 				this.sendMessage(JSON.stringify(m));
 			});
 			this.webSocket.addEventListener('message', (event) => {
-				console.log('Message from server ', event.data);
-				this.recieveMessage(event.data);
+				this.receiveMessage(event.data);
 			});
 		}
 	};
@@ -38,11 +37,16 @@ export default class ChatStore {
 		}
 	};
 
-	recieveMessage = (message: string) => {
-		let wsChatMessage: IWsChatMessage = JSON.parse(message);
-		this.pushChatMessage(wsChatMessage);
-		this.unreadMessages.push(wsChatMessage.chatId);
-		toast.info('You have new chat messages!');
+	receiveMessage = (message: string) => {
+		let obj: any = JSON.parse(message);
+		if (obj.messageType === 'ChatMessage') {
+			let wsChatMessage: IWsChatMessage = obj.message;
+			this.pushChatMessage(wsChatMessage);
+			this.unreadMessages.push(wsChatMessage.chatId);
+		} else if (obj.messageType === 'NotificationMessage') {
+			let notification: INotification = obj.message;
+			this.rootStore.profileStore.addNotification(notification);
+		}
 	};
 
 	loadChats = async () => {
