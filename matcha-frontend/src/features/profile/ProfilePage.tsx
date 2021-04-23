@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite';
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import {
 	Item,
 	Button,
@@ -17,7 +17,22 @@ import ProfileStatistics from './ProfileStatistics';
 const ProfilePage = () => {
 	const rootStore = useContext(RootStoreContext);
 	const { profile, updateProfile } = rootStore.profileStore;
+	const { completeProfile } = rootStore.userStore;
 	const { openModal, closeModal } = rootStore.modalStore;
+
+	useEffect(() => {
+		if (
+			profile!.biography &&
+			profile!.birthDate &&
+			profile!.gender &&
+			profile!.images.length > 0 &&
+			profile!.interests.length > 0 &&
+			profile!.sexualPreference
+		) {
+			completeProfile();
+		}
+		return () => {};
+	}, [profile, completeProfile]);
 
 	return (
 		<>

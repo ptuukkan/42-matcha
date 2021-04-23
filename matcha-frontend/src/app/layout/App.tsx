@@ -52,7 +52,10 @@ const App: React.FC<RouteComponentProps> = ({ location }) => {
 		<div
 			style={{ display: 'flex', minHeight: '100vh', flexDirection: 'column' }}
 		>
-			<Container className="main_container" style={{paddinTop: 90, paddingBottom: 90}}>
+			<Container
+				className="main_container"
+				style={{ paddinTop: 90, paddingBottom: 90 }}
+			>
 				<ToastContainer style={{ marginTop: '5%' }} position="top-right" />
 				<ModalContainer />
 				<SubModalContainer />
@@ -60,26 +63,53 @@ const App: React.FC<RouteComponentProps> = ({ location }) => {
 				<Switch>
 					<Route path="/verify/:link" component={EmailVerification} />
 					<Route path="/resetpassword/:link" component={ChangePassword} />
-					<Route exact path="/" component={user ? Browse : Landing} />
+					<Route
+						exact
+						path="/"
+						component={
+							user && !user.profileComplete
+								? ProfilePage
+								: user
+								? Browse
+								: Landing
+						}
+					/>
 					<Route
 						render={() => (
 							<Fragment>
 								<Switch>
-									<PrivateRoute path="/research" component={Research} />
+									<PrivateRoute
+										path="/research"
+										component={
+											user && user.profileComplete ? Research : ProfilePage
+										}
+									/>
 									<PrivateRoute
 										key={location.key}
 										path="/profile/:id"
-										component={ProfileVisit}
+										component={
+											user && user.profileComplete ? ProfileVisit : ProfilePage
+										}
 									/>
-									<PrivateRoute path="/research" component={Research} />
-									<PrivateRoute path="/matches" component={Matches} />
+									<PrivateRoute
+										path="/matches"
+										component={
+											user && user.profileComplete ? Matches : ProfilePage
+										}
+									/>
 									<PrivateRoute exact path="/profile" component={ProfilePage} />
 									<PrivateRoute
 										exact
 										path="/credentials"
 										component={ChangeCredentials}
 									/>
-									<PrivateRoute exact path="/chat" component={Chat} />
+									<PrivateRoute
+										exact
+										path="/chat"
+										component={
+											user && user.profileComplete ? Chat : ProfilePage
+										}
+									/>
 									<PrivateRoute component={NotFound} />
 								</Switch>
 							</Fragment>

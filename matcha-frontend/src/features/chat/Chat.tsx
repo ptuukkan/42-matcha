@@ -1,6 +1,14 @@
 import { observer } from 'mobx-react-lite';
 import React, { Fragment, useContext, useEffect, useState } from 'react';
-import { Dimmer, Loader, Menu, Tab, Image, Label } from 'semantic-ui-react';
+import {
+	Dimmer,
+	Loader,
+	Menu,
+	Tab,
+	Image,
+	Label,
+	Header,
+} from 'semantic-ui-react';
 import { RootStoreContext } from '../../app/stores/rootStore';
 import ChatPane from './ChatPane';
 
@@ -31,7 +39,13 @@ const Chat = () => {
 				/>
 				{chat.participant.firstName}
 				{unreadMessages.includes(chat.chatId) && (
-					<Label empty circular color="red" size="mini" style={{marginTop: 10}} />
+					<Label
+						empty
+						circular
+						color="red"
+						size="mini"
+						style={{ marginTop: 10 }}
+					/>
 				)}
 			</Menu.Item>
 		),
@@ -42,7 +56,9 @@ const Chat = () => {
 		),
 	}));
 
-	return (
+	return chats.length < 1 ? (
+		<Header>Get more chats with matches!</Header>
+	) : (
 		<Fragment>
 			<Tab
 				style={{ marginTop: 20 }}

@@ -1,6 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Container, Card, Image, Label, Button } from 'semantic-ui-react';
+import {
+	Container,
+	Card,
+	Image,
+	Label,
+	Button,
+	Header,
+} from 'semantic-ui-react';
 import agent from '../../app/api/agent';
 import { IPublicProfile } from '../../app/models/profile';
 
@@ -9,9 +16,11 @@ const Matches = () => {
 	useEffect(() => {
 		agent.Matches.list()
 			.then((p) => setProfiles(p))
-			.catch(e => console.log(e))
+			.catch((e) => console.log(e));
 	}, []);
-	return (
+	return profiles.length < 1 ? (
+		<Header>No matches :(</Header>
+	) : (
 		<Container>
 			<Card.Group itemsPerRow={2}>
 				{profiles!.sort().map((profile) => (

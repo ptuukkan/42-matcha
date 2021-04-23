@@ -32,6 +32,7 @@ export default class UserStore {
 			getUser: action,
 			stopLoading: action,
 			setToken: action,
+			completeProfile: action,
 		});
 	}
 
@@ -98,7 +99,7 @@ export default class UserStore {
 	getUser = async () => {
 		let location: ILocation = { latitude: 0, longitude: 0 };
 		try {
-			const geoLocation = await getPosition({timeout: 2000});
+			const geoLocation = await getPosition({ timeout: 2000 });
 			location.latitude = geoLocation.coords.latitude;
 			location.longitude = geoLocation.coords.longitude;
 		} catch (error) {
@@ -115,5 +116,9 @@ export default class UserStore {
 		} catch (error) {
 			console.log(error);
 		}
+	};
+
+	completeProfile = () => {
+		this.user!.profileComplete = true;
 	};
 }
