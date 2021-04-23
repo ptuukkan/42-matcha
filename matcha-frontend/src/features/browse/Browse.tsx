@@ -43,11 +43,9 @@ const Browse = () => {
 	if (loading) return <Loader active />;
 
 	return (
-		<Grid columns="1">
-			<Grid.Column>
-				<Button content="Filter / Sort" onClick={() => setVisible(!visible)} />
-			</Grid.Column>
-			<Grid.Column>
+		<Grid centered>
+			<Grid.Column width="10">
+			<Button content="Filter / Sort" onClick={() => setVisible(!visible)} />
 				<Sidebar.Pushable as={Segment}>
 					<Sidebar
 						as={Menu}
@@ -55,7 +53,6 @@ const Browse = () => {
 						onHide={() => setVisible(false)}
 						vertical
 						visible={visible}
-						width="wide"
 						style={{padding: 40}}
 					>
 						<BrowseListSorter profiles={profiles} setProfiles={setProfiles} />
