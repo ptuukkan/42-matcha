@@ -1,29 +1,15 @@
-use crate::database::cursor::CursorRequest;
-use crate::errors::{AppError, ValidationError};
-use crate::models::profile::Profile;
-use crate::models::user::RegisterFormValues;
-use crate::models::user::User;
 use crate::application::profile::location;
+use crate::errors::AppError;
+use crate::models::profile::Profile;
+use crate::models::user::{RegisterFormValues, User};
 use lettre::{SendableEmail, SendmailTransport, Transport};
 use lettre_email::EmailBuilder;
 use regex::Regex;
 use std::env;
 
 pub async fn register(values: RegisterFormValues) -> Result<(), AppError> {
+	values.validate().await?;
 	let mut user = User::from(&values);
-	let mut validation_error = ValidationError::empty();
-	if !User::find("emailAddress", &user.email_address)
-		.await?
-		.is_empty()
-	{
-		validation_error.add("emailAddress", "Email address is already in use");
-	}
-	if !User::find("username", &user.username).await?.is_empty() {
-		validation_error.add("username", "Username is already in use");
-	}
-	if !validation_error.errors.is_empty() {
-		return Err(AppError::ValidationError(validation_error));
-	}
 	let mut profile = Profile::from(&values);
 	profile.location = location::create().await?;
 	profile.create().await?;
@@ -34,7 +20,10 @@ pub async fn register(values: RegisterFormValues) -> Result<(), AppError> {
 	}
 	let re = Regex::new(r".*test\.com$").unwrap();
 	if re.is_match(&user.email_address) {
-		if let Some(mut user) = User::find("emailAddress", &values.email_address).await?.pop() {
+		if let Some(mut user) = User::find("emailAddress", &values.email_address)
+			.await?
+			.pop()
+		{
 			user.link = None;
 			user.update().await?;
 		}
@@ -73,23 +62,13 @@ pub fn send_verification_email(user: &User) -> Result<(), AppError> {
 }
 
 pub async fn verify(link: &str) -> Result<(), AppError> {
-	let mut result = CursorRequest::from(format!(
-		"FOR u IN users filter u.link == '{}' return u",
-		link
-	))
-	.send()
-	.await?
-	.extract_all::<User>()
-	.await?;
-	if result.is_empty() {
-		return Err(AppError::bad_request(
-			"Link is invalid or email address has already been validated",
-		));
-	}
-
-	if let Some(mut user) = result.pop() {
+	if let Some(mut user) = User::find("link", link).await?.pop() {
 		user.link = None;
-		user.update().await?
+		user.update().await?;
+		Ok(())
+	} else {
+		Err(AppError::bad_request(
+			"Link is invalid or email address has already been validated",
+		))
 	}
-	Ok(())
 }

@@ -115,6 +115,7 @@ export default class UserStore {
 			await this.rootStore.profileStore.getProfile();
 		} catch (error) {
 			console.log(error);
+			throw error;
 		}
 	};
 

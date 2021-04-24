@@ -1,15 +1,11 @@
-use crate::models::user::User;
-use crate::models::user::RegisterFormValues;
-use crate::models::user::CredentialChangeValues;
 use crate::application::profile::location;
-use actix_web_validator::Json;
-use crate::models::location::LocationDto;
 use crate::application::user;
-use crate::models::user::{
-	LoginFormValues, ResetFormValues, ResetPasswordValues,
-};
-use actix_web::{error::Error};
-use actix_web::{get, post, web, HttpResponse};
+use crate::application::user::password::{ResetFormValues, ResetPasswordValues};
+use crate::models::location::LocationDto;
+use crate::models::user::LoginFormValues;
+use crate::models::user::{RegisterFormValues, User};
+use actix_web::error::Error;
+use actix_web::{get, post, web, web::Json, web::Path, HttpResponse};
 
 #[post("/user/login")]
 async fn login(values: Json<LoginFormValues>) -> Result<HttpResponse, Error> {
@@ -24,9 +20,12 @@ async fn register(values: Json<RegisterFormValues>) -> Result<HttpResponse, Erro
 }
 
 #[post("/user/credentials")]
-async fn credentials(user: User, values: Json<CredentialChangeValues>) -> Result<HttpResponse, Error> {
-	user::credentials::change(user, values.into_inner()).await?;
-	Ok(HttpResponse::Created().finish())
+async fn credentials(
+	user: User,
+	values: Json<user::CredentialChangeValues>,
+) -> Result<HttpResponse, Error> {
+	user::change_credentials(user, values.into_inner()).await?;
+	Ok(HttpResponse::Ok().finish())
 }
 
 #[post("/user/password/reset")]
@@ -37,15 +36,15 @@ async fn reset(values: Json<ResetFormValues>) -> Result<HttpResponse, Error> {
 
 #[post("/user/password/reset/{reset_link}")]
 async fn reset_password(
-	web::Path(link): web::Path<String>,
+	Path(link): Path<String>,
 	values: Json<ResetPasswordValues>,
 ) -> Result<HttpResponse, Error> {
 	user::password::reset_password(&link, values.into_inner()).await?;
 	Ok(HttpResponse::Ok().finish())
 }
 
-#[get("/user/verify/{link}")] // <- define path parameters
-async fn verify(web::Path(link): web::Path<String>) -> Result<HttpResponse, Error> {
+#[get("/user/verify/{link}")]
+async fn verify(Path(link): Path<String>) -> Result<HttpResponse, Error> {
 	user::register::verify(&link).await?;
 	Ok(HttpResponse::Ok().finish())
 }

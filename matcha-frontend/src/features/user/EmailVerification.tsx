@@ -30,7 +30,7 @@ const EmailVerification = () => {
 		{status && message && (<Message positive content={message} />)}
 		{!status && message && (<Message negative content={message} />)}
 		</>
-		
+
 	)
 };
 

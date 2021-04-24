@@ -48,7 +48,20 @@ const validationSchema = {
 			alphabetic,
 		],
 		emailAddress: [Validators.required.validator, Validators.email.validator],
-		password: [Validators.required.validator, passwordComplexity],
+		password: [
+			Validators.required.validator,
+			passwordComplexity,
+			{
+				validator: Validators.minLength,
+				customArgs: { length: 8 },
+				message: 'Must be at least 8 characters.',
+			},
+			{
+				validator: Validators.maxLength,
+				customArgs: { length: 99 },
+				message: 'Must be less than 100 characters.',
+			},
+		],
 	},
 };
 

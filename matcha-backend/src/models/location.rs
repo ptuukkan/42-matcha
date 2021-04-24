@@ -47,7 +47,7 @@ impl Location {
 	}
 }
 
-#[derive(Serialize, Deserialize, Debug, Validate)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct LocationDto {
 	#[serde(deserialize_with = "de_coordinate")]
 	pub latitude: f32,

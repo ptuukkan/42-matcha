@@ -10,6 +10,7 @@ import { formValidation } from './RegisterValidation';
 const Register = () => {
 	const rootStore = useContext(RootStoreContext);
 	const { registerUser } = rootStore.userStore;
+	const { closeModal } = rootStore.modalStore;
 	const [successOpen, setSuccessOpen] = useState(true);
 
 	return (
@@ -67,7 +68,10 @@ const Register = () => {
 									primary
 									icon="check"
 									content="All Done"
-									onClick={() => setSuccessOpen(false)}
+									onClick={() => {
+										setSuccessOpen(false);
+										closeModal();
+									}}
 								/>
 							</Modal.Actions>
 						</Modal>

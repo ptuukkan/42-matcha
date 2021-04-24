@@ -1,5 +1,4 @@
 use crate::database::api;
-use crate::database::cursor::CursorRequest;
 use crate::errors::AppError;
 use serde::{Deserialize, Serialize};
 use std::env;
@@ -37,23 +36,6 @@ impl ChatConnection {
 			Err(AppError::internal("Edge creation failed"))
 		} else {
 			Ok(())
-		}
-	}
-
-	pub async fn find(from: &str, to: &str) -> Result<Option<Self>, AppError> {
-		let query = format!(
-			"FOR v, e IN 1..1 OUTBOUND 'profiles/{}' chatConnections FILTER e._to == 'chats/{}' RETURN e",
-			from, to
-		);
-		let mut edges = CursorRequest::from(query)
-			.send()
-			.await?
-			.extract_all::<Self>()
-			.await?;
-		if let Some(cc) = edges.pop() {
-			Ok(Some(cc))
-		} else {
-			Ok(None)
 		}
 	}
 }

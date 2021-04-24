@@ -1,17 +1,26 @@
 use crate::database::api;
 use crate::database::cursor::CursorRequest;
 use crate::errors::AppError;
+use crate::errors::ValidationError;
 use crate::infrastructure::security::jwt;
 use crate::models::base::CreateResponse;
 use crate::models::profile::Profile;
 use actix_web::{dev, FromRequest, HttpRequest};
-use actix_web_validator::Validate;
 use core::future::Future;
 use nanoid::nanoid;
+use regex::Regex;
 use serde::{Deserialize, Serialize};
 use sodiumoxide::crypto::pwhash::argon2id13;
 use std::env;
 use std::pin::Pin;
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct LoginResponse {
+	email_address: String,
+	pub token: String,
+	profile_complete: bool,
+}
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -24,57 +33,6 @@ pub struct User {
 	password: String,
 	pub link: Option<String>,
 	pub profile: String,
-}
-
-#[derive(Deserialize, Debug, Validate)]
-#[serde(rename_all = "camelCase")]
-pub struct RegisterFormValues {
-	#[validate(length(min = 2, max = 32))]
-	pub first_name: String,
-	#[validate(length(min = 2, max = 32))]
-	pub last_name: String,
-	#[validate(email)]
-	pub email_address: String,
-	#[validate(length(min = 2, max = 32))]
-	username: String,
-	#[validate(length(min = 6))]
-	password: String,
-}
-
-#[derive(Deserialize, Debug, Validate)]
-#[serde(rename_all = "camelCase")]
-pub struct CredentialChangeValues {
-	#[validate(email)]
-	pub email_address: String,
-	#[validate(length(min = 6))]
-	pub password: String,
-}
-
-#[derive(Deserialize, Debug, Validate)]
-#[serde(rename_all = "camelCase")]
-pub struct LoginFormValues {
-	pub email_address: String,
-	pub password: String,
-}
-
-#[derive(Deserialize, Debug, Validate)]
-#[serde(rename_all = "camelCase")]
-pub struct ResetFormValues {
-	pub email_address: String,
-}
-
-#[derive(Deserialize, Debug, Validate)]
-#[serde(rename_all = "camelCase")]
-pub struct ResetPasswordValues {
-	pub password: String,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-#[serde(rename_all = "camelCase")]
-pub struct LoginResponse {
-	email_address: String,
-	pub token: String,
-	profile_complete: bool,
 }
 
 impl User {
@@ -177,11 +135,6 @@ impl User {
 			_ => false,
 		}
 	}
-
-	// pub async fn get_profile(&self) -> Result<Profile, AppError> {
-	// 	let profile = Profile::get(&self.profile).await?;
-	// 	Ok(profile)
-	// }
 }
 
 impl From<&RegisterFormValues> for User {
@@ -216,5 +169,80 @@ impl FromRequest for User {
 			let user = user.unwrap();
 			Ok(user)
 		})
+	}
+}
+
+#[derive(Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct RegisterFormValues {
+	pub first_name: String,
+	pub last_name: String,
+	pub email_address: String,
+	username: String,
+	password: String,
+}
+
+impl RegisterFormValues {
+	pub async fn validate(&self) -> Result<(), AppError> {
+		let alphabetic = Regex::new(r"^[A-Za-zñÑáéíóúÁÉÍÓÚäÄöÖåÅ]+$").unwrap();
+		let email = Regex::new(r"^\S+@\S+\.\S+$").unwrap();
+		if self.first_name.len() < 2
+			|| self.first_name.len() > 32
+			|| !alphabetic.is_match(&self.first_name)
+		{
+			return Err(AppError::bad_request("invalid data"));
+		}
+		if self.last_name.len() < 2
+			|| self.last_name.len() > 32
+			|| !alphabetic.is_match(&self.last_name)
+		{
+			return Err(AppError::bad_request("invalid data"));
+		}
+		if self.username.len() < 2
+			|| self.username.len() > 32
+			|| !alphabetic.is_match(&self.username)
+		{
+			return Err(AppError::bad_request("invalid data"));
+		}
+		if !email.is_match(&self.email_address) {
+			return Err(AppError::bad_request("invalid data"));
+		}
+		if self.password.len() < 8 || self.password.len() > 99 {
+			return Err(AppError::bad_request("invalid data"));
+		}
+		let mut validation_error = ValidationError::empty();
+		if !User::find("emailAddress", &self.email_address)
+			.await?
+			.is_empty()
+		{
+			validation_error.add("emailAddress", "Email address is already in use");
+		}
+		if !User::find("username", &self.username).await?.is_empty() {
+			validation_error.add("username", "Username is already in use");
+		}
+		if !validation_error.errors.is_empty() {
+			return Err(AppError::ValidationError(validation_error));
+		}
+		Ok(())
+	}
+}
+
+#[derive(Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct LoginFormValues {
+	pub email_address: String,
+	pub password: String,
+}
+
+impl LoginFormValues {
+	pub fn validate(&self) -> Result<(), AppError> {
+		let email = Regex::new(r"^\S+@\S+\.\S+$").unwrap();
+		if !email.is_match(&self.email_address) {
+			return Err(AppError::bad_request("invalid data"));
+		}
+		if self.password.len() < 8 || self.password.len() > 99 {
+			return Err(AppError::bad_request("invalid data"));
+		}
+		Ok(())
 	}
 }
