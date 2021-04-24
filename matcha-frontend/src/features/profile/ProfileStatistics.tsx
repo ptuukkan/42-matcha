@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { Fragment, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { List, Image, Header } from 'semantic-ui-react';
 import { IProfileThumbnail } from '../../app/models/profile';
@@ -14,17 +14,28 @@ const ProfileStatistics: React.FC<IProps> = ({ profileThumbnails, title }) => {
 	const { closeModal } = rootStore.modalStore;
 
 	return (
-		<List selection verticalAlign="middle">
+		<Fragment>
 			<Header as="h2" content={title} color="pink" />
-			{profileThumbnails.map((p) => (
-				<List.Item key={p.id} as={Link} to={`/profile/${p.id}`} onClick={closeModal}>
-					<Image avatar src={p.image.url} />
-					<List.Content>
-						<List.Header>{p.firstName}</List.Header>
-					</List.Content>
-				</List.Item>
-			))}
-		</List>
+			<List
+				selection
+				verticalAlign="middle"
+				style={{ maxHeight: '50vh', overflow: 'auto' }}
+			>
+				{profileThumbnails.map((p) => (
+					<List.Item
+						key={p.id}
+						as={Link}
+						to={`/profile/${p.id}`}
+						onClick={closeModal}
+					>
+						<Image avatar src={p.image.url} />
+						<List.Content>
+							<List.Header>{p.firstName}</List.Header>
+						</List.Content>
+					</List.Item>
+				))}
+			</List>
+		</Fragment>
 	);
 };
 
