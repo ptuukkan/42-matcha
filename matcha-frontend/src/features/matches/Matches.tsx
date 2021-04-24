@@ -1,15 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import {
-	Container,
-	Card,
-	Image,
-	Label,
-	Button,
-	Grid,
-	Header,
-	Divider,
-} from 'semantic-ui-react';
+import { Container, Image, Button, Grid, Header } from 'semantic-ui-react';
 import agent from '../../app/api/agent';
 import { IPublicProfile } from '../../app/models/profile';
 
@@ -32,13 +23,17 @@ const Matches = () => {
 							as={Link}
 							to={`/profile/${profile.id}`}
 						>
-							<Label
-								color={profile.lastSeen !== 'online' ? 'grey' : 'pink'}
-								attached="top right"
-							>
-								{profile.lastSeen !== 'Offline' ? 'Offline' : 'Online'}
-							</Label>
-							<Image src={profile.images.find((i) => i.isMain)?.url} />
+							<Image
+								src={profile.images.find((i) => i.isMain)?.url}
+								label={{
+									color: profile.lastSeen !== 'online' ? 'grey' : 'pink',
+									attached: 'top right',
+									content:
+										profile.lastSeen !== 'online'
+											? `Last seen: ${profile.lastSeen}`
+											: 'Online',
+								}}
+							/>
 							<Header as="h5">
 								{profile.firstName} {profile.lastName}
 							</Header>

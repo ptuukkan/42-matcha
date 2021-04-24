@@ -5,7 +5,6 @@ import {
 	Segment,
 	Menu,
 	Header,
-	Card,
 	Grid,
 } from 'semantic-ui-react';
 import { IPublicProfile } from '../../app/models/profile';
