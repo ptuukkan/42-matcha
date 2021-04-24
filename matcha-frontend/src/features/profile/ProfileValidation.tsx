@@ -38,7 +38,14 @@ const validationSchema = {
 		],
 		birthDate: [Validators.required.validator],
 		interests: [interestValidator, arrayRequired.validator],
-		biography: [Validators.required.validator],
+		biography: [
+			Validators.required.validator,
+			{
+				validator: Validators.maxLength,
+				customArgs: { length: 255 },
+				message: 'Must be less than 256 characters.',
+			},
+		],
 		gender: [Validators.required.validator],
 		sexualPreference: [Validators.required.validator],
 		'location.latitude': [Validators.required.validator, latitudeValidator],

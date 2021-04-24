@@ -71,17 +71,6 @@ pub struct NotFoundError {
 }
 
 impl ValidationError {
-	// pub fn new(field: &str, error: &str) -> Self {
-	// 	let field_error = FieldError {
-	// 		field: field.to_owned(),
-	// 		error: error.to_owned()
-	// 	};
-	// 	Self {
-	// 		error_type: AppErrorType::ValidationError,
-	// 		errors: vec![field_error]
-	// 	}
-	// }
-
 	pub fn empty() -> Self {
 		Self {
 			error_type: AppErrorType::ValidationError,
@@ -294,4 +283,3 @@ impl From<chrono::ParseError> for AppError {
 		Self::InternalError(InternalError::from(from_error.to_string()))
 	}
 }
-

@@ -14,7 +14,6 @@ use crate::models::report::{Report, ReportFormValues};
 use crate::models::user::User;
 use crate::models::visit::Visit;
 use actix::Addr;
-use chrono::naive::NaiveDate;
 use serde_json::{json, Value};
 use std::convert::TryFrom;
 
@@ -46,6 +45,7 @@ pub async fn get_my(user: &User) -> Result<PrivateProfileDto, AppError> {
 }
 
 pub async fn update(user: &User, mut values: ProfileFormValues) -> Result<(), AppError> {
+	values.validate().await?;
 	let profile = Profile::get(&user.profile).await?;
 	if values.location_override.is_some() && values.location.is_some() {
 		let ol = values.location_override.unwrap();
@@ -60,19 +60,15 @@ pub async fn update(user: &User, mut values: ProfileFormValues) -> Result<(), Ap
 	if let Some(interests) = values.interests {
 		values.interests = interest::create(interests).await?;
 	}
-	if let Some(birth_date) = values.birth_date {
-		let split: Vec<&str> = birth_date.split('T').collect();
-		if NaiveDate::parse_from_str(split[0], "%Y-%m-%d").is_ok() {
-			values.birth_date = Some(split[0].to_owned());
-		} else {
-			return Err(AppError::bad_request("Birth date format incorrect"));
-		}
-	}
 	profile.update_from_form(&values).await?;
 	Ok(())
 }
 
-pub async fn get(user: &User, profile_key: &str, ws_srv: Addr<WsServer>) -> Result<PublicProfileDto, AppError> {
+pub async fn get(
+	user: &User,
+	profile_key: &str,
+	ws_srv: Addr<WsServer>,
+) -> Result<PublicProfileDto, AppError> {
 	let their_profile = ProfileWithDistance::get(&user.profile, profile_key).await?;
 	// if !profile.is_complete() {
 	// 	return Err(AppError::not_found("Profile not found"));
@@ -114,6 +110,7 @@ pub async fn report_profile(
 	their_profile_key: &str,
 	reason: ReportFormValues,
 ) -> Result<(), AppError> {
+	reason.validate()?;
 	if Report::find(&user.profile, their_profile_key)
 		.await?
 		.is_some()

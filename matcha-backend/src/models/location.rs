@@ -1,13 +1,12 @@
 use crate::database::api;
 use crate::errors::AppError;
 use crate::models::base::CreateResponse;
-use actix_web_validator::Validate;
 use serde::Deserializer;
 use serde::{de, Deserialize, Serialize};
 use serde_json::Value;
 use std::env;
 
-#[derive(Serialize, Deserialize, Debug, Validate)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Location {
 	#[serde(skip_serializing)]
 	#[serde(rename = "_key")]
@@ -53,6 +52,18 @@ pub struct LocationDto {
 	pub latitude: f32,
 	#[serde(deserialize_with = "de_coordinate")]
 	pub longitude: f32,
+}
+
+impl LocationDto {
+	pub fn validate(&self) -> Result<(), AppError> {
+		if self.latitude < -90.0 || self.latitude > 90.0 {
+			return Err(AppError::bad_request("invalid data"));
+		}
+		if self.longitude < -180.0 || self.longitude > 180.0 {
+			return Err(AppError::bad_request("invalid data"));
+		}
+		Ok(())
+	}
 }
 
 fn de_coordinate<'de, D: Deserializer<'de>>(deserializer: D) -> Result<f32, D::Error> {

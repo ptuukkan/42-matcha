@@ -10,7 +10,7 @@ pub async fn create(user: User, mut parts: awmp::Parts) -> Result<ImageDto, AppE
 	if let Some(image_file) = parts.files.take("image").pop() {
 		let mut profile = Profile::get(&user.profile).await?;
 		if profile.images.len() > 4 {
-			return Err(AppError::bad_request("Only five images allowerd"));
+			return Err(AppError::bad_request("Only five images allowed"));
 		}
 		let mut image = Image::new();
 		if profile.images.is_empty() {

@@ -5,12 +5,11 @@ use crate::errors::AppError;
 use crate::models::base::CreateResponse;
 use crate::models::profile::ProfileSlice;
 use crate::models::profile::ProfileThumbnail;
-use actix_web_validator::Validate;
 use serde::{Deserialize, Serialize};
 use std::convert::TryFrom;
 use std::env;
 
-#[derive(Serialize, Deserialize, Debug, Validate)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Chat {
 	#[serde(skip_serializing)]
 	#[serde(rename = "_key")]
@@ -26,7 +25,7 @@ pub struct ChatDto {
 	pub chat_id: String,
 }
 
-#[derive(Serialize, Deserialize, Debug, Validate)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Message {
 	pub timestamp: i64,
 	pub from: String,

@@ -1,4 +1,4 @@
-import { action, makeObservable, observable, runInAction } from 'mobx';
+import { makeAutoObservable, runInAction } from 'mobx';
 import agent from '../api/agent';
 import {
 	ICredentialFormValues,
@@ -21,19 +21,7 @@ export default class UserStore {
 
 	constructor(rootStore: RootStore) {
 		this.rootStore = rootStore;
-		makeObservable(this, {
-			token: observable,
-			loading: observable,
-			user: observable,
-			registerUser: action,
-			changeCredentials: action,
-			loginUser: action,
-			logoutUser: action,
-			getUser: action,
-			stopLoading: action,
-			setToken: action,
-			completeProfile: action,
-		});
+		makeAutoObservable(this);
 	}
 
 	stopLoading = () => {

@@ -16,11 +16,6 @@ pub struct Report {
 	reason: String,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct ReportFormValues {
-	reason: String,
-}
-
 impl Report {
 	fn url() -> Result<String, AppError> {
 		let db_url: String = env::var("DB_URL")?;
@@ -62,5 +57,19 @@ impl Report {
 		} else {
 			Ok(None)
 		}
+	}
+}
+
+#[derive(Debug, Deserialize)]
+pub struct ReportFormValues {
+	reason: String,
+}
+
+impl ReportFormValues {
+	pub fn validate(&self) -> Result<(), AppError> {
+		if self.reason.len() > 255 {
+			return Err(AppError::bad_request("invalid data"));
+		}
+		Ok(())
 	}
 }

@@ -11,6 +11,7 @@ pub async fn create() -> Result<String, AppError> {
 }
 
 pub async fn update(user: &User, location_input: LocationDto) -> Result<(), AppError> {
+	location_input.validate()?;
 	let profile = Profile::get(&user.profile).await?;
 	if profile.location_override {
 		return Ok(())

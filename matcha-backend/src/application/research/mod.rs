@@ -2,10 +2,10 @@ use crate::application::profile;
 use crate::errors::AppError;
 use crate::models::profile::{Profile, ProfileWithDistance, PublicProfileDto};
 use crate::models::user::User;
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize};
 use std::convert::TryFrom;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ResearchFormValues {
 	age: Vec<u8>,

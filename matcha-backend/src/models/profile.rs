@@ -1,14 +1,16 @@
 use crate::database::api;
 use crate::database::cursor::CursorRequest;
 use crate::errors::AppError;
+use crate::errors::ValidationError;
 use crate::models::base::CreateResponse;
 use crate::models::image::{Image, ImageDto};
 use crate::models::location::Location;
 use crate::models::location::LocationDto;
 use crate::models::user::RegisterFormValues;
-
+use crate::models::user::User;
 use chrono::{naive::NaiveDate, DateTime, Datelike, Utc};
 use chrono_humanize::{Accuracy, HumanTime, Tense};
+use regex::Regex;
 use serde::{Deserialize, Serialize};
 use serde_with_macros::skip_serializing_none;
 use std::convert::TryFrom;
@@ -44,21 +46,6 @@ pub enum SexualPreference {
 	Male,
 	Female,
 	Both,
-}
-
-#[skip_serializing_none]
-#[derive(Serialize, Deserialize, Debug)]
-#[serde(rename_all = "camelCase")]
-pub struct ProfileFormValues {
-	first_name: Option<String>,
-	last_name: Option<String>,
-	pub birth_date: Option<String>,
-	gender: Option<Gender>,
-	pub location_override: Option<bool>,
-	pub location: Option<LocationDto>,
-	sexual_preference: Option<SexualPreference>,
-	biography: Option<String>,
-	pub interests: Option<Vec<String>>,
 }
 
 impl Profile {
@@ -165,6 +152,74 @@ impl From<&RegisterFormValues> for Profile {
 			images: vec![],
 			last_seen: String::from("Never"),
 		}
+	}
+}
+
+#[skip_serializing_none]
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct ProfileFormValues {
+	first_name: Option<String>,
+	last_name: Option<String>,
+	username: Option<String>,
+	pub birth_date: Option<String>,
+	gender: Option<Gender>,
+	pub location_override: Option<bool>,
+	pub location: Option<LocationDto>,
+	sexual_preference: Option<SexualPreference>,
+	biography: Option<String>,
+	pub interests: Option<Vec<String>>,
+}
+
+impl ProfileFormValues {
+	pub async fn validate(&mut self) -> Result<(), AppError> {
+		let alphabetic = Regex::new(r"^[A-Za-zñÑáéíóúÁÉÍÓÚäÄöÖåÅ]+$").unwrap();
+		let valid_interest = Regex::new(r"^[a-z0-9-_:.]+$").unwrap();
+		if let Some(first_name) = &self.first_name {
+			if first_name.len() < 2 || first_name.len() > 32 || !alphabetic.is_match(first_name) {
+				return Err(AppError::bad_request("invalid data"));
+			}
+		}
+		if let Some(last_name) = &self.last_name {
+			if last_name.len() < 2 || last_name.len() > 32 || !alphabetic.is_match(last_name) {
+				return Err(AppError::bad_request("invalid data"));
+			}
+		}
+		if let Some(username) = &self.username {
+			if username.len() < 2 || username.len() > 32 || !alphabetic.is_match(username) {
+				return Err(AppError::bad_request("invalid data"));
+			}
+			let mut validation_error = ValidationError::empty();
+			if !User::find("username", username).await?.is_empty() {
+				validation_error.add("username", "Username is already in use");
+				return Err(AppError::ValidationError(validation_error));
+			}
+		}
+		if let Some(birth_date) = &self.birth_date {
+			let split: Vec<&str> = birth_date.split('T').collect();
+			if NaiveDate::parse_from_str(split[0], "%Y-%m-%d").is_ok() {
+				self.birth_date = Some(split[0].to_owned());
+			} else {
+				return Err(AppError::bad_request("invalid data"));
+			}
+		}
+		if let Some(location) = &self.location {
+			location.validate()?;
+		}
+		if let Some(biography) = &self.biography {
+			if biography.len() > 255 {
+				return Err(AppError::bad_request("invalid data"));
+			}
+		}
+		if let Some(interests) = &self.interests {
+			for interest in interests {
+				if !valid_interest.is_match(interest) {
+					return Err(AppError::bad_request("invalid data"));
+				}
+			}
+		}
+
+		Ok(())
 	}
 }
 

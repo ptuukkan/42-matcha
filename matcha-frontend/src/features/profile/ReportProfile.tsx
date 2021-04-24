@@ -14,7 +14,14 @@ interface IProps {
 
 const validationSchema = {
 	field: {
-		reason: [Validators.required.validator],
+		reason: [
+			Validators.required.validator,
+			{
+				validator: Validators.maxLength,
+				customArgs: { length: 255 },
+				message: 'Must be less than 256 characters.',
+			},
+		],
 	},
 };
 
