@@ -6,7 +6,9 @@ import {
 	Image,
 	Label,
 	Button,
+	Grid,
 	Header,
+	Divider,
 } from 'semantic-ui-react';
 import agent from '../../app/api/agent';
 import { IPublicProfile } from '../../app/models/profile';
@@ -22,36 +24,40 @@ const Matches = () => {
 		<Header>No matches :(</Header>
 	) : (
 		<Container>
-			<Card.Group itemsPerRow={2}>
-				{profiles!.sort().map((profile) => (
-					<Card key={profile.id} as={Link} to={`/profile/${profile.id}`}>
-						<Label color={profile.fameRating > 5 ? 'grey' : 'pink'} floating>
-							{profile.fameRating > 5 ? 'Offline' : 'Online'}
-						</Label>
-						<Image
-							src={profile.images.find((i) => i.isMain)?.url}
-							wrapped
-							ui={false}
-						/>
-						<Card.Content>
-							<Card.Header as="h5">
+			<Grid stackable divided="vertically">
+				<Grid.Row divided columns="3">
+					{profiles!.sort().map((profile) => (
+						<Grid.Column
+							key={profile.id}
+							as={Link}
+							to={`/profile/${profile.id}`}
+						>
+							<Label
+								color={profile.lastSeen !== 'online' ? 'grey' : 'pink'}
+								attached="top right"
+							>
+								{profile.lastSeen !== 'Offline' ? 'Offline' : 'Online'}
+							</Label>
+							<Image src={profile.images.find((i) => i.isMain)?.url} />
+							<Header as="h5">
 								{profile.firstName} {profile.lastName}
-							</Card.Header>
+							</Header>
 							Distance: {profile.distance} km
-						</Card.Content>
-						{profile.fameRating < 5 && (
-							<Button
-								color="pink"
-								icon="heart"
-								size="huge"
-								content="Start Chat"
-								as={Link}
-								to={'/chat'}
-							/>
-						)}
-					</Card>
-				))}
-			</Card.Group>
+							{profile.lastSeen === 'online' && (
+								<Button
+									color="pink"
+									icon="heart"
+									size="big"
+									content="Start Chat"
+									as={Link}
+									to={'/chat'}
+									fluid
+								/>
+							)}
+						</Grid.Column>
+					))}
+				</Grid.Row>
+			</Grid>
 		</Container>
 	);
 };
