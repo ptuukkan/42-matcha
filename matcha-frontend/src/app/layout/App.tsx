@@ -29,7 +29,6 @@ const App: React.FC<RouteComponentProps> = ({ location }) => {
 	const [appLoaded, setAppLoaded] = useState(false);
 	const rootStore = useContext(RootStoreContext);
 	const { token, getUser, logoutUser, user } = rootStore.userStore;
-	const { profile } = rootStore.profileStore;
 
 	useEffect(() => {
 		document.title = 'Matcha';

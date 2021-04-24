@@ -5,7 +5,7 @@ import {
 	Segment,
 	Menu,
 	Header,
-	Card,
+	Grid,
 } from 'semantic-ui-react';
 import { IPublicProfile } from '../../app/models/profile';
 import BrowseListFilter from '../browse/BrowseListFilter';
@@ -76,10 +76,8 @@ const ResearchList: React.FC<IProps> = ({
 
 				<Sidebar.Pusher>
 					<Segment style={{ minHeight: 750 }} basic>
-						<Card.Group itemsPerRow={4}>
-							{/* {profiles.map((profile, i) => (
-								<ResearchListItem profile={profile} key={i} />
-							))} */}
+						<Grid stackable divided='vertically'>
+							<Grid.Row columns="3">
 							{profiles
 								.filter(
 									(p) =>
@@ -93,9 +91,11 @@ const ResearchList: React.FC<IProps> = ({
 										p.mutualInterests <= mutualInterests[1]
 								)
 								.map((profile, i) => (
-									<ResearchListItem profile={profile} key={i} />
+									
+										<ResearchListItem profile={profile} key={i} />
 								))}
-						</Card.Group>
+								</Grid.Row>
+						</Grid>
 					</Segment>
 				</Sidebar.Pusher>
 			</Sidebar.Pushable>
