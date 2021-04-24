@@ -9,6 +9,9 @@ use crate::models::user::User;
 
 pub async fn list(user: &User) -> Result<Vec<PublicProfileDto>, AppError> {
 	let my_profile = Profile::get(&user.profile).await?;
+	if !my_profile.is_complete() {
+		return Err(AppError::unauthorized("unauthorized"));
+	}
 	let profiles: Vec<ProfileWithDistance> = ProfileWithDistance::get_all(&my_profile.key)
 		.await?
 		.into_iter()
@@ -25,7 +28,8 @@ pub async fn list(user: &User) -> Result<Vec<PublicProfileDto>, AppError> {
 }
 
 fn filter_profile(my_profile: &Profile, their_profile: &Profile) -> bool {
-	sexually_compatible(my_profile, their_profile)
+	their_profile.is_complete()
+		&& sexually_compatible(my_profile, their_profile)
 		&& sexually_compatible(their_profile, my_profile)
 		&& my_profile.key != their_profile.key
 }

@@ -2,7 +2,7 @@ use crate::application::profile;
 use crate::errors::AppError;
 use crate::models::profile::{Profile, ProfileWithDistance, PublicProfileDto};
 use crate::models::user::User;
-use serde::{Deserialize};
+use serde::Deserialize;
 use std::convert::TryFrom;
 
 #[derive(Debug, Deserialize)]
@@ -43,13 +43,21 @@ impl TryFrom<ResearchFormValues> for ResearchParams {
 	}
 }
 
-pub async fn list(user: &User, params: ResearchFormValues) -> Result<Vec<PublicProfileDto>, AppError> {
+pub async fn list(
+	user: &User,
+	params: ResearchFormValues,
+) -> Result<Vec<PublicProfileDto>, AppError> {
 	let my_profile = Profile::get(&user.profile).await?;
+	if !my_profile.is_complete() {
+		return Err(AppError::unauthorized("unauthorized"));
+	}
 	let profiles: Vec<ProfileWithDistance> = ProfileWithDistance::get_all(&my_profile.key).await?;
 	let mut profile_dtos: Vec<PublicProfileDto> = vec![];
 	for p in profiles {
-		let pdto = profile::utils::load_profile_dto(&my_profile, p).await?;
-		profile_dtos.push(pdto);
+		if p.profile.is_complete() {
+			let pdto = profile::utils::load_profile_dto(&my_profile, p).await?;
+			profile_dtos.push(pdto);
+		}
 	}
 	let params = ResearchParams::try_from(params)?;
 	let profile_dtos = profile_dtos

@@ -72,12 +72,12 @@ export default class UserStore {
 	loginUser = async (data: ILoginFormValues) => {
 		try {
 			const user = await agent.User.login(data);
+			this.setToken(user.token);
+			this.rootStore.modalStore.closeModal();
+			await this.rootStore.profileStore.getProfile();
 			runInAction(() => {
 				this.user = user;
 			});
-			this.setToken(user.token);
-			await this.rootStore.profileStore.getProfile();
-			this.rootStore.modalStore.closeModal();
 			history.push('/');
 		} catch (error) {
 			return { [FORM_ERROR]: error.message };
@@ -97,10 +97,10 @@ export default class UserStore {
 		}
 		try {
 			const user = await agent.User.current(location);
+			await this.rootStore.profileStore.getProfile();
 			runInAction(() => {
 				this.user = user;
 			});
-			await this.rootStore.profileStore.getProfile();
 		} catch (error) {
 			console.log(error);
 			throw error;

@@ -69,21 +69,26 @@ pub async fn get(
 	profile_key: &str,
 	ws_srv: Addr<WsServer>,
 ) -> Result<PublicProfileDto, AppError> {
+	let my_profile = Profile::get(&user.profile).await?;
+	if !my_profile.is_complete() {
+		return Err(AppError::unauthorized("unauthorized"));
+	}
 	let their_profile = ProfileWithDistance::get(&user.profile, profile_key).await?;
-	// if !profile.is_complete() {
-	// 	return Err(AppError::not_found("Profile not found"));
-	// }
+	if !their_profile.profile.is_complete() {
+		return Err(AppError::not_found("Profile not found"));
+	}
 	if user.profile != their_profile.profile.key {
 		utils::visit(&user.profile, profile_key, ws_srv).await?;
 	}
-
-	let my_profile = Profile::get(&user.profile).await?;
-
 	let profile_dto = utils::load_profile_dto(&my_profile, their_profile).await?;
 	Ok(profile_dto)
 }
 
 pub async fn block_profile(user: &User, their_profile_key: &str) -> Result<(), AppError> {
+	let my_profile = Profile::get(&user.profile).await?;
+	if !my_profile.is_complete() {
+		return Err(AppError::unauthorized("unauthorized"));
+	}
 	if Block::find(&user.profile, their_profile_key)
 		.await?
 		.is_some()
@@ -97,6 +102,10 @@ pub async fn block_profile(user: &User, their_profile_key: &str) -> Result<(), A
 }
 
 pub async fn unblock_profile(user: &User, their_profile_key: &str) -> Result<(), AppError> {
+	let my_profile = Profile::get(&user.profile).await?;
+	if !my_profile.is_complete() {
+		return Err(AppError::unauthorized("unauthorized"));
+	}
 	if let Some(block) = Block::find(&user.profile, their_profile_key).await? {
 		block.delete().await?;
 		Ok(())
@@ -111,6 +120,10 @@ pub async fn report_profile(
 	reason: ReportFormValues,
 ) -> Result<(), AppError> {
 	reason.validate()?;
+	let my_profile = Profile::get(&user.profile).await?;
+	if !my_profile.is_complete() {
+		return Err(AppError::unauthorized("unauthorized"));
+	}
 	if Report::find(&user.profile, their_profile_key)
 		.await?
 		.is_some()
@@ -128,6 +141,10 @@ pub async fn like(
 	profile_key: &str,
 	ws_srv: Addr<WsServer>,
 ) -> Result<Value, AppError> {
+	let my_profile = Profile::get(&user.profile).await?;
+	if !my_profile.is_complete() {
+		return Err(AppError::unauthorized("unauthorized"));
+	}
 	if Like::find(&user.profile, profile_key).await?.is_some() {
 		Err(AppError::bad_request("Already liked this profile"))
 	} else {
@@ -158,6 +175,10 @@ pub async fn unlike(
 	profile_key: &str,
 	ws_srv: Addr<WsServer>,
 ) -> Result<(), AppError> {
+	let my_profile = Profile::get(&user.profile).await?;
+	if !my_profile.is_complete() {
+		return Err(AppError::unauthorized("unauthorized"));
+	}
 	if let Some(like) = Like::find(&user.profile, profile_key).await? {
 		if Like::find(profile_key, &user.profile).await?.is_some() {
 			chat::delete(&user.profile, profile_key).await?;

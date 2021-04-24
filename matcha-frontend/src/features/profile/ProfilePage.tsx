@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite';
-import { useContext, useEffect } from 'react';
+import { Fragment, useContext, useEffect } from 'react';
 import {
 	Item,
 	Button,
@@ -22,12 +22,13 @@ const ProfilePage = () => {
 
 	useEffect(() => {
 		if (
-			profile!.biography &&
-			profile!.birthDate &&
-			profile!.gender &&
-			profile!.images.length > 0 &&
-			profile!.interests.length > 0 &&
-			profile!.sexualPreference
+			profile &&
+			profile.biography &&
+			profile.birthDate &&
+			profile.gender &&
+			profile.images.length > 0 &&
+			profile.interests.length > 0 &&
+			profile.sexualPreference
 		) {
 			completeProfile();
 		}
@@ -35,27 +36,27 @@ const ProfilePage = () => {
 	}, [profile, completeProfile]);
 
 	return (
-		<>
+		<Fragment>
 			<Item.Group divided>
 				<Item>
 					<Item.Image
 						size="small"
 						rounded
 						src={
-							profile?.images.length === 0
+							profile!.images.length === 0
 								? '/placeholder_gradient.png'
-								: profile?.images
+								: profile!.images
 										.filter((image) => image.isMain)
 										.map((im) => im.url)
 						}
 					/>
 					<Item.Content>
 						<Item.Header>
-							{profile?.firstName} {profile?.lastName}
+							{profile!.firstName} {profile!.lastName}
 						</Item.Header>
 						<Item.Meta>
-							<Item>Gender: {profile?.gender}</Item>
-							<Item>Sexual Preference: {profile?.sexualPreference}</Item>
+							<Item>Gender: {profile!.gender}</Item>
+							<Item>Sexual Preference: {profile!.sexualPreference}</Item>
 						</Item.Meta>
 						<Item.Description>
 							<Header sub color="pink">
@@ -139,7 +140,7 @@ const ProfilePage = () => {
 					floated="right"
 					size="tiny"
 					content="Edit credentials"
-					onClick={() => openModal(<ChangeCredentials />, 'large')}
+					onClick={() => openModal(<ChangeCredentials />)}
 				/>
 				{profile!.images.length > 1 && (
 					<Item>
@@ -151,7 +152,7 @@ const ProfilePage = () => {
 					</Item>
 				)}
 			</Item.Group>
-		</>
+		</Fragment>
 	);
 };
 

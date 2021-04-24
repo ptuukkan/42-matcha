@@ -21,7 +21,6 @@ import ModalContainer from '../common/modals/ModalContainer';
 import PrivateRoute from './PrivateRoute';
 import SubModalContainer from '../common/modals/SubModalContainer';
 import ProfileVisit from '../../features/profile/ProfileVisit';
-import ChangeCredentials from '../../features/user/ChangeCredentials';
 import Browse from '../../features/browse/Browse';
 import Research from '../../features/research/Research';
 import Matches from '../../features/matches/Matches';
@@ -30,8 +29,10 @@ const App: React.FC<RouteComponentProps> = ({ location }) => {
 	const [appLoaded, setAppLoaded] = useState(false);
 	const rootStore = useContext(RootStoreContext);
 	const { token, getUser, logoutUser, user } = rootStore.userStore;
+	const { profile } = rootStore.profileStore;
 
 	useEffect(() => {
+		document.title = 'Matcha';
 		if (token) {
 			getUser()
 				.catch(() => logoutUser())
@@ -98,11 +99,6 @@ const App: React.FC<RouteComponentProps> = ({ location }) => {
 										}
 									/>
 									<PrivateRoute exact path="/profile" component={ProfilePage} />
-									<PrivateRoute
-										exact
-										path="/credentials"
-										component={ChangeCredentials}
-									/>
 									<PrivateRoute
 										exact
 										path="/chat"
