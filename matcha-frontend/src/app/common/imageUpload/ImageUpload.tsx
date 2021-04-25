@@ -20,7 +20,7 @@ const ImageUpload: React.FC<IProps> = ({ setAddImageMode, addImage }) => {
 
 	return (
 		<Fragment>
-			<Grid>
+			<Grid stackable>
 				<Grid.Column width={4}>
 					<Header sub color="pink" content="Step 1 - Add image" />
 					<ImageDropzone setFiles={setFiles} />

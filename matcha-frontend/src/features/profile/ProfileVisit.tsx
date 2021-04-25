@@ -5,6 +5,7 @@ import agent from '../../app/api/agent';
 import NotFound from '../../app/layout/NotFound';
 import { IPublicProfile } from '../../app/models/profile';
 import BlockProfile from './BlockProfile';
+import ProfileImagesDisplay from './ProfileImagesDisplay';
 import ProfileVisitInterests from './ProfileVisitInterests';
 import ProfileVisitLikeButton from './ProfileVisitLikeButton';
 import ReportProfile from './ReportProfile';
@@ -90,15 +91,7 @@ const ProfileVisit = () => {
 				<ProfileVisitLikeButton profile={profile!} setProfile={setProfile} />
 				<BlockProfile id={profile.id} blocked={profile.blocked} />
 				<ReportProfile id={profile.id} />
-				{profile!.images.length > 1 && (
-					<Item>
-						{profile!.images
-							.filter((img) => !img.isMain)
-							.map((image, i) => (
-								<Item.Image key={i} size="small" rounded src={image.url} />
-							))}
-					</Item>
-				)}
+				<ProfileImagesDisplay images={profile!.images} />
 			</Item.Group>
 		</Fragment>
 	);

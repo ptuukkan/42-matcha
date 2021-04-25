@@ -1,7 +1,6 @@
 export interface IUser {
 	emailAddress: string;
 	token: string;
-	profileComplete: boolean
 }
 
 

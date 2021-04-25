@@ -1,57 +1,27 @@
-import { observer } from 'mobx-react-lite';
-import React from 'react';
-
-import { Image, Button, Card, Grid } from 'semantic-ui-react';
-import { IProfile } from '../../app/models/profile';
+import React, { Fragment } from 'react';
+import { Card, Grid, Image } from 'semantic-ui-react';
+import { IImage } from '../../app/models/profile';
 
 interface IProps {
-	profile: IProfile;
-	removeImage: (id: string) => void;
-	setMain: (id: string) => void;
+	images: IImage[];
 }
 
-const ProfileImagesDisplay: React.FC<IProps> = ({
-	profile,
-	removeImage,
-	setMain,
-}) => {
+const ProfileImagesDisplay: React.FC<IProps> = ({ images }) => {
+	if (images.length < 2) return <Fragment />;
+
 	return (
-		<Grid.Column width={16}>
-			<Grid.Row columns={6}>
-				<Card.Group itemsPerRow={5}>
-					{profile.images.map((image) => (
-						<Card key={image.id}>
-							<Image
-								size="tiny"
-								verticalAlign="middle"
-								src={image.url}
-								wrapped
-								ui={false}
-							/>
-							<Button.Group fluid widths={2}>
-								<Button
-									type="button"
-									onClick={() => setMain(image.id)}
-									disabled={image.isMain}
-									basic
-									positive
-									content="Main"
-								/>
-								<Button
-									type="button"
-									onClick={() => removeImage(image.id)}
-									disabled={image.isMain}
-									basic
-									negative
-									icon="trash"
-								/>
-							</Button.Group>
+		<Grid columns={5} stackable style={{ marginTop: 50 }}>
+			{images
+				.filter((img) => !img.isMain)
+				.map((image) => (
+					<Grid.Column key={image.id}>
+						<Card>
+							<Image src={image.url} />
 						</Card>
-					))}
-				</Card.Group>
-			</Grid.Row>
-		</Grid.Column>
+					</Grid.Column>
+				))}
+		</Grid>
 	);
 };
 
-export default observer(ProfileImagesDisplay);
+export default ProfileImagesDisplay;

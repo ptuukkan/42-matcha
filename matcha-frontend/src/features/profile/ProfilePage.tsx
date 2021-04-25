@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite';
-import { Fragment, useContext, useEffect } from 'react';
+import { Fragment, useContext } from 'react';
 import {
 	Item,
 	Button,
@@ -12,28 +12,13 @@ import {
 import { RootStoreContext } from '../../app/stores/rootStore';
 import ChangeCredentials from '../user/ChangeCredentials';
 import ProfileForm from './ProfileForm';
+import ProfileImagesDisplay from './ProfileImagesDisplay';
 import ProfileStatistics from './ProfileStatistics';
 
 const ProfilePage = () => {
 	const rootStore = useContext(RootStoreContext);
 	const { profile, updateProfile } = rootStore.profileStore;
-	const { completeProfile } = rootStore.userStore;
 	const { openModal, closeModal } = rootStore.modalStore;
-
-	useEffect(() => {
-		if (
-			profile &&
-			profile.biography &&
-			profile.birthDate &&
-			profile.gender &&
-			profile.images.length > 0 &&
-			profile.interests.length > 0 &&
-			profile.sexualPreference
-		) {
-			completeProfile();
-		}
-		return () => {};
-	}, [profile, completeProfile]);
 
 	return (
 		<Fragment>
@@ -142,15 +127,7 @@ const ProfilePage = () => {
 					content="Edit credentials"
 					onClick={() => openModal(<ChangeCredentials />)}
 				/>
-				{profile!.images.length > 1 && (
-					<Item>
-						{profile!.images
-							.filter((img) => !img.isMain)
-							.map((image, i) => (
-								<Item.Image key={i} size="small" rounded src={image.url} />
-							))}
-					</Item>
-				)}
+				<ProfileImagesDisplay images={profile!.images} />
 			</Item.Group>
 		</Fragment>
 	);

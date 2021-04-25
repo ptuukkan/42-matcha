@@ -10,6 +10,7 @@ import {
 	stringToSexPref,
 } from '../models/profile';
 import { RootStore } from './rootStore';
+import { history } from '../..';
 
 export default class ProfileStore {
 	rootStore: RootStore;
@@ -29,10 +30,29 @@ export default class ProfileStore {
 				this.profile = profile;
 			});
 			this.rootStore.chatStore.joinChat();
+			if (!this.isCompleted) {
+				history.push('/profile');
+			}
 		} catch (error) {
 			console.log(error);
 		}
 	};
+
+	get isCompleted() {
+		if (
+			this.profile &&
+			this.profile.biography &&
+			this.profile.birthDate &&
+			this.profile.gender &&
+			this.profile.images.length > 0 &&
+			this.profile.interests.length > 0 &&
+			this.profile.sexualPreference
+		) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 
 	updateProfile = async (data: IProfileFormValues): Promise<void | any> => {
 		try {

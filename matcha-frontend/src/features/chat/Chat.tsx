@@ -1,21 +1,15 @@
-import { observer } from 'mobx-react-lite';
-import React, { Fragment, useContext, useEffect, useState } from 'react';
-import {
-	Dimmer,
-	Loader,
-	Menu,
-	Tab,
-	Image,
-	Label,
-	Header,
-} from 'semantic-ui-react';
+import { useContext, useEffect, useState } from 'react';
+import { Dimmer, Header, Loader } from 'semantic-ui-react';
+import { AppMedia } from '../../app/layout/AppMedia';
 import { RootStoreContext } from '../../app/stores/rootStore';
-import ChatPane from './ChatPane';
+import ComputerChat from './ComputerChat';
+import MobileChat from './MobileChat';
 
 const Chat = () => {
+	const { Media, MediaContextProvider } = AppMedia;
 	const [loading, setLoading] = useState(false);
 	const rootStore = useContext(RootStoreContext);
-	const { loadChats, chats, unreadMessages } = rootStore.chatStore;
+	const { loadChats, chats } = rootStore.chatStore;
 
 	useEffect(() => {
 		setLoading(true);
@@ -29,45 +23,18 @@ const Chat = () => {
 			</Dimmer>
 		);
 
-	const panes = chats.map((chat, i) => ({
-		menuItem: (
-			<Menu.Item key={i}>
-				<Image
-					avatar
-					src={chat.participant.image.url}
-					style={{ marginRight: 10 }}
-				/>
-				{chat.participant.firstName}
-				{unreadMessages.includes(chat.chatId) && (
-					<Label
-						empty
-						circular
-						color="red"
-						size="mini"
-						style={{ marginTop: 10 }}
-					/>
-				)}
-			</Menu.Item>
-		),
-		render: () => (
-			<div>
-				<ChatPane chat={chat} />
-			</div>
-		),
-	}));
+	if (chats.length === 0) return <Header>Get more chats with matches!</Header>;
 
-	return chats.length < 1 ? (
-		<Header>Get more chats with matches!</Header>
-	) : (
-		<Fragment>
-			<Tab
-				style={{ marginTop: 20 }}
-				menu={{ fluid: true, vertical: true }}
-				menuPosition="left"
-				panes={panes}
-			/>
-		</Fragment>
+	return (
+		<MediaContextProvider>
+			<Media at="xs">
+				<MobileChat chats={chats} />
+			</Media>
+			<Media greaterThanOrEqual="sm">
+				<ComputerChat chats={chats} />
+			</Media>
+		</MediaContextProvider>
 	);
 };
 
-export default observer(Chat);
+export default Chat;

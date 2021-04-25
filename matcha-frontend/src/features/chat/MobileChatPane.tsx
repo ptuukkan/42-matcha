@@ -1,30 +1,26 @@
+import format from 'date-fns/format';
 import { observer } from 'mobx-react-lite';
-import React, { useContext, useEffect, useRef, useState } from 'react';
-import {
-	Tab,
-	Image,
-	GridRow,
-	Input,
-	Container,
-	Divider,
-	Message,
-	Ref,
-	Header,
-} from 'semantic-ui-react';
+import React, {
+	Fragment,
+	useContext,
+	useEffect,
+	useRef,
+	useState,
+} from 'react';
+import { Ref, Container, Message, Input } from 'semantic-ui-react';
 import { IChat, IWsChatMessage } from '../../app/models/chat';
 import { RootStoreContext } from '../../app/stores/rootStore';
-import format from 'date-fns/format';
-import { Link } from 'react-router-dom';
 
 interface IProps {
 	chat: IChat;
 }
 
-const ChatPane: React.FC<IProps> = ({ chat }) => {
+const MobileChatPane: React.FC<IProps> = ({ chat }) => {
 	const rootStore = useContext(RootStoreContext);
-	const [message, setMessage] = useState('');
 	const { sendChatMessage, unreadMessages, readMessages } = rootStore.chatStore;
 	const { profile } = rootStore.profileStore;
+	const [message, setMessage] = useState('');
+	const [error, setError] = useState(false);
 	const messageContainer = useRef<HTMLDivElement>(null);
 
 	const send = () => {
@@ -51,18 +47,7 @@ const ChatPane: React.FC<IProps> = ({ chat }) => {
 	});
 
 	return (
-		<Tab.Pane>
-			<GridRow>
-				<Image
-					avatar
-					src={chat.participant.image.url}
-					style={{ marginRight: 10 }}
-				/>
-				<Header as={Link} to={`/profile/${chat.participant.id}`}>
-					{chat.participant.firstName}
-				</Header>
-			</GridRow>
-			<Divider />
+		<Fragment>
 			<Ref innerRef={messageContainer}>
 				<Container
 					style={{
@@ -73,12 +58,15 @@ const ChatPane: React.FC<IProps> = ({ chat }) => {
 				>
 					{chat.messages.map((m, i) =>
 						m.from !== chat.participant.id ? (
-							<Message key={i} style={{ textAlign: 'right' }}>
+							<Message
+								key={i}
+								style={{ textAlign: 'right', wordWrap: 'break-word' }}
+							>
 								<Message.Header>{format(m.timestamp, 'HH:mm')}</Message.Header>
 								<Message.Content>{m.message}</Message.Content>
 							</Message>
 						) : (
-							<Message key={i}>
+							<Message key={i} style={{ wordWrap: 'break-word' }}>
 								<Message.Header>{format(m.timestamp, 'HH:mm')}</Message.Header>
 								<Message.Content>{m.message}</Message.Content>
 							</Message>
@@ -87,21 +75,30 @@ const ChatPane: React.FC<IProps> = ({ chat }) => {
 				</Container>
 			</Ref>
 			<Input
+				error={error}
 				style={{ padding: 10 }}
 				value={message}
 				action={{
 					color: 'pink',
 					icon: 'send',
 					content: 'Send',
-					disabled: message === '',
+					disabled: message === '' || error,
 					onClick: () => send(),
 				}}
-				onChange={(event) => setMessage(event.target.value)}
+				onChange={(event) => {
+					if (event.target.value.length > 255) {
+						setError(true);
+					} else if (error) {
+						setError(false);
+					}
+					setMessage(event.target.value);
+				}}
 				placeholder="Message..."
 				fluid
 			/>
-		</Tab.Pane>
+			{error && <Message error content="Message too long" />}
+		</Fragment>
 	);
 };
 
-export default observer(ChatPane);
+export default observer(MobileChatPane);

@@ -1,9 +1,10 @@
-import { Fragment, useContext, useEffect, useState } from 'react';
+import React, { Fragment, useContext, useEffect, useState } from 'react';
 import {
 	Switch,
 	Route,
 	RouteComponentProps,
 	withRouter,
+	Redirect,
 } from 'react-router-dom';
 import Navigation from '../../features/nav/Navigation';
 import { Container, Dimmer, Loader } from 'semantic-ui-react';
@@ -63,48 +64,22 @@ const App: React.FC<RouteComponentProps> = ({ location }) => {
 				<Switch>
 					<Route path="/verify/:link" component={EmailVerification} />
 					<Route path="/resetpassword/:link" component={ChangePassword} />
-					<Route
-						exact
-						path="/"
-						component={
-							user && !user.profileComplete
-								? ProfilePage
-								: user
-								? Browse
-								: Landing
-						}
-					/>
+					<Route exact path="/" component={user ? Browse : Landing} />
 					<Route
 						render={() => (
 							<Fragment>
 								<Switch>
-									<PrivateRoute
-										path="/research"
-										component={
-											user && user.profileComplete ? Research : ProfilePage
-										}
-									/>
+									<PrivateRoute path="/research" component={Research} />
 									<PrivateRoute
 										key={location.key}
 										path="/profile/:id"
-										component={
-											user && user.profileComplete ? ProfileVisit : ProfilePage
-										}
+										component={ProfileVisit}
 									/>
-									<PrivateRoute
-										path="/matches"
-										component={
-											user && user.profileComplete ? Matches : ProfilePage
-										}
-									/>
-									<PrivateRoute exact path="/profile" component={ProfilePage} />
-									<PrivateRoute
-										exact
-										path="/chat"
-										component={
-											user && user.profileComplete ? Chat : ProfilePage
-										}
-									/>
+									<PrivateRoute path="/matches" component={Matches} />
+									<Route exact path="/profile">
+										{user ? <ProfilePage /> : <Redirect to={'/'} />}
+									</Route>
+									<PrivateRoute exact path="/chat" component={Chat} />
 									<PrivateRoute component={NotFound} />
 								</Switch>
 							</Fragment>

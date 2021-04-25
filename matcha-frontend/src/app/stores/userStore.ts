@@ -106,8 +106,4 @@ export default class UserStore {
 			throw error;
 		}
 	};
-
-	completeProfile = () => {
-		this.user!.profileComplete = true;
-	};
 }

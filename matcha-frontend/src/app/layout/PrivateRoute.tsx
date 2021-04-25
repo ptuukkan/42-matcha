@@ -14,13 +14,22 @@ interface IProps extends RouteProps {
 
 const PrivateRoute: React.FC<IProps> = ({ component: Component, ...rest }) => {
 	const rootStore = useContext(RootStoreContext);
+	const { isCompleted } = rootStore.profileStore;
 	const { user } = rootStore.userStore;
 
 	return (
 		<Route
 			{...rest}
-			render={(props) =>
-				user ? <Component {...props} /> : <Redirect to={'/'} />
+			render={
+				(props) => {
+					if (user && !isCompleted) {
+						return <Redirect to={'/profile'} />;
+					} else if (isCompleted) {
+						return <Component {...props} />;
+					} else {
+						return <Redirect to={'/'} />;
+					}
+				}
 			}
 		/>
 	);

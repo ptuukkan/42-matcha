@@ -1,29 +1,41 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Container, Image, Button, Grid, Header } from 'semantic-ui-react';
+import {
+	Container,
+	Image,
+	Button,
+	Grid,
+	Header,
+	Loader,
+} from 'semantic-ui-react';
 import agent from '../../app/api/agent';
 import { IPublicProfile } from '../../app/models/profile';
 
 const Matches = () => {
 	const [profiles, setProfiles] = useState<IPublicProfile[]>([]);
+	const [loading, setLoading] = useState(true);
+
 	useEffect(() => {
+		setLoading(true);
 		agent.Matches.list()
 			.then((p) => setProfiles(p))
-			.catch((e) => console.log(e));
+			.catch((e) => console.log(e))
+			.finally(() => setLoading(false));
 	}, []);
-	return profiles.length < 1 ? (
-		<Header>No matches :(</Header>
-	) : (
+
+	if (loading) return <Loader active />;
+
+	if (profiles.length === 0) return <Header>No matches :(</Header>;
+
+	return (
 		<Container>
 			<Grid stackable divided="vertically">
 				<Grid.Row divided columns="3">
 					{profiles!.sort().map((profile) => (
-						<Grid.Column
-							key={profile.id}
-							as={Link}
-							to={`/profile/${profile.id}`}
-						>
+						<Grid.Column key={profile.id}>
 							<Image
+								as={Link}
+								to={`/profile/${profile.id}`}
 								src={profile.images.find((i) => i.isMain)?.url}
 								label={{
 									color: profile.lastSeen !== 'online' ? 'grey' : 'pink',

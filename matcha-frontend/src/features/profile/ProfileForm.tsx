@@ -1,5 +1,12 @@
 import { Form as FinalForm, Field } from 'react-final-form';
-import { Form, Button, Divider, Header, Loader, Dimmer } from 'semantic-ui-react';
+import {
+	Form,
+	Button,
+	Divider,
+	Header,
+	Loader,
+	Dimmer,
+} from 'semantic-ui-react';
 import agent from '../../app/api/agent';
 import TextInput from '../../app/common/form/TextInput';
 import React, { useEffect, useState } from 'react';
@@ -9,7 +16,7 @@ import { observer } from 'mobx-react-lite';
 import { formValidation } from './ProfileValidation';
 import { IInterestOption } from '../../app/models/interest';
 import ErrorMessage from '../../app/common/form/ErrorMessage';
-import ProfileImages from './ProfileImages';
+import ProfileFormImages from './ProfileFormImages';
 import {
 	IPrivateProfile,
 	IProfileFormValues,
@@ -58,8 +65,7 @@ const ProfileForm: React.FC<IProps> = ({
 		if (interests.length === 0) {
 			setInterestsLoading(true);
 			agent.Interests.get()
-				.then((interests) => {setInterests(interests)
-				console.log(interests)})
+				.then((interests) => setInterests(interests))
 				.catch((error) => console.log(error))
 				.finally(() => setInterestsLoading(false));
 		}
@@ -158,7 +164,7 @@ const ProfileForm: React.FC<IProps> = ({
 							</Form.Group>
 						</Condition>
 						<Divider />
-						<ProfileImages />
+						<ProfileFormImages />
 						<Divider />
 						{submitError && !dirtySinceLastSubmit && (
 							<ErrorMessage message={submitError} />

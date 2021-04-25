@@ -1,10 +1,10 @@
 import React, { Fragment, useContext, useState } from 'react';
 import { Button, Grid, Header } from 'semantic-ui-react';
 import { RootStoreContext } from '../../app/stores/rootStore';
-import ProfileImagesDisplay from './ProfileImagesDisplay';
+import ProfileFormImagesDisplay from './ProfileFormImagesDisplay';
 import ImageUpload from '../../app/common/imageUpload/ImageUpload';
 
-const ProfileImages = () => {
+const ProfileFormImages = () => {
 	const [addImageMode, setAddImageMode] = useState(false);
 	const rootStore = useContext(RootStoreContext);
 	const {
@@ -37,7 +37,7 @@ const ProfileImages = () => {
 					addImage={addImage}
 				/>
 			) : (
-				<ProfileImagesDisplay
+				<ProfileFormImagesDisplay
 					removeImage={removeImage}
 					setMain={setMain}
 					profile={profile!}
@@ -47,4 +47,4 @@ const ProfileImages = () => {
 	);
 };
 
-export default ProfileImages;
+export default ProfileFormImages;

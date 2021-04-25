@@ -44,7 +44,7 @@ const Browse = () => {
 
 	return (
 		<Grid centered>
-			<Grid.Column width="10">
+			<Grid.Column computer="10" tablet="10" mobile="16">
 			<Button content="Filter / Sort" onClick={() => setVisible(!visible)} />
 				<Sidebar.Pushable as={Segment}>
 					<Sidebar

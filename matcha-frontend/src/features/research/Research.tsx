@@ -56,7 +56,7 @@ const Research = () => {
 	return (
 		<Grid centered>
 			{searchMode ? (
-				<Grid.Column width={4}>
+				<Grid.Column computer={4} mobile={16} tablet={8}>
 						<ResearchForm interests={interests} loadProfiles={loadProfiles} searchParams={searchParams} />
 				</Grid.Column>
 			) : (

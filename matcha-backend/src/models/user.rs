@@ -4,7 +4,6 @@ use crate::errors::AppError;
 use crate::errors::ValidationError;
 use crate::infrastructure::security::jwt;
 use crate::models::base::CreateResponse;
-use crate::models::profile::Profile;
 use actix_web::{dev, FromRequest, HttpRequest};
 use core::future::Future;
 use nanoid::nanoid;
@@ -19,7 +18,6 @@ use std::pin::Pin;
 pub struct LoginResponse {
 	email_address: String,
 	pub token: String,
-	profile_complete: bool,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -62,11 +60,9 @@ impl User {
 	}
 
 	pub async fn login_response(&self, token: &str) -> Result<LoginResponse, AppError> {
-		let profile = Profile::get(&self.profile).await?;
 		Ok(LoginResponse {
 			email_address: self.email_address.to_owned(),
 			token: token.to_owned(),
-			profile_complete: profile.is_complete(),
 		})
 	}
 
