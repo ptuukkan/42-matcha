@@ -1,17 +1,13 @@
 import { observer } from 'mobx-react-lite';
-import React, { useContext } from 'react';
+import React, { Fragment, useContext } from 'react';
 import { Menu, Tab, Image, Label } from 'semantic-ui-react';
 import { IChat } from '../../app/models/chat';
 import { RootStoreContext } from '../../app/stores/rootStore';
 import ComputerChatPane from './ComputerChatPane';
 
-interface IProps {
-	chats: IChat[];
-}
-
-const ComputerChat: React.FC<IProps> = ({ chats }) => {
+const ComputerChat = () => {
 	const rootStore = useContext(RootStoreContext);
-	const { unreadMessages } = rootStore.chatStore;
+	const { chats } = rootStore.chatStore;
 
 	const panes = chats.map((chat, i) => ({
 		menuItem: (
@@ -22,7 +18,7 @@ const ComputerChat: React.FC<IProps> = ({ chats }) => {
 					style={{ marginRight: 10 }}
 				/>
 				{chat.participant.firstName}
-				{unreadMessages.includes(chat.chatId) && (
+				{chat.unread && (
 					<Label
 						empty
 						circular
@@ -34,9 +30,9 @@ const ComputerChat: React.FC<IProps> = ({ chats }) => {
 			</Menu.Item>
 		),
 		render: () => (
-			<div>
+			<Fragment>
 				<ComputerChatPane chat={chat} />
-			</div>
+			</Fragment>
 		),
 	}));
 

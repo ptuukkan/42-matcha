@@ -4,7 +4,7 @@ import { List } from 'semantic-ui-react';
 import { RootStoreContext } from '../../app/stores/rootStore';
 import NotificationsList from './NotificationsList';
 
-const Notifications = () => {
+const MobileNotifications = () => {
 	const rootStore = useContext(RootStoreContext);
 	const {
 		notifications,
@@ -24,7 +24,7 @@ const Notifications = () => {
 			divided
 			verticalAlign="middle"
 			relaxed
-			style={{ maxHeight: '50vh', overflow: 'auto', minWidth: 300 }}
+			style={{ maxHeight: '70vh', overflow: 'auto', minWidth: 300 }}
 		>
 			{notifications.length > 0 ? (
 				<NotificationsList
@@ -40,4 +40,4 @@ const Notifications = () => {
 	);
 };
 
-export default observer(Notifications);
+export default observer(MobileNotifications);

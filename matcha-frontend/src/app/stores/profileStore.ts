@@ -30,6 +30,7 @@ export default class ProfileStore {
 				this.profile = profile;
 			});
 			this.rootStore.chatStore.joinChat();
+			await this.rootStore.chatStore.loadChats();
 			if (!this.isCompleted) {
 				history.push('/profile');
 			}

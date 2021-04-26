@@ -42,6 +42,9 @@ export default class ChatStore {
 		if (obj.messageType === 'ChatMessage') {
 			let wsChatMessage: IWsChatMessage = obj.message;
 			this.pushChatMessage(wsChatMessage);
+			this.chats = this.chats.map((chat) =>
+				chat.chatId === wsChatMessage.chatId ? { ...chat, unread: true } : chat
+			);
 			this.unreadMessages.push(wsChatMessage.chatId);
 		} else if (obj.messageType === 'NotificationMessage') {
 			let notification: INotification = obj.message;
@@ -94,5 +97,20 @@ export default class ChatStore {
 
 	readMessages = (chatId: string) => {
 		this.unreadMessages = this.unreadMessages.filter((x) => x !== chatId);
+	};
+
+	get unreadChats() {
+		return this.chats.filter((chat) => chat.unread);
+	}
+
+	readChat = async (chatId: string) => {
+		this.chats = this.chats.map((chat) =>
+			chat.chatId === chatId ? { ...chat, unread: false } : chat
+		);
+		try {
+			await agent.Chat.read(chatId);
+		} catch (error) {
+			console.log(error);
+		}
 	};
 }

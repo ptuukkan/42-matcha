@@ -7,7 +7,7 @@ import React, {
 	useRef,
 	useState,
 } from 'react';
-import { Ref, Container, Message, Input } from 'semantic-ui-react';
+import { Ref, Container, Message, Input, Dimmer, Loader } from 'semantic-ui-react';
 import { IChat, IWsChatMessage } from '../../app/models/chat';
 import { RootStoreContext } from '../../app/stores/rootStore';
 
@@ -17,7 +17,7 @@ interface IProps {
 
 const MobileChatPane: React.FC<IProps> = ({ chat }) => {
 	const rootStore = useContext(RootStoreContext);
-	const { sendChatMessage, unreadMessages, readMessages } = rootStore.chatStore;
+	const { sendChatMessage, readChat } = rootStore.chatStore;
 	const { profile } = rootStore.profileStore;
 	const [message, setMessage] = useState('');
 	const [error, setError] = useState(false);
@@ -36,15 +36,15 @@ const MobileChatPane: React.FC<IProps> = ({ chat }) => {
 	};
 
 	useEffect(() => {
-		if (unreadMessages.includes(chat.chatId)) {
-			readMessages(chat.chatId);
-		}
 		if (messageContainer.current) {
 			messageContainer.current.scrollTo({
 				top: messageContainer.current.scrollHeight,
 			});
 		}
-	});
+		if (chat.unread) {
+			readChat(chat.chatId);
+		}
+	}, [chat.unread, chat.chatId, readChat]);
 
 	return (
 		<Fragment>

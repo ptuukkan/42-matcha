@@ -13,7 +13,7 @@ interface IProps {
 const MobileMenu: React.FC<IProps> = ({ logoutUser }) => {
 	const rootStore = useContext(RootStoreContext);
 	const { unreadNotificationsCount } = rootStore.profileStore;
-	const { unreadMessages } = rootStore.chatStore;
+	const { unreadChats } = rootStore.chatStore;
 	const [menuOpen, setMenuOpen] = useState(false);
 
 	return (
@@ -22,13 +22,13 @@ const MobileMenu: React.FC<IProps> = ({ logoutUser }) => {
 				<Popup
 					trigger={
 						<Menu.Item>
-							{unreadMessages.length + unreadNotificationsCount > 0 && (
+							{unreadChats.length + unreadNotificationsCount > 0 && (
 								<Label
 									circular
 									color="red"
 									size="mini"
 									className="notificationBall"
-									content={unreadMessages.length + unreadNotificationsCount}
+									content={unreadChats.length + unreadNotificationsCount}
 								/>
 							)}
 							<Icon name="bars" size="massive" />
@@ -84,41 +84,34 @@ const MobileMenu: React.FC<IProps> = ({ logoutUser }) => {
 									style={{ marginRight: 0, marginLeft: 5 }}
 								/>
 							</span>
-							{unreadMessages.length > 0 && (
+							{unreadChats.length > 0 && (
 								<Label
 									circular
 									color="red"
 									size="mini"
-									content={unreadMessages.length}
+									content={unreadChats.length}
 								/>
 							)}
 						</Menu.Item>
-						<Popup
-							trigger={
-								<Menu.Item name="notifications">
-									Notifications
-									<span style={{ float: 'right' }}>
-										<Icon
-											name="bell"
-											style={{ marginRight: 0, marginLeft: 5 }}
-										/>
-									</span>
-									{unreadNotificationsCount > 0 && (
-										<Label
-											circular
-											color="red"
-											size="mini"
-											content={unreadNotificationsCount}
-										/>
-									)}
-								</Menu.Item>
-							}
-							position="bottom right"
-							on="click"
-							pinned
+						<Menu.Item
+							name="notifications"
+							as={Link}
+							to="/notifications"
+							onClick={() => setMenuOpen(false)}
 						>
-							<Notifications />
-						</Popup>
+							Notifications
+							<span style={{ float: 'right' }}>
+								<Icon name="bell" style={{ marginRight: 0, marginLeft: 5 }} />
+							</span>
+							{unreadNotificationsCount > 0 && (
+								<Label
+									circular
+									color="red"
+									size="mini"
+									content={unreadNotificationsCount}
+								/>
+							)}
+						</Menu.Item>
 					</Menu>
 				</Popup>
 

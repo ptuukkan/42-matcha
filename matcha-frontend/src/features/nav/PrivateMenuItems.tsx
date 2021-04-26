@@ -12,7 +12,7 @@ interface IProps {
 const PrivateMenuItems: React.FC<IProps> = ({ logoutUser }) => {
 	const rootStore = useContext(RootStoreContext);
 	const { unreadNotificationsCount } = rootStore.profileStore;
-	const { unreadMessages } = rootStore.chatStore;
+	const { unreadChats } = rootStore.chatStore;
 
 	return (
 		<Fragment>
@@ -30,13 +30,13 @@ const PrivateMenuItems: React.FC<IProps> = ({ logoutUser }) => {
 					My Profile
 				</Menu.Item>
 				<Menu.Item as={Link} to="/chat" name="chat">
-					{unreadMessages.length > 0 && (
+					{unreadChats.length > 0 && (
 						<Label
 							circular
 							color="red"
 							size="mini"
 							className="notificationBall"
-							content={unreadMessages.length}
+							content={unreadChats.length}
 						/>
 					)}
 					<Icon name="comments" />

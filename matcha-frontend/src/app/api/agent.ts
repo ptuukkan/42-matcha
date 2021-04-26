@@ -74,6 +74,7 @@ const requests = {
 
 const Chat = {
 	getAll: (): Promise<IChat[]> => requests.get('/chat'),
+	read: (chatId: string): Promise<void> => requests.get(`/chat/${chatId}`),
 };
 
 const User = {
@@ -140,7 +141,7 @@ const Notification = {
 	read: (notifications: string[]): Promise<void> =>
 		requests.post('/notification', notifications),
 	clear: (notifications: string[]): Promise<void> =>
-	requests.post('/notification/clear', notifications),
+		requests.post('/notification/clear', notifications),
 };
 
 const agent = {

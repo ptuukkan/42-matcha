@@ -23,6 +23,7 @@ pub struct ChatDto {
 	pub participant: ProfileThumbnail,
 	pub messages: Vec<Message>,
 	pub chat_id: String,
+	pub unread: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug)]

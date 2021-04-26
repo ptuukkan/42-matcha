@@ -1,9 +1,9 @@
+use crate::application::chat;
 use crate::chat::client::WsSession;
 use crate::chat::server::WsServer;
 use crate::models::user::User;
-use crate::application::chat;
 use actix::*;
-use actix_web::{get, web, Error, HttpRequest, HttpResponse};
+use actix_web::{get, web, Error, HttpRequest, HttpResponse, web::Path};
 use actix_web_actors::ws;
 use std::time::Instant;
 
@@ -25,14 +25,17 @@ async fn chat_route(
 }
 
 #[get("/chat")]
-async fn get_all(
-	user: User
-) -> Result<HttpResponse, Error> {
+async fn get_all(user: User) -> Result<HttpResponse, Error> {
 	let chats = chat::get_all(user).await?;
 	Ok(HttpResponse::Ok().json(chats))
 }
 
+#[get("/chat/{id}")]
+async fn read(user: User, Path(id): Path<String>) -> Result<HttpResponse, Error> {
+	chat::read(user, id).await?;
+	Ok(HttpResponse::Ok().finish())
+}
+
 pub fn routes(config: &mut web::ServiceConfig) {
-	config.service(chat_route)
-	.service(get_all);
+	config.service(chat_route).service(get_all).service(read);
 }

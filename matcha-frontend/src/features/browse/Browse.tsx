@@ -45,7 +45,7 @@ const Browse = () => {
 	return (
 		<Grid centered>
 			<Grid.Column computer="10" tablet="10" mobile="16">
-			<Button content="Filter / Sort" onClick={() => setVisible(!visible)} />
+				<Button content="Filter / Sort" onClick={() => setVisible(!visible)} />
 				<Sidebar.Pushable as={Segment}>
 					<Sidebar
 						as={Menu}
@@ -53,7 +53,7 @@ const Browse = () => {
 						onHide={() => setVisible(false)}
 						vertical
 						visible={visible}
-						style={{padding: 40}}
+						style={{ padding: 40 }}
 					>
 						<BrowseListSorter profiles={profiles} setProfiles={setProfiles} />
 						<BrowseListFilter

@@ -5,21 +5,17 @@ import { IChat } from '../../app/models/chat';
 import { RootStoreContext } from '../../app/stores/rootStore';
 import MobileChatPane from './MobileChatPane';
 
-interface IProps {
-	chats: IChat[];
-}
-
-const MobileChat: React.FC<IProps> = ({ chats }) => {
-	const [selectedChat, setSelectedChat] = useState(chats[0]);
+const MobileChat = () => {
 	const rootStore = useContext(RootStoreContext);
-	const { unreadMessages } = rootStore.chatStore;
+	const { chats } = rootStore.chatStore;
+	const [selectedChat, setSelectedChat] = useState(chats[0]);
 
 	const chatOptions = chats.map((chat) => ({
 		key: chat.chatId,
 		text: chat.participant.firstName,
 		value: chat.chatId,
 		image: { avatar: true, src: chat.participant.image.url },
-		label: unreadMessages.includes(chat.chatId) && {
+		label: chat.unread && {
 			color: 'red',
 			empty: true,
 			circular: true,

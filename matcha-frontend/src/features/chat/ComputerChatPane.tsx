@@ -23,11 +23,10 @@ interface IProps {
 const ComputerChatPane: React.FC<IProps> = ({ chat }) => {
 	const rootStore = useContext(RootStoreContext);
 	const [message, setMessage] = useState('');
-	const { sendChatMessage, unreadMessages, readMessages } = rootStore.chatStore;
+	const { sendChatMessage, readChat } = rootStore.chatStore;
 	const { profile } = rootStore.profileStore;
 	const messageContainer = useRef<HTMLDivElement>(null);
 	const [error, setError] = useState(false);
-
 	const send = () => {
 		const wsMessage: IWsChatMessage = {
 			chatId: chat.chatId,
@@ -41,15 +40,15 @@ const ComputerChatPane: React.FC<IProps> = ({ chat }) => {
 	};
 
 	useEffect(() => {
-		if (unreadMessages.includes(chat.chatId)) {
-			readMessages(chat.chatId);
-		}
 		if (messageContainer.current) {
 			messageContainer.current.scrollTo({
 				top: messageContainer.current.scrollHeight,
 			});
 		}
-	});
+		if (chat.unread) {
+			readChat(chat.chatId);
+		}
+	}, [chat.unread, chat.chatId, readChat]);
 
 	return (
 		<Tab.Pane>
@@ -74,12 +73,15 @@ const ComputerChatPane: React.FC<IProps> = ({ chat }) => {
 				>
 					{chat.messages.map((m, i) =>
 						m.from !== chat.participant.id ? (
-							<Message key={i} style={{ textAlign: 'right', wordWrap: "break-word" }}>
+							<Message
+								key={i}
+								style={{ textAlign: 'right', wordWrap: 'break-word' }}
+							>
 								<Message.Header>{format(m.timestamp, 'HH:mm')}</Message.Header>
 								<Message.Content>{m.message}</Message.Content>
 							</Message>
 						) : (
-							<Message key={i} style={{ wordWrap: "break-word" }}>
+							<Message key={i} style={{ wordWrap: 'break-word' }}>
 								<Message.Header>{format(m.timestamp, 'HH:mm')}</Message.Header>
 								<Message.Content>{m.message}</Message.Content>
 							</Message>
@@ -102,9 +104,9 @@ const ComputerChatPane: React.FC<IProps> = ({ chat }) => {
 					if (event.target.value.length > 255) {
 						setError(true);
 					} else if (error) {
-						setError(false)
+						setError(false);
 					}
-					setMessage(event.target.value)
+					setMessage(event.target.value);
 				}}
 				placeholder="Message..."
 				fluid

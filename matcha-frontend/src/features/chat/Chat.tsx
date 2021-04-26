@@ -7,14 +7,13 @@ import MobileChat from './MobileChat';
 
 const Chat = () => {
 	const { Media, MediaContextProvider } = AppMedia;
-	const [loading, setLoading] = useState(false);
+	const [loading, setLoading] = useState(true);
 	const rootStore = useContext(RootStoreContext);
 	const { loadChats, chats } = rootStore.chatStore;
 
 	useEffect(() => {
-		setLoading(true);
 		loadChats().finally(() => setLoading(false));
-	}, [loadChats]);
+	});
 
 	if (loading)
 		return (
@@ -28,10 +27,10 @@ const Chat = () => {
 	return (
 		<MediaContextProvider>
 			<Media at="xs">
-				<MobileChat chats={chats} />
+				<MobileChat />
 			</Media>
 			<Media greaterThanOrEqual="sm">
-				<ComputerChat chats={chats} />
+				<ComputerChat />
 			</Media>
 		</MediaContextProvider>
 	);

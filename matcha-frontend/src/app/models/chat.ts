@@ -4,6 +4,7 @@ export interface IChat {
 	chatId: string,
 	messages: IMessage[];
 	participant: IProfileThumbnail;
+	unread: boolean;
 }
 
 export interface IMessage {

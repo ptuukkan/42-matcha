@@ -25,6 +25,7 @@ import ProfileVisit from '../../features/profile/ProfileVisit';
 import Browse from '../../features/browse/Browse';
 import Research from '../../features/research/Research';
 import Matches from '../../features/matches/Matches';
+import MobileNotifications from '../../features/notifications/MobileNotifications';
 
 const App: React.FC<RouteComponentProps> = ({ location }) => {
 	const [appLoaded, setAppLoaded] = useState(false);
@@ -80,6 +81,11 @@ const App: React.FC<RouteComponentProps> = ({ location }) => {
 										{user ? <ProfilePage /> : <Redirect to={'/'} />}
 									</Route>
 									<PrivateRoute exact path="/chat" component={Chat} />
+									<PrivateRoute
+										exact
+										path="/notifications"
+										component={MobileNotifications}
+									/>
 									<PrivateRoute component={NotFound} />
 								</Switch>
 							</Fragment>
