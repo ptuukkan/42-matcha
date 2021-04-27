@@ -18,41 +18,12 @@ impl Interest {
 		Ok(db_url + "_api/document/interests/")
 	}
 
-	// fn key_url(&self) -> Result<String, AppError> {
-	// 	Ok(format!("{}{}", &Self::url()?, self.key))
-	// }
-
-	// pub async fn create(&mut self) -> Result<(), AppError> {
-	// 	let res: CreateResponse = api::post(&Self::url()?, &self).await?;
-	// 	self.key = res.key;
-	// 	Ok(())
-	// }
-
 	pub async fn create_many(interests: Vec<Interest>) -> Result<Vec<String>, AppError> {
 		let url = Self::url()?;
 		let res: Vec<CreateResponse> = api::post(&url, &interests).await?;
 		let keys = res.into_iter().map(|x| x.key).collect();
 		Ok(keys)
 	}
-
-	// pub async fn get(key: &str) -> Result<Self, AppError> {
-	// 	let url = format!("{}{}", Self::url()?, key);
-	// 	let user = api::get(&url).await?;
-	// 	Ok(user)
-	// }
-
-	// pub async fn find(key: &str, value: &str) -> Result<Vec<Self>, AppError> {
-	// 	let query = format!(
-	// 		"FOR i IN interests filter i.{} == '{}' return i",
-	// 		key, value
-	// 	);
-	// 	let result = CursorRequest::from(query)
-	// 		.send()
-	// 		.await?
-	// 		.extract_all::<Self>()
-	// 		.await?;
-	// 	Ok(result)
-	// }
 
 	pub async fn get_all() -> Result<Vec<Self>, AppError> {
 		let query = "FOR i IN interests return i";
