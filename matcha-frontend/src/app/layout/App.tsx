@@ -31,6 +31,7 @@ const App: React.FC<RouteComponentProps> = ({ location }) => {
 	const [appLoaded, setAppLoaded] = useState(false);
 	const rootStore = useContext(RootStoreContext);
 	const { token, getUser, logoutUser, user } = rootStore.userStore;
+	const { isCompleted } = rootStore.profileStore;
 
 	useEffect(() => {
 		document.title = 'Matcha';
@@ -65,7 +66,11 @@ const App: React.FC<RouteComponentProps> = ({ location }) => {
 				<Switch>
 					<Route path="/verify/:link" component={EmailVerification} />
 					<Route path="/resetpassword/:link" component={ChangePassword} />
-					<Route exact path="/" component={user ? Browse : Landing} />
+					<Route exact path="/">
+						{user && !isCompleted && <Redirect to="/profile" />}
+						{user && isCompleted && <Browse />}
+						{!user && <Landing />}
+					</Route>
 					<Route
 						render={() => (
 							<Fragment>
