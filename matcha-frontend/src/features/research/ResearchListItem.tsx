@@ -10,7 +10,7 @@ interface IProps {
 const ResearchListItem: React.FC<IProps> = ({ profile }) => {
 	return (
 		<GridColumn key={profile.id} as={Link} to={`/profile/${profile.id}`}>
-			<Image src={profile.images.find((i) => i.isMain)?.url} wrapped />
+			<Image src={profile.images.find((i) => i.isMain)?.url} wrapped fluid />
 			<Header>
 				{profile.firstName} {profile.lastName}, {profile.age}
 			</Header>

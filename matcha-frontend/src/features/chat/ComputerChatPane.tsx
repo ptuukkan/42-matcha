@@ -22,11 +22,12 @@ interface IProps {
 
 const ComputerChatPane: React.FC<IProps> = ({ chat }) => {
 	const rootStore = useContext(RootStoreContext);
-	const [message, setMessage] = useState('');
 	const { sendChatMessage, readChat } = rootStore.chatStore;
 	const { profile } = rootStore.profileStore;
+	const [message, setMessage] = useState('');
 	const messageContainer = useRef<HTMLDivElement>(null);
 	const [error, setError] = useState(false);
+
 	const send = () => {
 		const wsMessage: IWsChatMessage = {
 			chatId: chat.chatId,
@@ -45,6 +46,9 @@ const ComputerChatPane: React.FC<IProps> = ({ chat }) => {
 				top: messageContainer.current.scrollHeight,
 			});
 		}
+	})
+
+	useEffect(() => {
 		if (chat.unread) {
 			readChat(chat.chatId);
 		}

@@ -33,7 +33,7 @@ async fn get_all(user: User) -> Result<HttpResponse, Error> {
 #[get("/api/chat/{id}")]
 async fn read(user: User, Path(id): Path<String>) -> Result<HttpResponse, Error> {
 	chat::read(user, id).await?;
-	Ok(HttpResponse::Ok().finish())
+	Ok(HttpResponse::Ok().content_type("text/plain").finish())
 }
 
 pub fn routes(config: &mut web::ServiceConfig) {

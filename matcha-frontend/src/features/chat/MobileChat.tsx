@@ -7,7 +7,7 @@ import MobileChatPane from './MobileChatPane';
 const MobileChat = () => {
 	const rootStore = useContext(RootStoreContext);
 	const { chats } = rootStore.chatStore;
-	const [selectedChat, setSelectedChat] = useState(chats[0]);
+	const [selectedChat, setSelectedChat] = useState(chats[0].chatId);
 
 	const chatOptions = chats.map((chat) => ({
 		key: chat.chatId,
@@ -27,10 +27,7 @@ const MobileChat = () => {
 		data: DropdownProps
 	) => {
 		if (data.value) {
-			const chat = chats.find((c) => c.chatId === data.value);
-			if (chat) {
-				setSelectedChat(chat);
-			}
+			setSelectedChat(data.value.toString());
 		}
 	};
 
@@ -43,7 +40,7 @@ const MobileChat = () => {
 				options={chatOptions}
 			/>
 			<Divider />
-			<MobileChatPane chat={selectedChat} />
+			<MobileChatPane chat={chats.find(c => c.chatId === selectedChat)!} />
 		</Segment>
 	);
 };

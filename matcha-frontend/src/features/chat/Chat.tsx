@@ -13,7 +13,7 @@ const Chat = () => {
 
 	useEffect(() => {
 		loadChats().finally(() => setLoading(false));
-	});
+	}, [loadChats]);
 
 	if (loading)
 		return (

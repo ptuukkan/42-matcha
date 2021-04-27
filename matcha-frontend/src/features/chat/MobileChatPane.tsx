@@ -20,8 +20,8 @@ const MobileChatPane: React.FC<IProps> = ({ chat }) => {
 	const { sendChatMessage, readChat } = rootStore.chatStore;
 	const { profile } = rootStore.profileStore;
 	const [message, setMessage] = useState('');
-	const [error, setError] = useState(false);
 	const messageContainer = useRef<HTMLDivElement>(null);
+	const [error, setError] = useState(false);
 
 	const send = () => {
 		const wsMessage: IWsChatMessage = {
@@ -41,6 +41,9 @@ const MobileChatPane: React.FC<IProps> = ({ chat }) => {
 				top: messageContainer.current.scrollHeight,
 			});
 		}
+	})
+
+	useEffect(() => {
 		if (chat.unread) {
 			readChat(chat.chatId);
 		}
