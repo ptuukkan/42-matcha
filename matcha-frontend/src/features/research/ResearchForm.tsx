@@ -54,7 +54,7 @@ const ResearchForm: React.FC<IProps> = ({ interests, loadProfiles, searchParams 
 						label="Distance"
 						name="distance"
 						min={0}
-						max={1000}
+						max={20000}
 						component={RangeInput}
 					/>
 					<Field

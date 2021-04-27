@@ -9,7 +9,7 @@ use crate::models::location::LocationDto;
 use crate::models::user::RegisterFormValues;
 use crate::models::user::User;
 use chrono::{naive::NaiveDate, DateTime, Datelike, Utc};
-use chrono_humanize::{Accuracy, HumanTime, Tense};
+use chrono_humanize::Humanize;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use serde_with_macros::skip_serializing_none;
@@ -294,12 +294,11 @@ impl TryFrom<Profile> for PublicProfileDto {
 		if let Ok(last_seen_date) =
 			DateTime::parse_from_str(&profile.last_seen, "%Y-%m-%d %H:%M:%S %z")
 		{
-			last_seen = HumanTime::from(last_seen_date).to_text_en(Accuracy::Rough, Tense::Past);
+			last_seen = last_seen_date.humanize();
 		} else {
 			last_seen = profile.last_seen;
 		}
 		Ok(Self {
-			last_seen,
 			id: profile.key,
 			first_name: profile.first_name,
 			last_name: profile.last_name,
@@ -316,6 +315,7 @@ impl TryFrom<Profile> for PublicProfileDto {
 			compatibility_rating: 0,
 			mutual_interests: 0,
 			blocked: false,
+			last_seen,
 		})
 	}
 }

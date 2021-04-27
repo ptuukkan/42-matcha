@@ -1,3 +1,4 @@
+use crate::models::block::Block;
 use crate::chat::server::WsServer;
 use crate::errors::AppError;
 use crate::models::notification::{
@@ -25,6 +26,9 @@ pub async fn create(
 	source_profile: &str,
 	ws_srv: Addr<WsServer>,
 ) -> Result<(), AppError> {
+	if Block::find(target_profile, source_profile).await?.is_some() {
+		return Ok(());
+	}
 	let mut notification = Notification::new(notification_type, target_profile, source_profile);
 	notification.create().await?;
 	let notification_dto = load_notification_dto(notification).await?;

@@ -89,7 +89,7 @@ const Browse = () => {
 					</Sidebar>
 
 					<Sidebar.Pusher>
-						<Segment basic>
+						<Segment basic style={{minHeight: "70vh"}}>
 							<BrowseList
 								profiles={profiles.filter(
 									(p) =>
