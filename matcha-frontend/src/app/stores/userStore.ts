@@ -10,8 +10,7 @@ import { RootStore } from './rootStore';
 import { history } from '../..';
 import { FORM_ERROR } from 'final-form';
 import { IValidationError } from '../models/errors';
-import { getPosition } from '../common/location/locationUtils';
-import { ILocation } from '../models/profile';
+import { getLocation } from '../common/location/locationUtils';
 
 export default class UserStore {
 	rootStore: RootStore;
@@ -85,17 +84,8 @@ export default class UserStore {
 	};
 
 	getUser = async () => {
-		let location: ILocation = { latitude: 0, longitude: 0 };
 		try {
-			const geoLocation = await getPosition({ timeout: 2000 });
-			location.latitude = geoLocation.coords.latitude;
-			location.longitude = geoLocation.coords.longitude;
-		} catch (error) {
-			const ipLocation = await agent.Location.get();
-			location.latitude = ipLocation.latitude;
-			location.longitude = ipLocation.longitude;
-		}
-		try {
+			const location = await getLocation();
 			const user = await agent.User.current(location);
 			await this.rootStore.profileStore.getProfile();
 			runInAction(() => {

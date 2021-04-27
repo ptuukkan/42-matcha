@@ -11,6 +11,7 @@ import {
 } from '../models/profile';
 import { RootStore } from './rootStore';
 import { history } from '../..';
+import { getLocation } from '../common/location/locationUtils';
 
 export default class ProfileStore {
 	rootStore: RootStore;
@@ -57,6 +58,9 @@ export default class ProfileStore {
 
 	updateProfile = async (data: IProfileFormValues): Promise<void | any> => {
 		try {
+			if (!data.locationOverride) {
+				data.location = await getLocation();
+			}
 			await agent.Profile.update(data);
 			runInAction(() => {
 				this.profile!.firstName = data.firstName;

@@ -47,14 +47,10 @@ pub async fn get_my(user: &User) -> Result<PrivateProfileDto, AppError> {
 pub async fn update(user: &User, mut values: ProfileFormValues) -> Result<(), AppError> {
 	values.validate().await?;
 	let profile = Profile::get(&user.profile).await?;
-	if values.location_override.is_some() && values.location.is_some() {
-		let ol = values.location_override.unwrap();
-		if ol {
-			let loc = values.location.unwrap();
-			let mut profile_location = Location::get(&profile.location).await?;
-			profile_location.coordinate = vec![loc.latitude, loc.longitude];
-			profile_location.update().await?;
-		}
+	if let Some(location) = values.location {
+		let mut profile_location = Location::get(&profile.location).await?;
+		profile_location.coordinate = vec![location.latitude, location.longitude];
+		profile_location.update().await?;
 	}
 	values.location = None;
 	if let Some(interests) = values.interests {
