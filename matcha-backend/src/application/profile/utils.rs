@@ -1,15 +1,16 @@
+use crate::application::notification;
 use crate::application::profile::WsServer;
-use actix::Addr;
-use chrono::Utc;
 use crate::errors::AppError;
 use crate::models::block::Block;
 use crate::models::image::{Image, ImageDto};
 use crate::models::like::Like;
-use crate::models::profile::{Profile, ProfileWithDistance, PublicProfileDto};
-use crate::models::visit::Visit;
-use std::convert::TryFrom;
-use crate::application::notification;
 use crate::models::notification::NotificationType;
+use crate::models::profile::{Profile, ProfileWithDistance, PublicProfileDto};
+use crate::models::user::User;
+use crate::models::visit::Visit;
+use actix::Addr;
+use chrono::Utc;
+use std::convert::TryFrom;
 
 pub async fn visit(from: &str, to: &str, ws_srv: Addr<WsServer>) -> Result<(), AppError> {
 	notification::create(NotificationType::Visit, to, from, ws_srv).await?;
@@ -64,6 +65,9 @@ pub async fn load_profile_dto(
 			profile_dto.mutual_interests += 1;
 		}
 	}
+	if let Some(user) = User::find("profile", &key).await?.pop() {
+		profile_dto.username = user.username;
+	}
 	profile_dto.compatibility_rating = compatibility_rating(my_profile, &profile_dto)?;
 	profile_dto.blocked = Block::find(&my_profile.key, &key).await?.is_some();
 	Ok(profile_dto)
@@ -110,4 +114,3 @@ pub async fn set_offline(profile_key: &str) -> Result<(), AppError> {
 	profile.update().await?;
 	Ok(())
 }
-

@@ -267,6 +267,7 @@ impl From<Profile> for PrivateProfileDto {
 #[serde(rename_all = "camelCase")]
 pub struct PublicProfileDto {
 	pub id: String,
+	pub username: String,
 	first_name: String,
 	last_name: String,
 	pub age: u8,
@@ -300,6 +301,7 @@ impl TryFrom<Profile> for PublicProfileDto {
 		}
 		Ok(Self {
 			id: profile.key,
+			username: String::new(),
 			first_name: profile.first_name,
 			last_name: profile.last_name,
 			age,

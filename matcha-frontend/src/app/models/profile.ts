@@ -24,6 +24,7 @@ export interface IReportFormData {
 
 export interface IPublicProfile extends IProfile {
 	age: number;
+	username: string;
 	distance: number;
 	connected: boolean;
 	liked: boolean;
