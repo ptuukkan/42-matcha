@@ -3,6 +3,7 @@ import { Button, Grid, Header } from 'semantic-ui-react';
 import { RootStoreContext } from '../../app/stores/rootStore';
 import ProfileFormImagesDisplay from './ProfileFormImagesDisplay';
 import ImageUpload from '../../app/common/imageUpload/ImageUpload';
+import { observer } from 'mobx-react-lite';
 
 const ProfileFormImages = () => {
 	const [addImageMode, setAddImageMode] = useState(false);
@@ -24,6 +25,7 @@ const ProfileFormImages = () => {
 					<Button
 						floated="right"
 						type="button"
+						disabled={profile!.images.length === 5}
 						primary
 						content={addImageMode ? 'Cancel' : 'Add Photo'}
 						onClick={() => setAddImageMode(!addImageMode)}
@@ -47,4 +49,4 @@ const ProfileFormImages = () => {
 	);
 };
 
-export default ProfileFormImages;
+export default observer(ProfileFormImages);

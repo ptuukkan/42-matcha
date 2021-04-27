@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom';
-import { Form, Header, Button } from 'semantic-ui-react';
+import { Form, Header, Button, Grid } from 'semantic-ui-react';
 import TextInput from '../../app/common/form/TextInput';
 import { Form as FinalForm, Field } from 'react-final-form';
 import agent from '../../app/api/agent';
@@ -44,32 +44,34 @@ const ChangePassword = () => {
 	if (finish) return <Header>Password successfully changed!</Header>;
 
 	return (
-		<div>
-			<Header>Reset your password</Header>
-			<FinalForm
-				onSubmit={onSubmit}
-				validate={formValidation.validateForm}
-				render={({
-					handleSubmit,
-					submitError,
-					dirtySinceLastSubmit,
-					submitting,
-				}) => (
-					<Form onSubmit={handleSubmit} error>
-						<Field
-							type="password"
-							name="password"
-							placeholder="Password"
-							component={TextInput}
-						/>
-						{submitError && !dirtySinceLastSubmit && (
-							<ErrorMessage message={submitError} />
-						)}
-						<Button primary loading={submitting} content="Reset password" />
-					</Form>
-				)}
-			/>
-		</div>
+		<Grid centered>
+			<Grid.Column>
+				<Header>Reset your password</Header>
+				<FinalForm
+					onSubmit={onSubmit}
+					validate={formValidation.validateForm}
+					render={({
+						handleSubmit,
+						submitError,
+						dirtySinceLastSubmit,
+						submitting,
+					}) => (
+						<Form onSubmit={handleSubmit} error>
+							<Field
+								type="password"
+								name="password"
+								placeholder="Password"
+								component={TextInput}
+							/>
+							{submitError && !dirtySinceLastSubmit && (
+								<ErrorMessage message={submitError} />
+							)}
+							<Button primary loading={submitting} content="Reset password" />
+						</Form>
+					)}
+				/>
+			</Grid.Column>
+		</Grid>
 	);
 };
 

@@ -51,7 +51,7 @@ const ProfileVisit = () => {
 					/>
 					<Item.Content>
 						<Item.Header>
-							{profile!.firstName} {profile!.lastName}
+							{profile!.firstName} {profile!.lastName}, {profile!.age}
 							{profile!.connected && (
 									<Label color="pink" horizontal style={{marginLeft: 10}}>
 										Matched

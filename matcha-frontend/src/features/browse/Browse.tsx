@@ -12,16 +12,16 @@ import { IPublicProfile } from '../../app/models/profile';
 import agent from '../../app/api/agent';
 import BrowseList from './BrowseList';
 import BrowseListSorter from './BrowseListSorter';
-import BrowseListFilter from './BrowseListFilter';
 import { RootStoreContext } from '../../app/stores/rootStore';
+import BrowseListFilter from './BrowseListFilter';
 
 const Browse = () => {
 	const [profiles, setProfiles] = useState<IPublicProfile[]>([]);
-	const [compatibility, setCompatibility] = useState<Number[]>([0, 100]);
-	const [ages, setAges] = useState<Number[]>([18, 100]);
-	const [radius, setRadius] = useState<Number[]>([0, 1000]);
-	const [famerate, setFamerate] = useState<Number[]>([0, 10]);
-	const [mutualInterests, setMutualInterests] = useState<Number[]>([0, 10]);
+	const [compatibility, setCompatibility] = useState<number[]>([0, 100]);
+	const [ages, setAges] = useState<number[]>([18, 100]);
+	const [radius, setRadius] = useState<number[]>([0, 1000]);
+	const [famerate, setFamerate] = useState<number[]>([0, 10]);
+	const [mutualInterests, setMutualInterests] = useState<number[]>([0, 10]);
 	const [loading, setLoading] = useState(false);
 	const [visible, setVisible] = useState(false);
 	const rootStore = useContext(RootStoreContext);
@@ -89,7 +89,7 @@ const Browse = () => {
 					</Sidebar>
 
 					<Sidebar.Pusher>
-						<Segment basic style={{minHeight: "70vh"}}>
+						<Segment basic style={{ minHeight: '75vh' }}>
 							<BrowseList
 								profiles={profiles.filter(
 									(p) =>

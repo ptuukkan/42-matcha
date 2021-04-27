@@ -24,10 +24,10 @@ const ResearchList: React.FC<IProps> = ({
 	setProfiles,
 	setSearchMode,
 }) => {
-	const [ages, setAges] = useState<Number[]>([18, 100]);
-	const [radius, setRadius] = useState<Number[]>([0, 20000]);
-	const [famerate, setFamerate] = useState<Number[]>([0, 10]);
-	const [mutualInterests, setMutualInterests] = useState<Number[]>([0, 10]);
+	const [ages, setAges] = useState<number[]>([18, 100]);
+	const [radius, setRadius] = useState<number[]>([0, 20000]);
+	const [famerate, setFamerate] = useState<number[]>([0, 10]);
+	const [mutualInterests, setMutualInterests] = useState<number[]>([0, 10]);
 	const [showSideBar, setShowSideBar] = useState(false);
 
 	const filterProfiles = () => {
