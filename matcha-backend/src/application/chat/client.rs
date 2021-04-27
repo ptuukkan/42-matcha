@@ -65,21 +65,6 @@ impl Actor for WsSession {
 
 	fn started(&mut self, ctx: &mut Self::Context) {
 		self.hb(ctx);
-		// let addr = ctx.address();
-		// self.addr
-		// 	.send(Connect {
-		// 		addr: addr.recipient(),
-		// 	})
-		// 	.into_actor(self)
-		// 	.then(|res, act, ctx| {
-		// 		match res {
-		// 			Ok(res) => act.id = res,
-
-		// 			_ => ctx.stop(),
-		// 		}
-		// 		fut::ready(())
-		// 	})
-		// 	.wait(ctx);
 	}
 
 	fn stopping(&mut self, _ctx: &mut Self::Context) -> Running {
@@ -164,8 +149,6 @@ impl WsSession {
 	fn hb(&self, ctx: &mut ws::WebsocketContext<Self>) {
 		ctx.run_interval(HEARTBEAT_INTERVAL, |act, ctx| {
 			if Instant::now().duration_since(act.hb) > CLIENT_TIMEOUT {
-				// println!("Websocket Client heartbeat failed, disconnecting!");
-				// act.addr.do_send(Disconnect { id: act.id });
 				ctx.stop();
 				return;
 			}
