@@ -1,7 +1,6 @@
 import { observer } from 'mobx-react-lite';
 import React, { useContext, useState } from 'react';
 import { Divider, Dropdown, DropdownProps, Segment } from 'semantic-ui-react';
-import { IChat } from '../../app/models/chat';
 import { RootStoreContext } from '../../app/stores/rootStore';
 import MobileChatPane from './MobileChatPane';
 

@@ -4,13 +4,13 @@ use actix_web::error::Error;
 use actix_web::web::Json;
 use actix_web::{get, post, web, HttpResponse};
 
-#[get("/notification")]
+#[get("/api/notification")]
 async fn get_notifications(user: User) -> Result<HttpResponse, Error> {
 	let notifications = notification::get_all(user).await?;
 	Ok(HttpResponse::Ok().json(notifications))
 }
 
-#[post("/notification")]
+#[post("/api/notification")]
 async fn read_notifications(
 	_user: User,
 	notifications: Json<Vec<String>>,
@@ -19,7 +19,7 @@ async fn read_notifications(
 	Ok(HttpResponse::Ok().finish())
 }
 
-#[post("/notification/clear")]
+#[post("/api/notification/clear")]
 async fn clear_notifications(
 	_user: User,
 	notifications: Json<Vec<String>>,

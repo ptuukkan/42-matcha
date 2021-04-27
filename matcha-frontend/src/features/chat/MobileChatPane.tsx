@@ -7,7 +7,7 @@ import React, {
 	useRef,
 	useState,
 } from 'react';
-import { Ref, Container, Message, Input, Dimmer, Loader } from 'semantic-ui-react';
+import { Ref, Container, Message, Input } from 'semantic-ui-react';
 import { IChat, IWsChatMessage } from '../../app/models/chat';
 import { RootStoreContext } from '../../app/stores/rootStore';
 

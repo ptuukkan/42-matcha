@@ -7,19 +7,19 @@ use crate::models::user::{RegisterFormValues, User};
 use actix_web::error::Error;
 use actix_web::{get, post, web, web::Json, web::Path, HttpResponse};
 
-#[post("/user/login")]
+#[post("/api/user/login")]
 async fn login(values: Json<LoginFormValues>) -> Result<HttpResponse, Error> {
 	let user = user::login(values.into_inner()).await?;
 	Ok(HttpResponse::Ok().json(user))
 }
 
-#[post("/user/register")]
+#[post("/api/user/register")]
 async fn register(values: Json<RegisterFormValues>) -> Result<HttpResponse, Error> {
 	user::register::register(values.into_inner()).await?;
 	Ok(HttpResponse::Created().finish())
 }
 
-#[post("/user/credentials")]
+#[post("/api/user/credentials")]
 async fn credentials(
 	user: User,
 	values: Json<user::CredentialChangeValues>,
@@ -28,13 +28,13 @@ async fn credentials(
 	Ok(HttpResponse::Ok().finish())
 }
 
-#[post("/user/password/reset")]
+#[post("/api/user/password/reset")]
 async fn reset(values: Json<ResetFormValues>) -> Result<HttpResponse, Error> {
 	user::password::reset(values.into_inner()).await?;
 	Ok(HttpResponse::Ok().finish())
 }
 
-#[post("/user/password/reset/{reset_link}")]
+#[post("/api/user/password/reset/{reset_link}")]
 async fn reset_password(
 	Path(link): Path<String>,
 	values: Json<ResetPasswordValues>,
@@ -43,13 +43,13 @@ async fn reset_password(
 	Ok(HttpResponse::Ok().finish())
 }
 
-#[get("/user/verify/{link}")]
+#[get("/api/user/verify/{link}")]
 async fn verify(Path(link): Path<String>) -> Result<HttpResponse, Error> {
 	user::register::verify(&link).await?;
 	Ok(HttpResponse::Ok().finish())
 }
 
-#[post("/user/current")]
+#[post("/api/user/current")]
 async fn current_user(user: User, location: Json<LocationDto>) -> Result<HttpResponse, Error> {
 	location::update(&user, location.into_inner()).await?;
 	Ok(HttpResponse::Ok().json(user.login_response("").await?))

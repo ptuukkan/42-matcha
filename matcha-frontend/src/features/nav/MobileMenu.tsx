@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Menu, Icon, Label, Popup } from 'semantic-ui-react';
 import { RootStoreContext } from '../../app/stores/rootStore';
-import Notifications from '../notifications/Notifications';
 
 interface IProps {
 	logoutUser: () => void;

@@ -1,7 +1,6 @@
 import { observer } from 'mobx-react-lite';
-import React, { Fragment, useContext } from 'react';
+import { Fragment, useContext } from 'react';
 import { Menu, Tab, Image, Label } from 'semantic-ui-react';
-import { IChat } from '../../app/models/chat';
 import { RootStoreContext } from '../../app/stores/rootStore';
 import ComputerChatPane from './ComputerChatPane';
 

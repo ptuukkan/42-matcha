@@ -24,13 +24,13 @@ async fn chat_route(
 	)
 }
 
-#[get("/chat")]
+#[get("/api/chat")]
 async fn get_all(user: User) -> Result<HttpResponse, Error> {
 	let chats = chat::get_all(user).await?;
 	Ok(HttpResponse::Ok().json(chats))
 }
 
-#[get("/chat/{id}")]
+#[get("/api/chat/{id}")]
 async fn read(user: User, Path(id): Path<String>) -> Result<HttpResponse, Error> {
 	chat::read(user, id).await?;
 	Ok(HttpResponse::Ok().finish())

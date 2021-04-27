@@ -8,13 +8,13 @@ use actix_web::error::Error;
 use actix_web::web::{Json, Path};
 use actix_web::{delete, get, post, put, web, HttpResponse};
 
-#[get("/profile")]
+#[get("/api/profile")]
 async fn get_my_profile(user: User) -> Result<HttpResponse, Error> {
 	let profile = profile::get_my(&user).await?;
 	Ok(HttpResponse::Ok().json(profile))
 }
 
-#[get("/profile/{id}")]
+#[get("/api/profile/{id}")]
 async fn get_profile(
 	user: User,
 	Path(id): Path<String>,
@@ -24,19 +24,19 @@ async fn get_profile(
 	Ok(HttpResponse::Ok().json(profile))
 }
 
-#[get("/profile/{id}/block")]
+#[get("/api/profile/{id}/block")]
 async fn block_profile(user: User, Path(id): Path<String>) -> Result<HttpResponse, Error> {
 	profile::block_profile(&user, &id).await?;
 	Ok(HttpResponse::Ok().finish())
 }
 
-#[delete("/profile/{id}/block")]
+#[delete("/api/profile/{id}/block")]
 async fn unblock_profile(user: User, Path(id): Path<String>) -> Result<HttpResponse, Error> {
 	profile::unblock_profile(&user, &id).await?;
 	Ok(HttpResponse::Ok().finish())
 }
 
-#[post("/profile/{id}/report")]
+#[post("/api/profile/{id}/report")]
 async fn report_profile(
 	user: User,
 	Path(id): Path<String>,
@@ -46,7 +46,7 @@ async fn report_profile(
 	Ok(HttpResponse::Ok().finish())
 }
 
-#[get("/profile/{id}/like")]
+#[get("/api/profile/{id}/like")]
 async fn like_profile(
 	user: User,
 	Path(id): Path<String>,
@@ -56,7 +56,7 @@ async fn like_profile(
 	Ok(HttpResponse::Ok().json(&res))
 }
 
-#[delete("/profile/{id}/like")]
+#[delete("/api/profile/{id}/like")]
 async fn unlike_profile(
 	user: User,
 	Path(id): Path<String>,
@@ -66,7 +66,7 @@ async fn unlike_profile(
 	Ok(HttpResponse::Ok().finish())
 }
 
-#[put("/profile")]
+#[put("/api/profile")]
 async fn update_profile(
 	user: User,
 	values: Json<ProfileFormValues>,
@@ -75,25 +75,25 @@ async fn update_profile(
 	Ok(HttpResponse::Ok().finish())
 }
 
-#[post("/profile/image")]
+#[post("/api/profile/image")]
 async fn create_image(user: User, parts: awmp::Parts) -> Result<HttpResponse, Error> {
 	let image = profile::image::create(user, parts).await?;
 	Ok(HttpResponse::Created().json(image))
 }
 
-#[delete("/profile/image/{id}")]
+#[delete("/api/profile/image/{id}")]
 async fn delete_image(user: User, Path(id): Path<String>) -> Result<HttpResponse, Error> {
 	profile::image::delete(user, &id).await?;
 	Ok(HttpResponse::Ok().finish())
 }
 
-#[put("/profile/image/{id}")]
+#[put("/api/profile/image/{id}")]
 async fn set_main(user: User, Path(id): Path<String>) -> Result<HttpResponse, Error> {
 	profile::image::set_main(user, &id).await?;
 	Ok(HttpResponse::Ok().finish())
 }
 
-#[get("/interests")]
+#[get("/api/interests")]
 async fn get_interests(_user: User) -> Result<HttpResponse, Error> {
 	let interests = profile::interest::get().await?;
 	Ok(HttpResponse::Ok().json(interests))
