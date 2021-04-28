@@ -34,7 +34,6 @@ export default class ProfileStore {
 			await this.rootStore.chatStore.loadChats();
 			if (!this.isCompleted) {
 				history.push('/profile');
-				toast.info("Welcome! Please fill your profile.")
 			}
 		} catch (error) {
 			console.log(error);

@@ -24,6 +24,7 @@ const BrowseListItem: React.FC<IProps> = ({
 				ui={false}
 				as={Link}
 				to={`/profile/${profile.id}`}
+				fluid
 			/>
 			<div className="profileinfo">
 				<Card.Header as="h1" style={{ marginBottom: 0 }}>

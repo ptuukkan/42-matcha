@@ -8,6 +8,7 @@ import {
 	Menu,
 	Rating,
 	Header,
+	Message,
 } from 'semantic-ui-react';
 import { RootStoreContext } from '../../app/stores/rootStore';
 import ChangeCredentials from '../user/ChangeCredentials';
@@ -17,12 +18,13 @@ import ProfileStatistics from './ProfileStatistics';
 
 const ProfilePage = () => {
 	const rootStore = useContext(RootStoreContext);
-	const { profile, updateProfile } = rootStore.profileStore;
+	const { profile, updateProfile, isCompleted } = rootStore.profileStore;
 	const { openModal, closeModal } = rootStore.modalStore;
 
 	return (
 		<Fragment>
 			<Item.Group divided>
+				{!isCompleted && <Message info content='Welcome! Please fill in your profile and add at least one image.'/>}
 				<Item>
 					<Item.Image
 						size="small"
