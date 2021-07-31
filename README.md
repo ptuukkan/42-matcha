@@ -7,7 +7,7 @@ the profile of other users, like them and chat with those that liked back.
 ## Constraints
 - Front end must use HTML, CSS, and JavaScript.
 - Database must be relational or graph oriented.
-- ORM and User Accounts Manager is forbidden.
+- Using ORM or User Account Manager is forbidden.
 - Application must be mobile friendly.
 
 ## Solution
@@ -17,4 +17,6 @@ We divided our work so that Antti focused more on front end while I on back end.
 
 It was really interesting and fun to learn Rust in this project. Definitely my new favorite language!
 
-## Screenshots
+## Demo
+https://user-images.githubusercontent.com/32325110/127747991-e482fd94-a413-4910-b18d-42a78dd99774.mp4
+
